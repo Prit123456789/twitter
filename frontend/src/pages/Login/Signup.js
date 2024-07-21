@@ -28,7 +28,7 @@ const Signup = () => {
                 email: email,
             }
 
-            fetch('https://twitter-kpoy.vercel.app//register', {
+            fetch('https://twitter-jy1w.onrender.com//register', {
                 method: "POST",
                 headers: {
                     'content-type': 'application/json'

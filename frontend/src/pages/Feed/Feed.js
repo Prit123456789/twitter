@@ -7,7 +7,7 @@ function Feed() {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        fetch('https://twitter-kpoy.vercel.app/post')
+        fetch('https://twitter-jy1w.onrender.com/post')
             .then(res => res.json())
             .then(data => {
                 setPosts(data);
