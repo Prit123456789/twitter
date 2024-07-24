@@ -1,7 +1,7 @@
 import React from "react";
 import "./Post.css";
 import { Avatar } from "@mui/material";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser"
+import VerifiedUserIcon from "@mui/icons-material/Verified"
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -20,8 +20,8 @@ function Post({ p }) {
           <div className="post__headerText">
             <h3>{name}{" "}
               <span className="post__headerSpecial">
-                <VerifiedUserIcon className="post__badge" /> @{username}
-              </span>
+                <VerifiedUserIcon className="post__badge" />
+               </span> <p className="post__headerSpecial">@{username}</p>
             </h3>
           </div>
           <div className="post__headerDescription">

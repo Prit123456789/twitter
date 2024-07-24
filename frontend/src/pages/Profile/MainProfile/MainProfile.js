@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import EditProfile from '../EditProfile/EditProfile';
 import axios from "axios";
 import useLoggedInUser from '../../../hooks/useLoggedInUser';
+import ObtainLocation from  '../ObtainLocation';
 
 
 const MainProfile = ({ user }) => {
@@ -21,7 +22,7 @@ const MainProfile = ({ user }) => {
   const username = user?.email?.split('@')[0];
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    fetch(`https://twitter-jy1w.onrender.com//userpost?email=${user?.email}`)
+    fetch(`https://twitter-jy1w.onrender.com/userpost?email=${user?.email}`)
       .then(res => res.json())
       .then(data => {
         setPosts(data);
@@ -47,7 +48,7 @@ const MainProfile = ({ user }) => {
         setIsLoading(false)
 
         if (url) {
-          fetch(`https://twitter-jy1w.onrender.com//userUpdates/${user?.email}`, {
+          fetch(`https://twitter-jy1w.onrender.com/userUpdates/${user?.email}`, {
             method: "PATCH",
             headers: {
               'content-type': 'application/json'
@@ -86,7 +87,7 @@ const MainProfile = ({ user }) => {
         }
         setIsLoading(false)
         if (url) {
-          fetch(`https://twitter-jy1w.onrender.com//userUpdates/${user?.email}`, {
+          fetch(`https://twitter-jy1w.onrender.com/userUpdates/${user?.email}`, {
             method: "PATCH",
             headers: {
               'content-type': 'application/json'
@@ -174,16 +175,20 @@ const MainProfile = ({ user }) => {
                     {loggedInUser[0]?.location ? <p className='subInfo'><MyLocationIcon /> {loggedInUser[0].location}</p> : ''}
                     {loggedInUser[0]?.website ? <p className='subInfo link'><AddLinkIcon /> {loggedInUser[0].website}</p> : ''}
                   </div>
+                </div> 
+                <div>
+                   <ObtainLocation/>
                 </div>
                 <h4 className='tweetsText'>Tweets</h4>
                 <hr />
               </div>
               {
-                posts.map(p => <Post p={p} />)
+                posts.map(p => <Post id={p._id} p={p}/>)
               }
             </div>
           }
         </div>
+        
       </div>
     </div>
   );

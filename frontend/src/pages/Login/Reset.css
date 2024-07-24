@@ -1,62 +1,14 @@
-.login-container {
-    display: flex;
-    flex: 1;
-    width: 100vw;
-
-
-}
-
-.form-container {
-    flex: 1;
-    padding: 50px;
-    margin: 10px;
-    /* margin-left: -50px; */
-    align-content: center;
-
-.forgot{
-    text-align: center;
-    color: var(--twitter-color);
-}
-
-}
-
-.form-box {
-    justify-content: left;
-    align-items: inherit;
-    grid-row: auto;
-}
-
 .Twitter-img {
     color: skyblue;
     max-width: 50%;
 
 }
-
-.input-form {
-    width: 20px;
-
-}
-
-.heading,
-h1 {
-    font-size: 50px
-}
-
-.heading1,
-h3 {
-    font-size: 35px;
-
-    justify-content: end
-}
-
-
 .image-container {
     flex: 2;
     margin-left: -100px;
 
 
 }
-
 .image {
     max-width: 100%;
     height: 100%;
@@ -65,19 +17,15 @@ h3 {
 
 
 }
-
 input {
     display: grid;
     margin-bottom: 1px;
     padding: 5px;
     background-color: white;
     margin-top: 20px;
-
+    
 }
-
-.email,
-.password {
-
+.email{
     background-color: #E8F0FE;
     width: 70%;
     border-radius: 8px;
@@ -85,22 +33,6 @@ input {
     border: none;
     outline: none;
 }
-
-.display-name {
-
-
-    background-color: #E8F0FE;
-    width: 70%;
-    border-radius: 8px;
-    padding: 14px;
-    border: none;
-    outline: none;
-
-}
-
-
-
-
 .btn-login {
     padding: 7px;
 }
@@ -117,40 +49,28 @@ input {
     margin-bottom: 20px;
     margin-top: 15px;
 }
-
-.g-btn {
-    border: 1px solid;
-    height: 40px !important;
-    line-height: 40px !important;
-    font-size: 15px !important;
-    width: 70% !important;
+.reset-container{
+    display: flex;
+    flex: 1;
+    width: 100vw;
+}
+.reset-form{
+    flex: 1;
+    padding: 50px;
     margin: 10px;
+    /* margin-left: -50px; */
+    align-content: center;
 }
-
-.google-button {
-    margin-top: 5%;
+.form-box {
+    justify-content: left;
+    align-items: inherit;
+    grid-row: auto;
 }
-
-.g-btn>div,
-.g-btn>div>svg {
-    height: 30px !important;
-
+h1 {
+    font-size: 50px
 }
-
-.errorMessage {
-    color: red;
-    font-weight: 500;
-    margin: 10px 0;
-}
-
-.signUpText>Link {
-    text-decoration: none;
-    color: var(--twitter-color) !important;
-
-}
-
 @media screen and (max-width:688px) {
-    .login-container {
+    .reset-container {
         order: 2;
         display: flex;
         flex-direction: column;
@@ -158,7 +78,7 @@ input {
 
     }
 
-    .form-container {
+    .reset-form {
         padding: 10px;
     }
 

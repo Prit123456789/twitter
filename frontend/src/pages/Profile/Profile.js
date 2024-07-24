@@ -1,10 +1,13 @@
-import React from 'react'
-import '../pages.css'
-import { useUserAuth } from "../../context/UserAuthContext"
-import MainProfile from './MainProfile/MainProfile'
+import React from 'react';
+import '../pages.css';
+import './ObtainLocation';
+import { useUserAuth } from "../../context/UserAuthContext";
+import MainProfile from './MainProfile/MainProfile';
+
+
 
 function Profile() {
-
+   
     const { user } = useUserAuth();
     return (
         <div className='profilePage'>

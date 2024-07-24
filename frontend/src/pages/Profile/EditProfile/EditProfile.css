@@ -28,11 +28,11 @@
 
 .header>.save-btn {
   margin-right: 10px;
-  color: aliceblue;
-  background-color: black;
+  color: white;
+  background-color: var(--twitter-color)!important;
   padding: 5px 20px;
   border-radius: 20px;
-
+  border-color: var(--twitter-color)!important;
 }
 
 .header__twittericon {
@@ -55,7 +55,6 @@
   height: 200px;
   width: 100%;
   margin-top: 5px;
-  ;
   background-color: #b4b7b9;
   margin-bottom: 5px;
 }
@@ -91,8 +90,8 @@
 
 .fill-content>.text-field {
   padding-bottom: 10px;
-  border: none;
-
+  border-radius: 200px; ;
+  
 }
 
 .birthdate-section {

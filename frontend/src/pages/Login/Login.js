@@ -24,7 +24,9 @@ const Login = () => {
             window.alert(err.message);
         }
     };
-
+    const handleReset=()=>{
+        navigate("/reset");
+    }
     const handleGoogleSignIn = async (e) => {
         e.preventDefault();
         try {
@@ -68,11 +70,11 @@ const Login = () => {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
 
-
                             <div className="btn-login">
                                 <button type="submit" className="btn" >Log In</button>
                             </div>
                         </form>
+                                 <p onClick={handleReset} className="forgot">Forgot Password?</p>
                         <hr />
                         <div>
                             <GoogleButton

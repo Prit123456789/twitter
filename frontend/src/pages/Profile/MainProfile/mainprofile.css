@@ -11,7 +11,7 @@
     height: 200px;
     width: 600px;
   }
-
+  
   .coverImageContainer {
     position: relative;
   }
@@ -118,7 +118,8 @@
   }
 
   .Edit-profile-btn {
-    background-color: white;
+    background-color: var(--twitter-color) !important;
+    color: white;
     padding: 10px;
     border: 1px solid;
     border-radius: 2rem;
@@ -160,7 +161,7 @@
     align-items: center;
     gap: 5px;
   }
-
+ 
   .link {
     color: var(--twitter-color);
     cursor: pointer;
