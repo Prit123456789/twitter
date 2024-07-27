@@ -12,13 +12,13 @@
     margin: 10px;
     /* margin-left: -50px; */
     align-content: center;
-
+}
 .forgot{
     text-align: center;
     color: var(--twitter-color);
+    cursor: pointer;
 }
 
-}
 
 .form-box {
     justify-content: left;
@@ -103,6 +103,7 @@ input {
 
 .btn-login {
     padding: 7px;
+   
 }
 
 .btn {
@@ -110,6 +111,7 @@ input {
     width: 75%;
     margin-right: 20px;
     padding: 14px;
+    color: white;
     border-radius: 8px;
     font-size: 17px;
     border: none;

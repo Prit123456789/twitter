@@ -12,11 +12,40 @@
 .image {
     max-width: 100%;
     height: 100%;
-    /* margin-left: -50px; */
-
-
-
+   
 }
+.gen-container{
+    display: flex;
+    align-items: center;
+}
+.gen-text{
+  width: 200px;
+  padding: 10px;
+  margin: 5px;
+  border: 2px solid black;
+  border-radius: 25px;
+  font-size: 16px;
+  text-align: center;
+}
+.pass-gen,.pass-copy{
+    padding: 10px 20px;
+    margin: 5px;
+    border: 2px solid;
+    border-radius: 25px;
+    background-color: var(--twitter-color)!important;
+    cursor: pointer;
+}
+.pass-copy{
+    width: 70px;
+    border-radius: 10px;
+    color: white;
+}
+
+.pass-gen{
+    font-size: x-small;
+    color: white;
+}
+
 input {
     display: grid;
     margin-bottom: 1px;

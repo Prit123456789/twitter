@@ -15,7 +15,8 @@ import Profile from "./pages/Profile/Profile";
 import Reset from "./pages/Login/Reset";
 import More from "./pages/More/More";
 import Notifications from "./pages/Notifications/Notifications";
-import NewPass from "./pages/Login/NewPass";
+
+
 
 function App() {
   return (
@@ -44,7 +45,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset" element={<Reset/>}/>
           <Route path="/signup" element={<Signup />} />
-          <Route path="/newpass" element={<NewPass/>}/>
+
         </Routes>
         </UserAuthContextProvider>
       </BrowserRouter>

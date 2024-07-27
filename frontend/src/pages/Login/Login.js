@@ -81,7 +81,7 @@ const Login = () => {
 
                                 className="g-btn"
                                 type="light"
-
+                                marginLeft='80px'
                                 onClick={handleGoogleSignIn}
                             />
 
@@ -96,7 +96,7 @@ const Login = () => {
                                 textDecoration: 'none',
                                 color: 'var(--twitter-color)',
                                 fontWeight: '600',
-                                marginLeft: '5px'
+                                marginLeft: '2px'
                             }}
                         >
                             Sign up
