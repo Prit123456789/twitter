@@ -83,8 +83,10 @@ const MyMapComponent = () => {
       getLocation();
       navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
+        city,
+        state,
+        country,
+        
       });
       fetchWeatherData(position.coords.latitude, position.coords.longitude)
       .then((weatherData) => {
