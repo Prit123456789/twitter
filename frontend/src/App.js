@@ -15,8 +15,7 @@ import Profile from "./pages/Profile/Profile";
 import Reset from "./pages/Login/Reset";
 import More from "./pages/More/More";
 import Notifications from "./pages/Notifications/Notifications";
-
-
+import MyMapComponent from "./pages/Profile/MyMapComponent";
 
 function App() {
   return (
@@ -45,7 +44,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset" element={<Reset/>}/>
           <Route path="/signup" element={<Signup />} />
-
+          <Route path="/maps" element={<MyMapComponent/>}/>
         </Routes>
         </UserAuthContextProvider>
       </BrowserRouter>

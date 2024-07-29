@@ -129,7 +129,16 @@
   .Edit-profile-btn:hover {
     background-color: rgb(207, 206, 206);
   }
-
+  .loc-btn{
+    background-color: var(--twitter-color) !important;
+    color: white;
+    padding: 10px;
+    border: 1px ;
+    border-radius: 2rem; 
+  }
+  .loc-btn:hover{
+    background-color: rgb(207, 206, 206);
+  }
   .Tweet {
     background-color: white;
     width: 20%;
@@ -141,7 +150,8 @@
   .tweetsText {
     margin-top: 20px;
     margin-left: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 5px; 
+    
   }
 
   .infoContainer {

@@ -1,0 +1,9 @@
+.modal {
+    background-color: white;
+    padding: 10px;
+    overflow-y: scroll;
+  }
+  
+  .modal::-webkit-scrollbar {
+    display: none;
+  }

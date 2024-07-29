@@ -1,6 +1,6 @@
 import React from 'react';
 import '../pages.css';
-import './ObtainLocation';
+import './MyMapComponent';
 import { useUserAuth } from "../../context/UserAuthContext";
 import MainProfile from './MainProfile/MainProfile';
 
