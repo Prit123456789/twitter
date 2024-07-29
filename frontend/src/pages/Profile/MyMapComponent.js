@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LoadScript, GoogleMap, Marker } from '@react-google-maps/api';
 import { Box,Modal} from '@mui/material';
+import {google} from 'google-geocoder'
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { InfoWindow } from '@react-google-maps/api';
@@ -20,14 +21,13 @@ const style = {
 const libraries = ['places']; // Include places library for searching
 
 const MyMapComponent = () => {
-  const [map, setMap] = useState(null);
+  const [maps, setMap] = useState(null);
   const [weatherData,setWeatherData]=useState();
   const [center, setCenter] = useState({ lat: 40.7128, lng: -74.0059 }); // Initial center coordinates
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const google=useState();
-
+  
   const handleLoad = (mapInstance) => {
     setMap(mapInstance);
   };
@@ -40,45 +40,46 @@ const MyMapComponent = () => {
     const data = await response.json();
     return data;
   };
-  function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition, showError);
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  }
-  function showError(){
-    alert("Couldn't fetch at this time")
-  }
-  function showPosition(position) {
-    const geocoder = new google.maps.Geocoder();
-    const latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
-    geocoder.geocode({ location: latlng }, (results, status) => {
-      if (status === "OK") {
-        const addressComponents = results[0].address_components;
-        const city = getAddressComponent(addressComponents, 'locality');
-        const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
-        const country = getAddressComponent(addressComponents, 'country');
-        const locationString = `${city}, ${state}, ${country}`;
-  
-        // Update the map display with the locationString
-        document.getElementById('location-display').textContent = locationString;
-      } else {
-        // Handle geocoding error
-      }
-    });
-  }
-  
-  function getAddressComponent(addressComponents, type) {
-    for (const component of addressComponents) {
-      if (component.types.includes(type)) {
-        return component.long_name;
-      }
-    }
-    return '';
-  }
   
   useEffect(() => {
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+    function showError(){
+      alert("Couldn't fetch at this time");
+    }
+    function showPosition(position) {
+      const geocoder = new google.maps.Geocoder();
+      const latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
+      geocoder.geocode({ location: latlng }, (results, status) => {
+        if (status === "OK") {
+          const addressComponents = results[0].address_components;
+          const city = getAddressComponent(addressComponents, 'locality');
+          const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
+          const country = getAddressComponent(addressComponents, 'country');
+          const locationString = `${city}, ${state}, ${country}`;
+    
+          // Update the map display with the locationString
+          document.getElementById('location-display').textContent = locationString;
+        } else {
+          // Handle geocoding error
+        }
+      });
+    }
+    
+    function getAddressComponent(addressComponents, type) {
+      for (const component of addressComponents) {
+        if (component.types.includes(type)) {
+          return component.long_name;
+        }
+      }
+      return '';
+    }
+    
       getLocation();
       navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
