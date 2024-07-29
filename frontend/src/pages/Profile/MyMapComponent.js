@@ -5,13 +5,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import { InfoWindow } from '@react-google-maps/api';
 
+
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 600,
-  height: 600,
+  height: 300,
   bgcolor: 'background.paper',
   boxShadow: 24,
   borderRadius: 8,
@@ -25,6 +26,7 @@ const MyMapComponent = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const google=useState();
 
   const handleLoad = (mapInstance) => {
     setMap(mapInstance);
@@ -38,9 +40,46 @@ const MyMapComponent = () => {
     const data = await response.json();
     return data;
   };
-
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }
+  function showError(){
+    alert("Couldn't fetch at this time")
+  }
+  function showPosition(position) {
+    const geocoder = new google.maps.Geocoder();
+    const latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
+    geocoder.geocode({ location: latlng }, (results, status) => {
+      if (status === "OK") {
+        const addressComponents = results[0].address_components;
+        const city = getAddressComponent(addressComponents, 'locality');
+        const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
+        const country = getAddressComponent(addressComponents, 'country');
+        const locationString = `${city}, ${state}, ${country}`;
+  
+        // Update the map display with the locationString
+        document.getElementById('location-display').textContent = locationString;
+      } else {
+        // Handle geocoding error
+      }
+    });
+  }
+  
+  function getAddressComponent(addressComponents, type) {
+    for (const component of addressComponents) {
+      if (component.types.includes(type)) {
+        return component.long_name;
+      }
+    }
+    return '';
+  }
+  
   useEffect(() => {
-    
+      getLocation();
       navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
         lat: position.coords.latitude,
