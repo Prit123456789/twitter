@@ -124,7 +124,7 @@ const MyMapComponent = () => {
     <InfoWindow position={center}>
       <div>
         <h3>{weatherData.name}</h3>
-        <h2>{weatherData.state},{weatherData.country}</h2>
+        <h2>{state},{country}</h2>
         <p>Temperature: {weatherData.main.temp}°C</p>
         <p>Description: {weatherData.weather[0].description}</p>
       </div>
