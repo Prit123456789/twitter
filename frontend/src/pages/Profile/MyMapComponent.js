@@ -83,11 +83,9 @@ const MyMapComponent = () => {
       getLocation();
       navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
-        city,
-        state,
-        country,
-        
-      });
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        });
       fetchWeatherData(position.coords.latitude, position.coords.longitude)
       .then((weatherData) => {
         // Update weather state with fetched data
@@ -126,6 +124,7 @@ const MyMapComponent = () => {
     <InfoWindow position={center}>
       <div>
         <h3>{weatherData.name}</h3>
+        <h2>{weatherData.state},{weatherData.country}</h2>
         <p>Temperature: {weatherData.main.temp}°C</p>
         <p>Description: {weatherData.weather[0].description}</p>
       </div>
