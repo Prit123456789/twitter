@@ -60,7 +60,7 @@ const MyMapComponent = () => {
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
         const locationString = `${city}, ${state}, ${country}`;
-        setLocation({ city, state, country });
+        
         // Update the map display with the locationString
         document.getElementById('location-display').textContent = locationString;
       } else {
