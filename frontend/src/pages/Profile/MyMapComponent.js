@@ -27,7 +27,6 @@ const MyMapComponent = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [location,setLocation]= useState({});
   
   const handleLoad = (mapInstance) => {
     setMap(mapInstance);
@@ -62,20 +61,11 @@ const MyMapComponent = () => {
         const country = getAddressComponent(addressComponents, 'country');
         const locationString = `${city}, ${state}, ${country}`;
         setLocation({ city, state, country });
-        setCenter({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          });
-        fetchWeatherData(position.coords.latitude, position.coords.longitude)
-        .then((weatherData) => {
-          // Update weather state with fetched data
-          setWeatherData(weatherData);
-        })
-        .catch((error) => {
-          console.error('Error fetching weather data:', error);
-        });
+        // Update the map display with the locationString
         document.getElementById('location-display').textContent = locationString;
-      } 
+      } else {
+        
+      }
     });
   }
   
@@ -89,7 +79,20 @@ const MyMapComponent = () => {
   }
   useEffect(() => {
       getLocation();
-      
+      navigator.geolocation.getCurrentPosition((position) => {
+      setCenter({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        });
+      fetchWeatherData(position.coords.latitude, position.coords.longitude)
+      .then((weatherData) => {
+        // Update weather state with fetched data
+        setWeatherData(weatherData);
+      })
+      .catch((error) => {
+        console.error('Error fetching weather data:', error);
+      });
+    });
   }, []);
   
   return (
@@ -119,7 +122,7 @@ const MyMapComponent = () => {
     <InfoWindow position={center}>
       <div>
         <h3>{weatherData.name}</h3>
-        <h2 id='location-display'>{location.city},{location.state},{location.country} </h2>
+        <h2 id='location-display'> </h2>
         <p>Temperature: {weatherData.main.temp}°C</p>
         <p>Description: {weatherData.weather[0].description}</p>
       </div>
