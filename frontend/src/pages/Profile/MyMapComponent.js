@@ -3,6 +3,7 @@ import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/ap
 import { Box, Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -18,10 +19,10 @@ const libraries = ['places']; // Include places library for searching
 
 const MyMapComponent = () => {
   const [map, setMap] = useState(null);
-  const [weatherData, setWeatherData] = useState();
-  const [center, setCenter] = useState({ lat: 40.7128, lng: -74.0059 }); // Initial center coordinates
+  const [weatherData, setWeatherData] = useState(null);
+  const [center, setCenter] = useState({lat:'',lng:''}); // Initial center coordinates
   const [open, setOpen] = useState(false);
-  const [locationData, setLocationData] = useState({});
+  const [locationData, setLocationData] = useState({ city: '', state: '', country: '' });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -38,7 +39,7 @@ const MyMapComponent = () => {
     const data = await response.json();
     return data;
   };
-
+  
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -46,6 +47,8 @@ const MyMapComponent = () => {
       alert("Geolocation is not supported by this browser.");
     }
   };
+ 
+
 
   const showError = () => {
     alert("Couldn't fetch at this time");
@@ -62,7 +65,6 @@ const MyMapComponent = () => {
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
         const locationString = `${city}, ${state}, ${country}`;
-
         setLocationData({ city, state, country });
 
         // Update the map display with the locationString
@@ -83,11 +85,24 @@ const MyMapComponent = () => {
   };
 
   useEffect(() => {
-    getLocation();
-    navigator.geolocation.getCurrentPosition((position) => {
+
+   getLocation((position)=>{
+     setCenter({
+     lat: position.coords.latitude,
+     lng: position.coords.longitude
+    });
+    setLocationData(position.coords.longitude,position.coords.latitude)
+    .then((locationData)=>{
+     setLocationData(locationData);
+    })
+    .catch((error)=>{
+    console.error('Error getting location details', error);
+    });
+    });
+      navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
-        lat: position.coords.latitude,
         lng: position.coords.longitude,
+        lat: position.coords.latitude,
       });
       fetchWeatherData(position.coords.latitude, position.coords.longitude)
         .then((weatherData) => {
@@ -96,9 +111,11 @@ const MyMapComponent = () => {
         .catch((error) => {
           console.error('Error fetching weather data:', error);
         });
+       
     });
   }, []);
-
+       
+  
   return (
     <LoadScript
       googleMapsApiKey="AIzaSyDCl54pE9PWGkFZ_QDRiJYEJruGc15FUIQ"
@@ -115,7 +132,7 @@ const MyMapComponent = () => {
         <Box sx={style}>
           <div className='header'>
             <IconButton onClick={() => setOpen(false)}><CloseIcon /></IconButton>
-            <h2 className='header-title'>Weather Conditions</h2>
+            <h2 className='header-title'>{locationData.city}</h2>
             <h2 className='save-btn'></h2>
           </div>
           <GoogleMap
@@ -129,9 +146,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4 id='location-display'>
-                    {locationData.city}, {locationData.state}, {locationData.country}
-                  </h4>
+                  <h4>{locationData.state},{locationData.country}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
