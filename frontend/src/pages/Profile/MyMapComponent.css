@@ -7,3 +7,30 @@
   .modal::-webkit-scrollbar {
     display: none;
   }
+  
+
+  .header {
+    margin-top: 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 0;
+    z-index: 1;
+    background-color: white;
+    top: 0px;
+    position: sticky;
+  }
+  
+  .header>.header-title {
+    font-size: 20px;
+    font-weight: 400;
+    margin-left: 40px;
+  }
+  .header>.save-btn {
+    margin-right: 10px;
+    color: white;
+    
+    padding: 5px 20px;
+    border-radius: 20px;
+  
+  }
