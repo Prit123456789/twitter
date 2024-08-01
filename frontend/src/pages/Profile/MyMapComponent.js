@@ -104,7 +104,7 @@ const MyMapComponent = () => {
         .catch((error) => {
           console.error('Error fetching weather data:', error);
         });  
-      fetchLocationData(latlng)
+      fetchLocationData(position.coords.latitude, position.coords.longitude )
       .then((locationData)=>{
         setLocationData(locationData);
       })
