@@ -48,7 +48,13 @@ const MyMapComponent = () => {
     }
   };
  
-
+   const fetchLocationData= async(latlng) => {
+   const apiKey='AIzaSyDCl54pE9PWGkFZ_QDRiJYEJruGc15FUIQ';
+   const apiUrl=`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlng}extra_computations=ADDRESS_DESCRIPTORS&key=${apiKey}`;
+   const response =await fetch(apiUrl);
+   const data = await response.json();
+   return data;
+   };
 
   const showError = () => {
     alert("Couldn't fetch at this time");
@@ -57,7 +63,7 @@ const MyMapComponent = () => {
   const showPosition = (position) => {
     const geocoder = new window.google.maps.Geocoder();
     const latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
-
+    
     geocoder.geocode({ location: latlng }, (results, status) => {
       if (status === "OK" && results[0]) {
         const addressComponents = results[0].address_components;
@@ -98,13 +104,13 @@ const MyMapComponent = () => {
         .catch((error) => {
           console.error('Error fetching weather data:', error);
         });  
-        showPosition(position.coords.latitude, position.coords.longitude)
-        .then((locationData)=>{
-          setLocationData(locationData);
-         })
-         .catch((error)=>{
-         console.error('Error getting location details', error);
-         });
+      fetchLocationData(latlng)
+      .then((locationData)=>{
+        setLocationData(locationData);
+      })
+      .catch((error)=>{
+        console.error('Error fetching location data:', error);
+      })
            
     });
   }, []);
