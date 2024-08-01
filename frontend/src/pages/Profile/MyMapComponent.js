@@ -30,7 +30,7 @@ const MyMapComponent = () => {
   const handleLoad = (mapInstance) => {
     setMap(mapInstance);
   };
-
+  useEffect(() => {
   const fetchWeatherData = async (lat, lng) => {
     const apiKey = 'd8a63be92e9856c6b85717af421ab957'; // Replace with your actual API key
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric`;
@@ -42,7 +42,7 @@ const MyMapComponent = () => {
   
   const getLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition, showError,setLocationData);
+      navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
       alert("Geolocation is not supported by this browser.");
     }
@@ -84,21 +84,8 @@ const MyMapComponent = () => {
     return '';
   };
 
-  useEffect(() => {
-
-    navigator.geolocation.getCurrentPosition((position)=>{
-     setCenter({
-     lat: position.coords.latitude,
-     lng: position.coords.longitude
-    });
-    getLocation(position.coords.latitude, position.coords.longitude)
-    .then((city, state, country)=>{
-     setLocationData(city, state, country);
-    })
-    .catch((error)=>{
-    console.error('Error getting location details', error);
-    });
-    });
+    
+      getLocation();
       navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
         lng: position.coords.longitude,
@@ -110,8 +97,15 @@ const MyMapComponent = () => {
         })
         .catch((error) => {
           console.error('Error fetching weather data:', error);
-        });
-       
+        });  
+        showPosition(position.coords.latitude, position.coords.longitude)
+        .then((locationData)=>{
+          setLocationData(locationData);
+         })
+         .catch((error)=>{
+         console.error('Error getting location details', error);
+         });
+           
     });
   }, []);
        
@@ -146,7 +140,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4>{locationData.state},{locationData.country}</h4>
+                  <h4 id='location-display'>{locationData.city},{locationData.state},{locationData.country}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
