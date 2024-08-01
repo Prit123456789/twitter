@@ -22,7 +22,7 @@ const MyMapComponent = () => {
   const [center, setCenter] = useState({ lat: '', lng: '' }); // Initial center coordinates
   const [open, setOpen] = useState(false);
   const [locationData, setLocationData] = useState({ city: '', state: '', country: '' });
-
+  const [locationString, setLocationString] = useState('');
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -74,10 +74,12 @@ const MyMapComponent = () => {
         const city = getAddressComponent(addressComponents, 'locality');
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
+        const locationString=`${city},${state},${country}`
         setLocationData({ city, state, country });
+        setLocationString(locationString);
 
         // Update the map display with the locationString
-        document.getElementById('location-display').textContent = `${city}, ${state}, ${country}`;
+        document.getElementById('location-display').textContent = locationString;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -112,7 +114,9 @@ const MyMapComponent = () => {
           <div className='header'>
             <IconButton onClick={handleClose}><CloseIcon /></IconButton>
             <h2 className='header-title'>Location</h2>
+            <h2 className='save-btn'></h2>
           </div>
+          <div id='location-display'>{locationString}</div> 
           <GoogleMap
             mapContainerStyle={{ width: '100%', height: '400px' }}
             zoom={10}
@@ -124,7 +128,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4 id='location-display'>{locationData.city}, {locationData.state}, {locationData.country}</h4>
+                  <h4 id='location-display'>{locationString}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
