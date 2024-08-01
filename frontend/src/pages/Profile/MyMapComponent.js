@@ -42,7 +42,7 @@ const MyMapComponent = () => {
   
   const getLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition, showError);
+      navigator.geolocation.getCurrentPosition(showPosition, showError,setLocationData);
     } else {
       alert("Geolocation is not supported by this browser.");
     }
@@ -86,12 +86,12 @@ const MyMapComponent = () => {
 
   useEffect(() => {
 
-   getLocation((position)=>{
+    navigator.geolocation.getCurrentPosition((position)=>{
      setCenter({
      lat: position.coords.latitude,
      lng: position.coords.longitude
     });
-    navigator.geolocation.getCurrentPosition(position.coords.longitude,position.coords.latitude)
+    getLocation(position.coords.latitude, position.coords.longitude)
     .then((locationData)=>{
      setLocationData(locationData);
     })
