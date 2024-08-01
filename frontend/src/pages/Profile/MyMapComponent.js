@@ -95,7 +95,7 @@ const MyMapComponent = () => {
       navigator.geolocation.getCurrentPosition((position) => {
       setCenter({
         lng: position.coords.longitude,
-        lat: position.coords.latitude,
+        lat: position.coords.latitude
       });
       fetchWeatherData(position.coords.latitude, position.coords.longitude)
         .then((weatherData) => {
@@ -104,7 +104,11 @@ const MyMapComponent = () => {
         .catch((error) => {
           console.error('Error fetching weather data:', error);
         });  
-      fetchLocationData(position.coords.latitude, position.coords.longitude )
+      setCenter({
+        lat: position.coords.latitude,
+         lng: position.coords.longitude      
+       });
+      fetchLocationData(position.coords.longitude, position.coords.latitude)
       .then((locationData)=>{
         setLocationData(locationData);
       })
@@ -132,7 +136,7 @@ const MyMapComponent = () => {
         <Box sx={style}>
           <div className='header'>
             <IconButton onClick={() => setOpen(false)}><CloseIcon /></IconButton>
-            <h2 className='header-title'>{locationData.city}</h2>
+            <h2 className='header-title'>Location</h2>
             <h2 className='save-btn'></h2>
           </div>
           <GoogleMap
@@ -146,7 +150,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4 id='location-display'>{locationData.name},{locationData.name},{locationData.name}</h4>
+                  <h4 id='location-display'>{locationData.city},{locationData.state},{locationData.country}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
