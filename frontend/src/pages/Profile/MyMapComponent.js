@@ -91,7 +91,7 @@ const MyMapComponent = () => {
      lat: position.coords.latitude,
      lng: position.coords.longitude
     });
-    setLocationData(position.coords.longitude,position.coords.latitude)
+    navigator.geolocation.getCurrentPosition(position.coords.longitude,position.coords.latitude)
     .then((locationData)=>{
      setLocationData(locationData);
     })
