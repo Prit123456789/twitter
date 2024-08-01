@@ -92,8 +92,8 @@ const MyMapComponent = () => {
      lng: position.coords.longitude
     });
     getLocation(position.coords.latitude, position.coords.longitude)
-    .then((locationData)=>{
-     setLocationData(locationData);
+    .then((city, state, country)=>{
+     setLocationData(city, state, country);
     })
     .catch((error)=>{
     console.error('Error getting location details', error);
