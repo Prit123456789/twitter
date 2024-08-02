@@ -22,7 +22,7 @@ const MyMapComponent = () => {
   const [center, setCenter] = useState({ lat: '', lng: '' }); // Initial center coordinates
   const [open, setOpen] = useState(false);
   const [locationData, setLocationData] = useState({ city: '', state: '', country: '' });
-
+  const [locationString, setLocationString] = useState('');
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -43,7 +43,7 @@ const MyMapComponent = () => {
     const fetchLocationData = async (lat, lng) => {
       const apiKey = 'AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws';
       const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
+      const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
       const data = await response.json();
       return data;
     };
@@ -68,15 +68,16 @@ const MyMapComponent = () => {
       try {
         const weatherData = await fetchWeatherData(lat, lng);
         setWeatherData(weatherData);
-
+        
         const locationData = await fetchLocationData(lat, lng);
         const addressComponents = locationData.results[0].address_components;
         const city = getAddressComponent(addressComponents, 'locality');
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
         setLocationData({ city, state, country });
+        
 
-        document.getElementById('location-display').textContent = `${city}, ${state}, ${country}`;
+        document.getElementById('location-display').textContent = `${city},${state},${country}`;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -113,6 +114,7 @@ const MyMapComponent = () => {
             <h2 className='header-title'>Location</h2>
             <h2 className='save-btn'></h2>
           </div>
+          <div id='location-display'>{locationString}</div> 
           <GoogleMap
             mapContainerStyle={{ width: '100%', height: '400px' }}
             zoom={10}
@@ -124,7 +126,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4>{locationData.city}, {locationData.state}, {locationData.country}</h4>
+                  <h4 >{locationData.city},{locationData.state},{locationData.state}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
