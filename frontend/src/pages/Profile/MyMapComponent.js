@@ -41,9 +41,11 @@ const MyMapComponent = () => {
     };
 
     const fetchLocationData = async (lat, lng) => {
-      const apiKey = 'AIzaSyDCl54pE9PWGkFZ_QDRiJYEJruGc15FUIQ';
-      const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-      const response = await fetch(apiUrl);
+      const apiKey = 'AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws';
+      const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+     const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
+
+
       const data = await response.json();
       return data;
     };
@@ -99,7 +101,7 @@ const MyMapComponent = () => {
 
   return (
     <LoadScript
-      googleMapsApiKey="AIzaSyDCl54pE9PWGkFZ_QDRiJYEJruGc15FUIQ"
+      googleMapsApiKey="AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws"
       libraries={libraries}
     >
       <button onClick={handleOpen} className='loc-btn'>Obtain Location</button>
