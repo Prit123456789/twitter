@@ -43,9 +43,7 @@ const MyMapComponent = () => {
     const fetchLocationData = async (lat, lng) => {
       const apiKey = 'AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws';
       const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-     const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
-
-
+      const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
       const data = await response.json();
       return data;
     };
@@ -80,7 +78,6 @@ const MyMapComponent = () => {
         setLocationData({ city, state, country });
         setLocationString(locationString);
 
-        // Update the map display with the locationString
         document.getElementById('location-display').textContent = locationString;
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -130,7 +127,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4 id='location-display'>{locationString}</h4>
+                  <h4 >{locationData.city},{locationData.state},{locationData.state}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
