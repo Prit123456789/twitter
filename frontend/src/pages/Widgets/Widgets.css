@@ -4,7 +4,13 @@
   overflow-y: scroll;
 }
 
-
+.Bot {
+  display: inline;
+  text-align: center;
+  display: flex;
+  align-items:center;
+  background-color: var(--twitter-background)!important;
+}
 .widgets::-webkit-scrollbar {
   display: none;
 }

@@ -5,12 +5,12 @@ body{
 .app{
   display: flex;
   height: 100vh;
-  max-width: 1300px;
+  max-width: 1080px;
   margin-right: auto;
   margin-left: auto;
   padding: 0 10px;
 }
-@media screen and (max-widht:688px){
+@media screen and (max-width:1080px){
   .app{
     display: block;
   }

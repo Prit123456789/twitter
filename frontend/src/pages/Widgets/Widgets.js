@@ -1,5 +1,6 @@
 import React from "react";
 import "./Widgets.css";
+import ChatBot from 'react-chatbot-kit';
 import {
   TwitterTimelineEmbed,
   TwitterTweetEmbed,
@@ -7,6 +8,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 
 function Widgets() {
+
   return (
     <div className="widgets">
       <div className="widgets__input">
@@ -24,10 +26,11 @@ function Widgets() {
           screenName="elonmusk"
           options={{ height: 400 }}
         />
-
+    
+      </div>
 
       </div>
-    </div>
+    
   );
 }
 

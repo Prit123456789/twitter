@@ -19,7 +19,7 @@ import { Avatar } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import CustomeLink from "./CumtomeLink";
+import CustomLink from "./CustomLink";
 import useLoggedInUser from "../../hooks/useLoggedInUser";
 import { useNavigate } from "react-router-dom";
 
@@ -31,7 +31,6 @@ function Sidebar({ handleLogout, user }) {
   const openMenu = Boolean(anchorEl);
   const [loggedInUser] = useLoggedInUser();
   const navigate = useNavigate();
-
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
     //console.log(e.currentTarget);
@@ -44,33 +43,36 @@ function Sidebar({ handleLogout, user }) {
 
     <div className="sidebar">
       <TwitterIcon className="sidebar__twitterIcon" />
-      <CustomeLink to='/home/feed'>
+      <CustomLink to='/home/feed'>
         <SidebarOptions active Icon={HomeIcon} text="Home" />
-      </CustomeLink>
-      <CustomeLink to='/home/explore'>
+      </CustomLink>
+      <CustomLink to='/home/explore'>
         <SidebarOptions Icon={SearchIcon} text="Explore" />
-      </CustomeLink>
-      <CustomeLink to='/home/notifications'>
+      </CustomLink>
+      <CustomLink to='/home/notifications'>
         <SidebarOptions Icon={NotificationsNoneIcon} text="Notifications" />
-      </CustomeLink>
-      <CustomeLink to='/home/messages'>
+      </CustomLink>
+      <CustomLink to='/home/messages'>
         <SidebarOptions Icon={MailOutlineIcon} text="Messages" />
-      </CustomeLink>
-      <CustomeLink to='/home/bookmarks'>
+      </CustomLink>
+      <CustomLink to='/home/bookmarks'>
         <SidebarOptions Icon={BookmarkBorderIcon} text="Bookmarks" />
-      </CustomeLink>
-      <CustomeLink to='/home/lists'>
+      </CustomLink>
+      <CustomLink to='/home/lists'>
         <SidebarOptions Icon={ListAltIcon} text="Lists" />
-      </CustomeLink>
-      <CustomeLink to='/home/profile'>
+      </CustomLink>
+      <CustomLink to='/home/profile'>
         <SidebarOptions Icon={PermIdentityIcon} text="Profile" />
-      </CustomeLink>
-      <CustomeLink to='/home/more'>
+      </CustomLink>
+      <CustomLink to='/home/more'>
         <SidebarOptions Icon={MoreIcon} text="More" />
-      </CustomeLink>
-      <Button variant="outlined" className="sidebar__tweet" fullWidth>
-        Tweet
-      </Button>
+      </CustomLink>
+      <CustomLink to='/home/chatbot'>
+        <Button variant="outlined" className="sidebar__tweet" fullWidth>
+          ChatBot
+        </Button>
+      </CustomLink>
+      
       <div className="Profile__info">
         <Avatar src={loggedInUser[0]?.profileImage ? loggedInUser[0]?.profileImage : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"} />
         <div className="user__info">

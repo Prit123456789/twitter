@@ -2,7 +2,7 @@
   border-right: 1px solid var(--twitter-background);
   flex: 0.3;
   position: inherit;
-  min-width: 150px;
+  min-width: 180px;
   margin-top: 20px;
   padding-right: 20px;
   overflow-y: scroll;

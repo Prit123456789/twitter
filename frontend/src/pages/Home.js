@@ -22,6 +22,7 @@ const Home = () => {
             <Sidebar handleLogout={handleLogout} user={user} />
             <Outlet />
             <Widgets />
+           
         </div>
     );
 };

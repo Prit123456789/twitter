@@ -16,6 +16,7 @@ import Reset from "./pages/Login/Reset";
 import More from "./pages/More/More";
 import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
+import ChatBot from './pages/ChatBot/ChatBot'
 
 function App() {
   return (
@@ -40,12 +41,13 @@ function App() {
             <Route path="lists" element={<Lists />} />
             <Route path="profile" element={<Profile />} />
             <Route path="more" element={<More />} />
+            <Route path="chatbot" element={<ChatBot/>}/>
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/reset" element={<Reset/>}/>
           <Route path="/signup" element={<Signup />} />
           <Route path="/maps" element={<MyMapComponent/>}/>
-        </Routes>
+        </Routes> 
         </UserAuthContextProvider>
       </BrowserRouter>
     </div>

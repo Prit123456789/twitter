@@ -1,0 +1,209 @@
+.chatbot{
+    border-right: 1px solid var(--twitter-background);
+    width: 40vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgb(255, 255, 255);
+    justify-content: center;
+}
+.chatbot::-webkit-scrollbar{
+    display: none;
+}
+.head{
+    width: 100%;
+    height: 10vh;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.P{
+    font-size: 20px;
+    margin-left: 200px;
+    color: var(--twitter-color)!important;
+    font-weight: 600;
+}
+
+.head>img{
+    width: 40px;
+height: 45px;
+}
+
+.Msg{
+    border-top: 1px solid rgb(200, 200, 200);;
+    border-bottom: 1px solid rgb(200, 200, 200);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    background: #f5fcff;
+    overflow-y: scroll;
+}
+
+.Msg-Box{
+    padding: 10px;  
+   
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.Text{
+    width: auto; 
+    max-width: 400px;                   
+    background-color: rgb(215, 215, 215);          
+    padding: 10px;                    
+    border-radius: 15px;                   
+    align-self: flex-end !important;
+}
+
+.user-message p{
+    word-wrap: break-word;            
+    overflow-wrap: break-word; 
+    margin: 0; 
+    font-weight: 500; 
+}
+
+.hr{
+    border-bottom: 1px solid rgb(169, 169, 169);
+    padding-bottom: 20px;
+}
+
+.bot-message{
+    width: auto; 
+    max-width: 400px;                    
+    background-color: rgb(196, 230, 255);           
+    padding: 10px;                    
+    box-sizing: border-box; 
+    border-radius: 15px;                     
+   align-self: flex-start;
+}
+
+.bot-message p{
+    font-weight: 500; 
+    word-wrap: break-word;            
+    overflow-wrap: break-word; 
+    margin: 0;  
+}
+
+.chatbot-input{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 10vh;
+}
+
+.input-div{
+    width: 100%;
+    border-radius: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    margin-bottom: 20px;
+}
+.post {
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--twitter-background);
+    padding-bottom: 10px;
+  }
+  
+  .post__body {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .post__body>img {
+    border-radius: 20px;
+  }
+  
+  .post__footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    margin-top: 10px;
+  }
+  
+  .post__footer__icon:hover {
+    cursor: pointer;
+    color: var(--twitter-color);
+  }
+  
+  .post__headerDescription {
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+  
+  .post__headerText>h3 {
+    font-size: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .post__badge {
+    font-size: 14px !important;
+    color: var(--twitter-color);
+  }
+  
+  .post__headerSpecial {
+    font-weight: 600;
+    font-size: 12px;
+    color: gray;
+  }
+  
+  .post__avatar {
+    padding: 20px;
+  }
+.input-div .place{
+    border: none;
+    font-size: 14px;
+    outline: none;
+   background: #eaeaea;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    height: 35px;
+    width: 80%;
+    padding-left: 10px;
+
+}
+
+.input-div button{
+    width: 25%;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    height: 45px;
+    background: var(--twitter-color);
+    color: white;
+    font-weight: 500;
+    font-size: 15px;
+    margin-top: 20px;
+    border: white;
+    cursor: pointer;
+}
+
+.loading {
+    margin: auto;
+    margin-top: 230px;
+    width: 80px;
+    padding: 8px;
+   aspect-ratio: 1;
+    border-radius: 50%;
+    background: #25b09b;
+    --_m: 
+      conic-gradient(#0000 10%,#000),
+      linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+            mask: var(--_m);
+    -webkit-mask-composite: source-out;
+            mask-composite: subtract;
+    animation: l3 1s infinite linear;
+  }
+  @keyframes l3 {
+     0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
