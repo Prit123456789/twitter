@@ -8,7 +8,7 @@ import AddLinkIcon from '@mui/icons-material/AddLink';
 import Post from "./Post/Post"
 import { defer, useNavigate } from 'react-router-dom';
 import EditProfile from '../EditProfile/EditProfile';
-import axios from "axios";
+import axios from 'axios';
 import useLoggedInUser from '../../../hooks/useLoggedInUser';
 import "../MyMapComponent"
 import MyMapComponent from '../MyMapComponent';
