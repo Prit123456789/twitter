@@ -37,7 +37,14 @@ const MyMapComponent = () => {
 
       const response = await fetch(apiUrl);
       const data = await response.json();
-      return data;
+      const weatherDetails = {
+        temperature: data.main.temp,
+        description: data.weather[0].description,
+        windSpeed: data.wind.speed,
+        humidity: data.main.humidity,
+      };
+
+      return weatherDetails;
     };
 
     const fetchLocationData = async (lat, lng) => {
@@ -64,25 +71,31 @@ const MyMapComponent = () => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
       setCenter({ lat, lng });
-
+    
       try {
-        const weatherData = await fetchWeatherData(lat, lng);
-        setWeatherData(weatherData);
-        
-        const locationData = await fetchLocationData(lat, lng);
-        const addressComponents = locationData.results[0].address_components;
+        const weatherDetails = await fetchWeatherData(lat, lng);
+        const locationDetails = await fetchLocationData(lat, lng);
+    
+        const addressComponents = locationDetails.results[0].address_components;
         const city = getAddressComponent(addressComponents, 'locality');
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
-        setLocationData(locationData[city,state,country]);
-        
-
-        document.getElementById('location-display').textContent = `${city},${state},${country}`;
+    
+        // Combine weather and location details
+        const combinedData = {
+          ...weatherDetails,
+          city,
+          state,
+          country,
+        };
+    
+        setWeatherData(combinedData);
+        setLocationString(`${city}, ${state}, ${country}`);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
+    
     const getAddressComponent = (addressComponents, type) => {
       for (const component of addressComponents) {
         if (component.types.includes(type)) {
@@ -129,6 +142,9 @@ const MyMapComponent = () => {
                   <h4 >{weatherData.city},{weatherData.state},{weatherData.country}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
+                  <p>Description: {weatherData.description}</p>
+                  <p>Wind Speed: {weatherData.windSpeed} m/s</p>
+                  <p>Humidity: {weatherData.humidity}%</p>
                 </div>
               </InfoWindow>
             )}
