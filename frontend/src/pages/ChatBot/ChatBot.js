@@ -7,7 +7,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PublishIcon from "@mui/icons-material/Publish";
-import { useTranslation } from "i18next";
+// import { useTranslation } from "i18next";
 
 const ChatBot = (user) => {
 
@@ -18,7 +18,7 @@ const ChatBot = (user) => {
 
   const [messages, setMessages] = useState([]);
 
-  const {t} = useTranslation();
+  // const {t} = useTranslation();
 
   const onSent = async (prompt) => {
     const url = `https://twitter-api45.p.rapidapi.com/search.php?query=${encodeURIComponent(prompt)}&search_type=Top&count=1000`;
