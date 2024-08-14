@@ -37,7 +37,7 @@ const MyMapComponent = () => {
 
       const response = await fetch(apiUrl);
       const data = await response.json();
-    
+
       const weatherDetails = {
         temperature: data.main.temp,
         description: data.weather[0].description,
@@ -51,9 +51,15 @@ const MyMapComponent = () => {
     const fetchLocationData = async (lat, lng) => {
       const apiKey = 'AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws';
       const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-      const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
+      const response = await fetch(locationURI);
       const data = await response.json();
-      return data;
+
+      const addressComponents = data.results[0].address_components;
+      const city = getAddressComponent(addressComponents, 'locality');
+      const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
+      const country = getAddressComponent(addressComponents, 'country');
+
+      return { city, state, country };
     };
 
     const getLocation = () => {
@@ -76,16 +82,10 @@ const MyMapComponent = () => {
       try {
         const weatherDetails = await fetchWeatherData(lat, lng);
         setWeatherData(weatherDetails);
-        
-        const locationData = await fetchLocationData(lat, lng);
-        const addressComponents = locationData.results[0].address_components;
-        const city = getAddressComponent(addressComponents, 'locality');
-        const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
-        const country = getAddressComponent(addressComponents, 'country');
-        setLocationData(locationData[city,state,country]);
-        
 
-        document.getElementById('location-display').textContent = `${city},${state},${country}`;
+        const locationDetails = await fetchLocationData(lat, lng);
+        setLocationData(locationDetails);
+        setLocationString(`${locationDetails.city}, ${locationDetails.state}, ${locationDetails.country}`);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -134,10 +134,10 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <p>Temperature: {weatherData.main.temp}°C</p>
-                  <p>Description: {weatherData.weather[0].description}</p>
+                  <p>Temperature: {weatherData.temperature}°C</p>
+                  <p>Description: {weatherData.description}</p>
                   <p>Wind Speed: {weatherData.windSpeed} m/s</p>
-                  <p>Humidity: {weatherData.humidity}%</p>  
+                  <p>Humidity: {weatherData.humidity}%</p>
                 </div>
               </InfoWindow>
             )}
@@ -147,4 +147,5 @@ const MyMapComponent = () => {
     </LoadScript>
   );
 };
+
 export default MyMapComponent;
