@@ -74,7 +74,7 @@ const MyMapComponent = () => {
         const city = getAddressComponent(addressComponents, 'locality');
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
-        setLocationData({ city, state, country });
+        setLocationData(locationData[city,state,country]);
         
 
         document.getElementById('location-display').textContent = `${city},${state},${country}`;
@@ -126,7 +126,7 @@ const MyMapComponent = () => {
               <InfoWindow position={center}>
                 <div>
                   <h3>{weatherData.name}</h3>
-                  <h4 >{locationData.city},{locationData.state},{locationData.state}</h4>
+                  <h4 >{locationData.city},{locationData.state},{locationData.country}</h4>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
                 </div>
