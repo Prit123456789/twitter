@@ -78,19 +78,24 @@ const MyMapComponent = () => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
       setCenter({ lat, lng });
-
+    
       try {
         const weatherDetails = await fetchWeatherData(lat, lng);
         setWeatherData(weatherDetails);
-
+    
         const locationDetails = await fetchLocationData(lat, lng);
+        console.log('Location Details:', locationDetails); // Logging the output to ensure it is correct
         setLocationData(locationDetails);
-        setLocationString(`${locationDetails.city}, ${locationDetails.state}, ${locationDetails.country}`);
+    
+        // Combine city, state, and country into a string
+        const locationString = `${locationDetails.city}, ${locationDetails.state}, ${locationDetails.country}`;
+        console.log('Location String:', locationString); // Log the combined location string
+        setLocationString(locationString);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
+    
     const getAddressComponent = (addressComponents, type) => {
       for (const component of addressComponents) {
         if (component.types.includes(type)) {
@@ -130,18 +135,18 @@ const MyMapComponent = () => {
             onLoad={handleLoad}
           >
             <Marker position={center} />
-            {weatherData && (
-              <InfoWindow position={center}>
-                <div>
-                  <h3>{locationData.city}</h3>
-                  <h3>{locationData.state},{locationData.country}</h3>
-                  <p>Temperature: {weatherData.temperature}°C</p>
-                  <p>Description: {weatherData.description}</p>
-                  <p>Wind Speed: {weatherData.windSpeed} m/s</p>
-                  <p>Humidity: {weatherData.humidity}%</p>
-                </div>
-              </InfoWindow>
-            )}
+            {weatherData && locationData.city && (
+  <InfoWindow position={center}>
+    <div>
+      <h3>{locationString}</h3> {/* Display the full location string */}
+      <p>Temperature: {weatherData.temperature}°C</p>
+      <p>Description: {weatherData.description}</p>
+      <p>Wind Speed: {weatherData.windSpeed} m/s</p>
+      <p>Humidity: {weatherData.humidity}%</p>
+    </div>
+  </InfoWindow>
+)}
+
           </GoogleMap>
         </Box>
       </Modal>
