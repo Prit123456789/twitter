@@ -37,29 +37,15 @@ const MyMapComponent = () => {
 
       const response = await fetch(apiUrl);
       const data = await response.json();
-
-      const weatherDetails = {
-        temperature: data.main.temp,
-        description: data.weather[0].description,
-        windSpeed: data.wind.speed,
-        humidity: data.main.humidity,
-      };
-
-      return weatherDetails;
+      return data;
     };
 
     const fetchLocationData = async (lat, lng) => {
       const apiKey = 'AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws';
       const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-      const response = await fetch(locationURI);
+      const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
       const data = await response.json();
-
-      const addressComponents = data.results[0].address_components;
-      const city = getAddressComponent(addressComponents, 'locality');
-      const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
-      const country = getAddressComponent(addressComponents, 'country');
-
-      return { city, state, country };
+      return data;
     };
 
     const getLocation = () => {
@@ -78,24 +64,25 @@ const MyMapComponent = () => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
       setCenter({ lat, lng });
-    
+
       try {
-        const weatherDetails = await fetchWeatherData(lat, lng);
-        setWeatherData(weatherDetails);
-    
-        const locationDetails = await fetchLocationData(lat, lng);
-        console.log('Location Details:', locationDetails); // Logging the output to ensure it is correct
-        setLocationData(locationDetails);
-    
-        // Combine city, state, and country into a string
-        const locationString = `${locationDetails.city}, ${locationDetails.state}, ${locationDetails.country}`;
-        console.log('Location String:', locationString); // Log the combined location string
-        setLocationString(locationString);
+        const weatherData = await fetchWeatherData(lat, lng);
+        setWeatherData(weatherData);
+        
+        const locationData = await fetchLocationData(lat, lng);
+        const addressComponents = locationData.results[0].address_components;
+        const city = getAddressComponent(addressComponents, 'locality');
+        const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
+        const country = getAddressComponent(addressComponents, 'country');
+        setLocationData(locationData[city,state,country]);
+        
+
+        document.getElementById('location-display').textContent = `${city},${state},${country}`;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-    
+
     const getAddressComponent = (addressComponents, type) => {
       for (const component of addressComponents) {
         if (component.types.includes(type)) {
@@ -135,18 +122,16 @@ const MyMapComponent = () => {
             onLoad={handleLoad}
           >
             <Marker position={center} />
-            {weatherData && locationData.city && (
-  <InfoWindow position={center}>
-    <div>
-      <h3>{locationString}</h3> {/* Display the full location string */}
-      <p>Temperature: {weatherData.temperature}°C</p>
-      <p>Description: {weatherData.description}</p>
-      <p>Wind Speed: {weatherData.windSpeed} m/s</p>
-      <p>Humidity: {weatherData.humidity}%</p>
-    </div>
-  </InfoWindow>
-)}
-
+            {weatherData && (
+              <InfoWindow position={center}>
+                <div>
+                  <h3>{weatherData.name}</h3>
+                  <h4 >{weatherData.city},{weatherData.state},{weatherData.country}</h4>
+                  <p>Temperature: {weatherData.main.temp}°C</p>
+                  <p>Description: {weatherData.weather[0].description}</p>
+                </div>
+              </InfoWindow>
+            )}
           </GoogleMap>
         </Box>
       </Modal>
