@@ -9,7 +9,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PublishIcon from "@mui/icons-material/Publish";
 // import { useTranslation } from "i18next";
 
-const ChatBot = (user) => {
+const ChatBot = () => {
 
   const [heading, setHeading] = useState("");
 

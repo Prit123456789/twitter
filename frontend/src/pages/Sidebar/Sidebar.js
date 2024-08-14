@@ -33,7 +33,7 @@ function Sidebar({ handleLogout, user }) {
   const navigate = useNavigate();
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
-    //console.log(e.currentTarget);
+   
   };
   const handleClose = () => {
     setAnchorEl(null);
