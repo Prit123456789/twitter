@@ -33,7 +33,7 @@ const MyMapComponent = () => {
   useEffect(() => {
     const fetchWeatherData = async (lat, lng) => {
       const apiKey = 'd8a63be92e9856c6b85717af421ab957'; // Replace with your actual API key
-      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric`;
+      const apiUrl =`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric`;
 
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -45,12 +45,13 @@ const MyMapComponent = () => {
       };
 
       return weatherDetails;
+ 
     };
 
     const fetchLocationData = async (lat, lng) => {
       const apiKey = 'AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws';
       const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-      const response = await fetch( `https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${locationURI}&key=${apiKey}`);
       const data = await response.json();
       return data;
     };
@@ -71,31 +72,25 @@ const MyMapComponent = () => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
       setCenter({ lat, lng });
-    
+
       try {
-        const weatherDetails = await fetchWeatherData(lat, lng);
-        const locationDetails = await fetchLocationData(lat, lng);
-    
-        const addressComponents = locationDetails.results[0].address_components;
+        const weatherData = await fetchWeatherData(lat, lng);
+        setWeatherData(weatherData);
+        
+        const locationData = await fetchLocationData(lat, lng);
+        const addressComponents = locationData.results[0].address_components;
         const city = getAddressComponent(addressComponents, 'locality');
         const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
         const country = getAddressComponent(addressComponents, 'country');
-    
-        // Combine weather and location details
-        const combinedData = {
-          ...weatherDetails,
-          city,
-          state,
-          country,
-        };
-    
-        setWeatherData(combinedData);
-        setLocationString(`${city}, ${state}, ${country}`);
+        setLocationData(locationData[city,state,country]);
+        
+
+        document.getElementById('location-display').textContent = `${city},${state},${country}`;
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-    
+
     const getAddressComponent = (addressComponents, type) => {
       for (const component of addressComponents) {
         if (component.types.includes(type)) {
@@ -137,7 +132,7 @@ const MyMapComponent = () => {
             <Marker position={center} />
             {weatherData && (
               <InfoWindow position={center}>
-                <div>
+               <div>
                   <h3>{weatherData.name}</h3>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
@@ -153,5 +148,3 @@ const MyMapComponent = () => {
     </LoadScript>
   );
 };
-
-export default MyMapComponent;
