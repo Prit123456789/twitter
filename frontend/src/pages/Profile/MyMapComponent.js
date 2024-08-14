@@ -39,6 +39,7 @@ const MyMapComponent = () => {
       const data = await response.json();
 
       const weatherDetails = {
+        name :data.main,
         temperature: data.main.temp,
         description: data.weather[0].description,
         windSpeed: data.wind.speed,
