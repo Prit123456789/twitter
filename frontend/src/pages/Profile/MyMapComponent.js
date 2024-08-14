@@ -136,8 +136,8 @@ const MyMapComponent = () => {
                   <h3>{weatherData.name}</h3>
                   <p>Temperature: {weatherData.main.temp}°C</p>
                   <p>Description: {weatherData.weather[0].description}</p>
-                  <p></p>
-                  <p></p>
+                  <p>Wind Speed: {weatherData.windSpeed} m/s</p>
+                  <p>Humidity: {weatherData.humidity}%</p>  
                 </div>
               </InfoWindow>
             )}
@@ -147,3 +147,4 @@ const MyMapComponent = () => {
     </LoadScript>
   );
 };
+export default MyMapComponent;
