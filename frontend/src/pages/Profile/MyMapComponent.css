@@ -29,8 +29,8 @@
   .header>.save-btn {
     margin-right: 10px;
     color: white;
-    
+    font-size: xx-small;
     padding: 5px 20px;
     border-radius: 20px;
-  
+    cursor: grabbing;
   }

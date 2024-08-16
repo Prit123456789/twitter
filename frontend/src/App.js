@@ -10,7 +10,7 @@ import Explore from "./pages/Explore/Explore";
 import Feed from "./pages/Feed/Feed";
 import Messages from "./pages/Messages/Messages";
 import Bookmarks from "./pages/Bookmarks/Bookmarks";
-import Lists from "./pages/Lists/Lists";
+import Languages from "./pages/Lists/Languages";
 import Profile from "./pages/Profile/Profile";
 import Reset from "./pages/Login/Reset";
 import More from "./pages/More/More";
@@ -18,11 +18,14 @@ import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
 import ChatBot from './pages/ChatBot/ChatBot'
 
+import './pages/Translation/Translation'
+
+
 function App() {
   return (
     <div className="app">
       <BrowserRouter>
-      <UserAuthContextProvider>
+      <UserAuthContextProvider>  
         <Routes>
           <Route path="/" element={<ProtectedRoute> <Home /></ProtectedRoute>} >
             <Route index element={<Feed />} />
@@ -38,7 +41,7 @@ function App() {
             <Route path="notifications" element={<Notifications />} />
             <Route path="messages" element={<Messages />} />
             <Route path="bookmarks" element={<Bookmarks />} />
-            <Route path="lists" element={<Lists />} />
+            <Route path="languages" element={<Languages />} />
             <Route path="profile" element={<Profile />} />
             <Route path="more" element={<More />} />
             <Route path="chatbot" element={<ChatBot/>}/>
@@ -47,8 +50,8 @@ function App() {
           <Route path="/reset" element={<Reset/>}/>
           <Route path="/signup" element={<Signup />} />
           <Route path="/maps" element={<MyMapComponent/>}/>
-        </Routes> 
-        </UserAuthContextProvider>
+        </Routes>
+        </UserAuthContextProvider> 
       </BrowserRouter>
     </div>
   );

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import {
+  APIProvider,
+  Map,
+  AdvancedMarker,
+  InfoWindow,
+} from "@vis.gl/react-google-maps";
+
 import { Box, Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -9,20 +15,18 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 600,
-  height: 300,
+  height: 500,
   bgcolor: 'background.paper',
   boxShadow: 24,
   borderRadius: 8,
 };
-const libraries = ['places']; // Include places library for searching
 
 const MyMapComponent = () => {
   const [map, setMap] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
-  const [center, setCenter] = useState({ lat: '', lng: '' }); // Initial center coordinates
+  const [center, setCenter] = useState({ lat: '', lng: '' });
   const [open, setOpen] = useState(false);
   const [locationData, setLocationData] = useState({ city: '', state: '', country: '' });
-  const [locationString, setLocationString] = useState('');
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -53,15 +57,24 @@ const MyMapComponent = () => {
       const locationURI = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
       const response = await fetch(locationURI);
       const data = await response.json();
-
-      const addressComponents = data.results[0].address_components;
-      const city = getAddressComponent(addressComponents, 'locality');
-      const state = getAddressComponent(addressComponents, 'administrative_area_level_1');
-      const country = getAddressComponent(addressComponents, 'country');
-
-      return { city, state, country };
+    
+      console.log('Geocoding API Response:', data); // Log the response for debugging
+    
+      if (data.results && data.results.length > 0) {
+        const addressComponents = data.results[0].address_components || [];
+        const city = addressComponents.find(component => component.types.includes('locality'))?.long_name || '';
+        const state = addressComponents.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '';
+        const country = addressComponents.find(component => component.types.includes('country'))?.long_name || '';
+    
+        console.log('Parsed Location Data:', { city, state, country }); // Log the parsed data
+    
+        return { city, state, country };
+      } else {
+        console.error('No results found in Geocoding API response.');
+        return { city: '', state: '', country: '' };
+      }
     };
-
+    
     const getLocation = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -71,7 +84,7 @@ const MyMapComponent = () => {
     };
 
     const showError = () => {
-      alert("Couldn't fetch at this time");
+      alert("Couldn't fetch location at this time.");
     };
 
     const showPosition = async (position) => {
@@ -85,29 +98,16 @@ const MyMapComponent = () => {
 
         const locationDetails = await fetchLocationData(lat, lng);
         setLocationData(locationDetails);
-        setLocationString(`${locationDetails.city}, ${locationDetails.state}, ${locationDetails.country}`);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-    };
-
-    const getAddressComponent = (addressComponents, type) => {
-      for (const component of addressComponents) {
-        if (component.types.includes(type)) {
-          return component.long_name;
-        }
-      }
-      return '';
     };
 
     getLocation();
   }, []);
 
   return (
-    <LoadScript
-      googleMapsApiKey="AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws"
-      libraries={libraries}
-    >
+    <APIProvider apiKey="AIzaSyCJ5OJwzBUMaFXx93pJgcN1T9dxUh8oUws">
       <button onClick={handleOpen} className='loc-btn'>Obtain Location</button>
 
       <Modal
@@ -120,20 +120,22 @@ const MyMapComponent = () => {
           <div className='header'>
             <IconButton onClick={handleClose}><CloseIcon /></IconButton>
             <h2 className='header-title'>Location</h2>
-            <h2 className='save-btn'></h2>
+            <h2 className='save-btn' onClick={handleClose}>Ok</h2>
           </div>
-          <div id='location-display'>{locationString}</div> 
-          <GoogleMap
+          <div id='location-display'>{`${locationData.city}, ${locationData.state}, ${locationData.country}`}</div>
+          <Map
             mapContainerStyle={{ width: '100%', height: '400px' }}
-            zoom={10}
+            defaultZoom={11}
+            gestureHandling={"greedy"}
+            mapId={"7933c8f34647f686"}
             center={center}
             onLoad={handleLoad}
           >
-            <Marker position={center} />
+            <AdvancedMarker position={center} />
             {weatherData && (
               <InfoWindow position={center}>
                 <div>
-                  <h3>{weatherData.name}</h3>
+                  <p>{`${locationData.city}, ${locationData.state}, ${locationData.country}`}</p>
                   <p>Temperature: {weatherData.temperature}°C</p>
                   <p>Description: {weatherData.description}</p>
                   <p>Wind Speed: {weatherData.windSpeed} m/s</p>
@@ -141,10 +143,10 @@ const MyMapComponent = () => {
                 </div>
               </InfoWindow>
             )}
-          </GoogleMap>
+          </Map>
         </Box>
       </Modal>
-    </LoadScript>
+    </APIProvider>
   );
 };
 

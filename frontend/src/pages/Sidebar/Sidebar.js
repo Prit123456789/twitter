@@ -22,12 +22,11 @@ import MenuItem from '@mui/material/MenuItem';
 import CustomLink from "./CustomLink";
 import useLoggedInUser from "../../hooks/useLoggedInUser";
 import { useNavigate } from "react-router-dom";
-
-
-
+import { useTranslation } from "react-i18next";
 
 function Sidebar({ handleLogout, user }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const {t}=useTranslation();
   const openMenu = Boolean(anchorEl);
   const [loggedInUser] = useLoggedInUser();
   const navigate = useNavigate();
@@ -58,14 +57,14 @@ function Sidebar({ handleLogout, user }) {
       <CustomLink to='/home/bookmarks'>
         <SidebarOptions Icon={BookmarkBorderIcon} text="Bookmarks" />
       </CustomLink>
-      <CustomLink to='/home/lists'>
-        <SidebarOptions Icon={ListAltIcon} text="Lists" />
+      <CustomLink to='/home/languages'>
+        <SidebarOptions Icon={ListAltIcon} text="Languages" />
       </CustomLink>
       <CustomLink to='/home/profile'>
         <SidebarOptions Icon={PermIdentityIcon} text="Profile" />
       </CustomLink>
       <CustomLink to='/home/more'>
-        <SidebarOptions Icon={MoreIcon} text="More" />
+        <SidebarOptions Icon={MoreIcon} text="More"/>
       </CustomLink>
       <CustomLink to='/home/chatbot'>
         <Button variant="outlined" className="sidebar__tweet" fullWidth>
