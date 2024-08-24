@@ -39,13 +39,13 @@ function Langs() {
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
     try {
       if (isFrench) {
-        await axios.post("http://localhost:5000/send-email-otp", {
+        await axios.post("http://twitter-jy1w.onrender.com/send-email-otp", {
           email,
           otp: generatedOtp,
         });
         alert("OTP sent to your email");
       } else {
-        await axios.post("http://localhost:5000/send-sms-otp", {
+        await axios.post("http://twitter-jy1w.onrender.com/send-sms-otp", {
           phoneNumber,
           otp: generatedOtp,
         });
@@ -63,8 +63,8 @@ function Langs() {
       try {
         const response = await axios.post(
           isFrench
-            ? "http://localhost:5000/verify-email-otp"
-            : "http://localhost:5000/verify-sms-otp",
+            ? "http://twitter-jy1w.onrender.com/verify-email-otp"
+            : "http://twitter-jy1w.onrender.com/verify-sms-otp",
           {
             email: isFrench ? email : undefined,
             phoneNumber: !isFrench ? phoneNumber : undefined,
