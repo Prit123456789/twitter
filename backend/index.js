@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 app.use(
   cors({
-    origin: "http://localhost:3000", // Adjust as needed
+    origin: "http://localhost:5000", // Adjust as needed
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
