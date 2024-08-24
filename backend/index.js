@@ -2,13 +2,6 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
-app.use(
-  cors({
-    origin: "http://localhost:5000", // Adjust as needed
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
 
 const bodyParser = require("body-parser");
 const { MongoClient, ServerApiVersion } = require("mongodb");
