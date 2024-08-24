@@ -7,7 +7,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PublishIcon from "@mui/icons-material/Publish";
-// import { useTranslation } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const ChatBot = () => {
 
@@ -18,7 +18,7 @@ const ChatBot = () => {
 
   const [messages, setMessages] = useState([]);
 
-  // const {t} = useTranslation();
+  const {t} = useTranslation('translations');
 
   const onSent = async (prompt) => {
     const url = `https://twitter-api45.p.rapidapi.com/search.php?query=${encodeURIComponent(prompt)}&search_type=Top&count=1000`;
@@ -133,9 +133,9 @@ const ChatBot = () => {
             value={input}
             type="text"
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder={("What do you want to see about??")}
+            placeholder={t("What do you want to see ??")}
           />
-          <button onClick={() => handleSendMessage()}>Send</button>
+          <button onClick={() => handleSendMessage()}>{t("Send")}</button>
         </div>
       </div>
     </div>

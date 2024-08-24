@@ -12,11 +12,11 @@ import axios from 'axios';
 import useLoggedInUser from '../../../hooks/useLoggedInUser';
 import "../MyMapComponent"
 import MyMapComponent from '../MyMapComponent';
-
+import { useTranslation } from 'react-i18next';
 
 function MainProfile({ user }) {
   const navigate = useNavigate();
-  // const [imageURL, setImageURL] = useState('');
+  
   const [isLoading, setIsLoading] = useState(false);
   const [loggedInUser] = useLoggedInUser();
 
@@ -161,7 +161,7 @@ function MainProfile({ user }) {
                   </h3>
                   <p className='usernameSection'>@{username}</p>
                 </div>
-                <EditProfile user={user} loggedInUser={loggedInUser} />
+                <EditProfile  user={user} loggedInUser={loggedInUser}/> 
               </div>
               <div className='infoContainer'>
                 {loggedInUser[0]?.bio ? <p>{loggedInUser[0].bio}</p> : ''}

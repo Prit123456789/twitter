@@ -24,9 +24,10 @@ import useLoggedInUser from "../../hooks/useLoggedInUser";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+
 function Sidebar({ handleLogout, user }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const {t}=useTranslation();
+  const {t}= useTranslation('translations');
   const openMenu = Boolean(anchorEl);
   const [loggedInUser] = useLoggedInUser();
   const navigate = useNavigate();
@@ -43,32 +44,32 @@ function Sidebar({ handleLogout, user }) {
     <div className="sidebar">
       <TwitterIcon className="sidebar__twitterIcon" />
       <CustomLink to='/home/feed'>
-        <SidebarOptions active Icon={HomeIcon} text="Home" />
+        <SidebarOptions active Icon={HomeIcon} text={t("Home")} />
       </CustomLink>
       <CustomLink to='/home/explore'>
-        <SidebarOptions Icon={SearchIcon} text="Explore" />
+        <SidebarOptions Icon={SearchIcon} text={t("Explore")} />
       </CustomLink>
       <CustomLink to='/home/notifications'>
-        <SidebarOptions Icon={NotificationsNoneIcon} text="Notifications" />
+        <SidebarOptions Icon={NotificationsNoneIcon} text={t("Notifications")} />
       </CustomLink>
       <CustomLink to='/home/messages'>
-        <SidebarOptions Icon={MailOutlineIcon} text="Messages" />
+        <SidebarOptions Icon={MailOutlineIcon} text={t("Messages" )}/>
       </CustomLink>
       <CustomLink to='/home/bookmarks'>
-        <SidebarOptions Icon={BookmarkBorderIcon} text="Bookmarks" />
+        <SidebarOptions Icon={BookmarkBorderIcon} text={t("Bookmarks")}/>
       </CustomLink>
       <CustomLink to='/home/languages'>
-        <SidebarOptions Icon={ListAltIcon} text="Languages" />
+        <SidebarOptions Icon={ListAltIcon} text={t("Languages")} />
       </CustomLink>
       <CustomLink to='/home/profile'>
-        <SidebarOptions Icon={PermIdentityIcon} text="Profile" />
+        <SidebarOptions Icon={PermIdentityIcon} text={t("Profile" )}/>
       </CustomLink>
       <CustomLink to='/home/more'>
-        <SidebarOptions Icon={MoreIcon} text="More"/>
+        <SidebarOptions Icon={MoreIcon} text={t("More")}/>
       </CustomLink>
       <CustomLink to='/home/chatbot'>
         <Button variant="outlined" className="sidebar__tweet" fullWidth>
-          ChatBot
+        {t('ChatBot')}
         </Button>
       </CustomLink>
       
@@ -99,8 +100,8 @@ function Sidebar({ handleLogout, user }) {
             </div>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleClose}>Add an existing account</MenuItem>
-          <MenuItem onClick={handleLogout}>Log out @{result}</MenuItem>
+          <MenuItem onClick={handleClose}>{t("Add an existing account")}</MenuItem>
+          <MenuItem onClick={handleLogout}>{t("Log Out")} @{result}</MenuItem>
         </Menu>
       </div>
     </div>

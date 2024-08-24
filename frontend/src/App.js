@@ -17,8 +17,7 @@ import More from "./pages/More/More";
 import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
 import ChatBot from './pages/ChatBot/ChatBot'
-
-import './pages/Translation/Translation'
+import './Translation/Translation'
 
 
 function App() {

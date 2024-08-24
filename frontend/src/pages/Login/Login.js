@@ -5,10 +5,12 @@ import { useUserAuth } from "../../context/UserAuthContext";
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from '@mui/icons-material/Twitter';
 import "./Login.css";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const {t}= useTranslation('translations')
     const [error, setError] = useState("");
     const { logIn, googleSignIn } = useUserAuth();
     const navigate = useNavigate();
@@ -51,14 +53,14 @@ const Login = () => {
                 <div className="form-container">
                     <div className="form-box" >
                         <TwitterIcon style={{ color: "skyblue" }} />
-                        <h2 className="heading">Happening now</h2>
+                        <h2 className="heading">{t('Happening now')}</h2>
 
                         {error && <p>{error.message}</p>}
                         <form onSubmit={handleSubmit}>
 
                             <input
                                 type="email" className="email"
-                                placeholder="Email address"
+                                placeholder={t("Email address")}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
 
@@ -66,15 +68,15 @@ const Login = () => {
 
                             <input className="password"
                                 type="password"
-                                placeholder="Password"
+                                placeholder={t("Password")}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
 
                             <div className="btn-login">
-                                <button type="submit" className="btn" >Log In</button>
+                                <button type="submit" className="btn" >{t('Log In')}</button>
                             </div>
                         </form>
-                                 <p onClick={handleReset} className="forgot">Forgot Password?</p>
+                                 <p onClick={handleReset} className="forgot">{t('Forgot password?')}</p>
                         <hr />
                         <div>
                             <GoogleButton
@@ -89,7 +91,7 @@ const Login = () => {
                         </div>
                     </div>
                     <div>
-                        Don't have an account?
+                       {t("Don't have an account?")}
                         <Link
                             to="/signup"
                             style={{
@@ -99,7 +101,7 @@ const Login = () => {
                                 marginLeft: '2px'
                             }}
                         >
-                            Sign up
+                            {t('Sign Up')}
                         </Link>
                     </div>
 

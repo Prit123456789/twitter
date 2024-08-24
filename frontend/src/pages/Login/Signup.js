@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserAuth } from "../../context/UserAuthContext";
 import twitterimg from "../../image/twitter.jpeg";
+import { useTranslation } from "react-i18next";
 import TwitterIcon from '@mui/icons-material/Twitter';
 import GoogleButton from "react-google-button";
 import "./Login.css"
@@ -10,6 +11,7 @@ import "./Login.css"
 const Signup = () => {
     const [username, setUsername] = useState(" ");
     const [name, setName] = useState("");
+    const {t}=useTranslation('translations')
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [password, setPassword] = useState("");
@@ -74,10 +76,10 @@ const Signup = () => {
                     <div className="">
                         <TwitterIcon className="Twittericon" style={{ color: "skyblue" }} />
 
-                        <h2 className="heading">Happening now</h2>
+                        <h2 className="heading">{t('Happening now')}</h2>
 
                         <div class="d-flex align-items-sm-center">
-                            <h3 className="heading1"> Join twitter today </h3>
+                            <h3 className="heading1"> {t('Join twitter today')} </h3>
                         </div>
 
 
@@ -92,13 +94,13 @@ const Signup = () => {
 
                             <input className="display-name" style={{ backgroudColor: "red" }}
                                 type="name"
-                                placeholder="Enter Full Name"
+                                placeholder={t("Enter Full Name")}
                                 onChange={(e) => setName(e.target.value)}
                             />
 
                             <input className="email"
                                 type="email"
-                                placeholder="Email address"
+                                placeholder={t("Email address")}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
 
@@ -106,13 +108,13 @@ const Signup = () => {
 
                             <input className="password"
                                 type="password"
-                                placeholder="Password"
+                                placeholder={t("Password")}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
 
 
                             <div className="btn-login">
-                                <button type="submit" className="btn">Sign Up</button>
+                                <button type="submit" className="btn">{t('Sign Up')}</button>
                             </div>
                         </form>
                         <hr />
@@ -126,7 +128,7 @@ const Signup = () => {
                             />
                         </div>
                         <div>
-                            Already have an account?
+                            {t('Already have an account?')}
                             <Link
                                 to="/login"
                                 style={{
@@ -136,7 +138,7 @@ const Signup = () => {
                                     marginLeft: '5px'
                                 }}
                             >
-                                Log In
+                                {t('Log In')}
                             </Link>
                         </div>
                     </div>

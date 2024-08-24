@@ -1,7 +1,7 @@
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from '@mui/icons-material/Twitter';
 import './Reset.css'
@@ -9,7 +9,7 @@ import './Reset.css'
 function Reset() {
   const auth= getAuth();
   const [email,setEmail]= useState();
-  
+  const {t} = useTranslation('translations')
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     if (!email) {
@@ -77,17 +77,17 @@ function Reset() {
       <div className='reset-form'> 
       <div className="form-box" >
       <TwitterIcon style={{ color: "skyblue" }} />        
-      <h2>Reset Password</h2>
-      <h4>Find your account and reset your password</h4>
+      <h2>{t('Reset Password')}</h2>
+      <h4>{t('Find your account and reset your password')}</h4>
       <form onSubmit={handlePasswordReset}>
         <input 
         type= 'email'
         className='email'
-        placeholder='Enter your email'
+        placeholder={t('Enter your email')}
         onChange={(e)=>setEmail(e.target.value)}
         />
         <div className='btn-login'>
-          <button type="submit" id='sendEmailButton' className='btn'>Submit</button>
+          <button type="submit" id='sendEmailButton' className='btn'>{t('Submit')}</button>
         </div>
         </form>
     </div>
@@ -100,11 +100,11 @@ function Reset() {
                                 marginLeft: '200px'
                             }}
                         >
-                            Back to login page
+                           {t( 'Back to login page')}
                         </Link>
                         <hr />
     <div className='gen-container'>
-      <button className='pass-gen' onClick={handleGeneratePassword}>Generate Password</button>
+      <button className='pass-gen' onClick={handleGeneratePassword}>{t('Generate Password')}</button>
       {password && (
         <div>
           <div  style={{ display: 'flex', alignItems: 'center' }}>
@@ -114,7 +114,7 @@ function Reset() {
               readOnly
               className='gen-text'
             />
-            <button className='pass-copy' onClick={handleCopyPassword}>Copy</button>
+            <button className='pass-copy' onClick={handleCopyPassword}>{t('Copy')}</button>
           </div>
         </div>
       )}
