@@ -2,13 +2,24 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
-app.use(
-  cors({
-    origin: "https://localhost:3000", // Replace with your Vercel URL
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://twitter-seven-puce.vercel.app/",
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 const bodyParser = require("body-parser");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
