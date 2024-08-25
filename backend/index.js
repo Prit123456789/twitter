@@ -14,7 +14,7 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://twitter-cxhu.onrender.com"], // Allowed origins
+    origin: ["http://localhost:3000", "https://twitter-seven-puce.vercel.app"], // Allowed origins
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Allow cookies and other credentials
   })
