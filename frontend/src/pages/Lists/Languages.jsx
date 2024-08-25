@@ -36,18 +36,15 @@ function Langs() {
   };
 
   const handleSendOtp = async () => {
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
     try {
       if (isFrench) {
         await axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
           email,
-          otp: generatedOtp,
         });
         alert("OTP sent to your email");
       } else {
         await axios.post("https://twitter-cxhu.onrender.com/send-sms-otp", {
           phoneNumber,
-          otp: generatedOtp,
         });
         alert("OTP sent to your mobile number");
       }

@@ -91,9 +91,6 @@ async function run() {
     // Email OTPs
     app.post("/send-email-otp", async (req, res) => {
       const { email } = req.body;
-      if (!email) {
-        return res.status(400).send({ error: "Email is required" });
-      }
 
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
@@ -106,7 +103,8 @@ async function run() {
         };
 
         await sgMail.send(msg);
-        await otpCollection.insertOne({ email, otp });
+
+        await otpCollection.insertOne({ email, otp, createdAt: new Date() });
 
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
@@ -132,15 +130,14 @@ async function run() {
       const formattedPhoneNumber = addDefaultCountryCode(phoneNumber);
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000); // Generate a random OTP
+        const otp = Math.floor(Math.random() * 9000 + 1000);
 
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
-          from: process.env.TWILIO_PHONE_NUMBER, // Ensure this number is valid
+          from: process.env.TWILIO_PHONE_NUMBER,
           to: formattedPhoneNumber,
         });
 
-        // Store the OTP in the database
         await otpCollection.insertOne({ phoneNumber, otp });
 
         res.status(200).send({ message: "OTP sent to your mobile number" });
@@ -161,7 +158,7 @@ async function run() {
         }
 
         if (otpDoc.otp === otp) {
-          await otpCollection.deleteOne({ email }); // Delete the OTP after verification
+          await otpCollection.deleteOne({ email });
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });
@@ -183,7 +180,7 @@ async function run() {
         }
 
         if (otpDoc.otp === otp) {
-          await otpCollection.deleteOne({ phoneNumber }); // Delete the OTP after verification
+          await otpCollection.deleteOne({ phoneNumber });
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });
