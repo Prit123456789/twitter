@@ -147,6 +147,7 @@ async function run() {
       }
     });
 
+    // Email OTP Verification
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
 
@@ -154,11 +155,14 @@ async function run() {
         const otpDoc = await otpCollection.findOne({ email });
 
         if (!otpDoc) {
-          return res.status(400).send({ error: "Invalid OTP" });
+          return res
+            .status(400)
+            .send({ error: "OTP not found for this email" });
         }
 
         if (otpDoc.otp === otp) {
-          await otpCollection.deleteOne({ email });
+          // Optionally check expiry here if implemented
+          await otpCollection.deleteOne({ email }); // Delete OTP after successful verification
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });
@@ -169,6 +173,7 @@ async function run() {
       }
     });
 
+    // SMS OTP Verification
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
 
@@ -176,11 +181,14 @@ async function run() {
         const otpDoc = await otpCollection.findOne({ phoneNumber });
 
         if (!otpDoc) {
-          return res.status(400).send({ error: "Invalid OTP" });
+          return res
+            .status(400)
+            .send({ error: "OTP not found for this phone number" });
         }
 
         if (otpDoc.otp === otp) {
-          await otpCollection.deleteOne({ phoneNumber });
+          // Optionally check expiry here if implemented
+          await otpCollection.deleteOne({ phoneNumber }); // Delete OTP after successful verification
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });
