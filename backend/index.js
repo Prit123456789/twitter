@@ -2,24 +2,32 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
-
-app.use(cors());
 const bodyParser = require("body-parser");
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const sgMail = require("@sendgrid/mail");
+const client1 = require("twilio")(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
 
 const port = process.env.PORT || 5000;
-const twilio = require("twilio");
-const sgMail = require("@sendgrid/mail");
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://twitter-jy1w.onrender.com"], // Allowed origins
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Allow cookies and other credentials
+  })
+);
+
+app.options("*", cors()); // Allow preflight for all routes
 
 app.use(express.json());
 app.use(bodyParser.json());
 
-sgMail.setApiKey(process.env.sg_ApiKey);
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client1 = require("twilio")(accountSid, authToken);
-
-sgMail.setApiKey(process.env.sg_ApiKey);
+sgMail.setApiKey(
+  SG.JnXbrgDbQi - XViEf2wIr - g.yudiTMMygykPsTi4jzsIl4sYUkdXYw3A0DGmN6RonPk
+);
 
 const uri = `mongodb+srv://twitter_admin:8WJMqzWj1QRyiEM6@cluster0.rctficy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
@@ -28,8 +36,9 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-sgMail.setApiKey(process.env.sg_ApiKey);
-let otpStore = {};
+// Store OTPs in a database for better scalability and security
+const otpCollection = client.db("database").collection("otps");
+
 async function run() {
   try {
     await client.connect();
@@ -81,86 +90,108 @@ async function run() {
       res.send(result);
     });
 
-    // Email OTP's
+    // Email OTPs
     app.post("/send-email-otp", async (req, res) => {
-      const { email, otp } = req.body;
+      const { email } = req.body;
 
       try {
+        const otp = Math.floor(Math.random() * 9000 + 1000); // Generate a random OTP
+
         const msg = {
           to: email,
-          from: process.env.SENDGRID_EMAIL,
+          from: "medikondurusrikanth@gmail.com", // Ensure this is a verified email
           subject: "Your OTP Code",
           text: `Your OTP code is ${otp}`,
         };
 
         await sgMail.send(msg);
-        otpStore[email] = otp;
-        console.log(`OTP sent to email: ${email}, OTP: ${otp}`); // Debugging
+
+        // Store the OTP in the database
+        await otpCollection.insertOne({ email, otp });
+
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
-        console.error("Error sending email:", error);
+        console.error(
+          "Error sending email:",
+          error.response ? error.response.body : error.message
+        );
         res.status(500).send({ error: "Error sending OTP" });
       }
     });
 
-    app.post("/send-sms-otp", async (req, res) => {
-      const { phoneNumber, otp } = req.body;
+    const addDefaultCountryCode = (phoneNumber) => {
+      return phoneNumber.startsWith("+") ? phoneNumber : "+91" + phoneNumber;
+    };
 
-      if (!phoneNumber || !otp) {
-        return res
-          .status(400)
-          .send({ error: "Phone number and OTP are required" });
+    app.post("/send-sms-otp", async (req, res) => {
+      const { phoneNumber } = req.body;
+
+      if (!phoneNumber) {
+        return res.status(400).send({ error: "Phone number is required" });
       }
 
       const formattedPhoneNumber = addDefaultCountryCode(phoneNumber);
 
       try {
-        const message = await client1.messages.create({
+        const otp = Math.floor(Math.random() * 9000 + 1000); // Generate a random OTP
+
+        await client1.messages.create({
           body: `Your OTP code is ${otp}`,
-          from: process.env.TWILIO_PHONE_NUMBER,
+          from: process.env.TWILIO_PHONE_NUMBER, // Ensure this number is valid
           to: formattedPhoneNumber,
         });
 
-        otpStore[formattedPhoneNumber] = otp; // Store OTP
-        console.log(
-          `SMS sent: ${message.sid}, to: ${formattedPhoneNumber}, OTP: ${otp}`
-        ); // Debugging
+        // Store the OTP in the database
+        await otpCollection.insertOne({ phoneNumber, otp });
+
         res.status(200).send({ message: "OTP sent to your mobile number" });
       } catch (error) {
-        console.error("Error sending SMS:", error);
+        console.error("Error sending SMS:", error.message);
         res.status(500).send({ error: "Error sending OTP" });
       }
     });
 
-    const clearOtp = (contact) => {
-      if (otpStore[contact]) {
-        delete otpStore[contact];
-        console.log(`OTP for ${contact} has been cleared.`);
-      } else {
-        console.log(`No OTP found for ${contact}.`);
-      }
-    };
-    // Updated endpoint for verifying OTP sent via email
-    app.post("/verify-email-otp", (req, res) => {
+    app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
 
-      if (otpStore[email] === otp) {
-        clearOtp(email); // Clear OTP after successful verification
-        res.status(200).send({ message: "OTP verified successfully" });
-      } else {
-        res.status(400).send({ error: "Invalid OTP" });
+      try {
+        const otpDoc = await otpCollection.findOne({ email });
+
+        if (!otpDoc) {
+          return res.status(400).send({ error: "Invalid OTP" });
+        }
+
+        if (otpDoc.otp === otp) {
+          await otpCollection.deleteOne({ email }); // Delete the OTP after verification
+          res.status(200).send({ message: "OTP verified successfully" });
+        } else {
+          res.status(400).send({ error: "Invalid OTP" });
+        }
+      } catch (error) {
+        console.error("Error verifying OTP:", error.message);
+        res.status(500).send({ error: "Error verifying OTP" });
       }
     });
 
-    // Updated endpoint for verifying OTP sent via SMS
-    app.post("/verify-sms-otp", (req, res) => {
+    app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
 
-      if (otpStore[phoneNumber] === otp) {
-        clearOtp(phoneNumber); // Clear OTP after successful verification
-        res.status(200).send({ message: "OTP verified successfully" });
-      } else {
-        res.status(400).send({ error: "Invalid OTP" });
+      try {
+        const otpDoc = await otpCollection.findOne({ phoneNumber });
+
+        if (!otpDoc) {
+          return res.status(400).send({ error: "Invalid OTP" });
+        }
+
+        if (otpDoc.otp === otp) {
+          await otpCollection.deleteOne({ phoneNumber }); // Delete the OTP after verification
+          res.status(200).send({ message: "OTP verified successfully" });
+        } else {
+          res.status(400).send({ error: "Invalid OTP" });
+        }
+      } catch (error) {
+        console.error("Error verifying OTP:", error.message);
+        res.status(500).send({ error: "Error verifying OTP" });
       }
     });
   } catch (error) {

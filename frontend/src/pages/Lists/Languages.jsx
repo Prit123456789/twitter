@@ -39,13 +39,13 @@ function Langs() {
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
     try {
       if (isFrench) {
-        await axios.post("http://twitter-jy1w.onrender.com/send-email-otp", {
+        await axios.post("https://twitter-jy1w.onrender.com/send-email-otp", {
           email,
           otp: generatedOtp,
         });
         alert("OTP sent to your email");
       } else {
-        await axios.post("http://twitter-jy1w.onrender.com/send-sms-otp", {
+        await axios.post("https://twitter-jy1w.onrender.com/send-sms-otp", {
           phoneNumber,
           otp: generatedOtp,
         });
@@ -53,8 +53,14 @@ function Langs() {
       }
       setOtpSent(true);
     } catch (error) {
-      console.error("Error sending OTP:", error.response || error.message);
-      alert("Failed to send OTP.");
+      console.error(
+        "Error sending OTP:",
+        error.response ? error.response.data : error.message
+      );
+      alert(
+        "Failed to send OTP: " +
+          (error.response ? error.response.data.error : error.message)
+      );
     }
   };
 
@@ -63,8 +69,8 @@ function Langs() {
       try {
         const response = await axios.post(
           isFrench
-            ? "http://twitter-jy1w.onrender.com/verify-email-otp"
-            : "http://twitter-jy1w.onrender.com/verify-sms-otp",
+            ? "https://twitter-jy1w.onrender.com/verify-email-otp"
+            : "https://twitter-jy1w.onrender.com/verify-sms-otp",
           {
             email: isFrench ? email : undefined,
             phoneNumber: !isFrench ? phoneNumber : undefined,
@@ -131,7 +137,10 @@ function Langs() {
                 );
               }}
             />
-            <button onClick={handleSendOtp} className="otp-btn">
+            <button
+              onClick={handleSendOtp}
+              onKeyDown={(e) => e.key === "Enter" && handleSendOtp}
+              className="otp-btn">
               {t("Send")}
             </button>
           </div>
@@ -148,7 +157,10 @@ function Langs() {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />
-            <button className="otp-btn" onClick={handleSubmitOtp}>
+            <button
+              className="otp-btn"
+              onClick={handleSubmitOtp}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp}>
               {t("Submit OTP")}
             </button>
           </div>
