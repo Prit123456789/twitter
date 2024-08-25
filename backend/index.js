@@ -149,7 +149,10 @@ async function run() {
 
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
-      console.log(`Verifying OTP for email: ${email}, OTP: ${otp}`);
+
+      if (!email || !otp) {
+        return res.status(400).send({ error: "Email and OTP are required" });
+      }
 
       try {
         const otpDoc = await otpCollection.findOne({ email });
@@ -174,9 +177,12 @@ async function run() {
 
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
-      console.log(
-        `Verifying OTP for phone number: ${phoneNumber}, OTP: ${otp}`
-      );
+
+      if (!phoneNumber || !otp) {
+        return res
+          .status(400)
+          .send({ error: "Phone number and OTP are required" });
+      }
 
       try {
         const otpDoc = await otpCollection.findOne({ phoneNumber });
