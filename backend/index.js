@@ -147,9 +147,9 @@ async function run() {
       }
     });
 
-    // Email OTP Verification
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
+      console.log(`Verifying OTP for email: ${email}, OTP: ${otp}`);
 
       try {
         const otpDoc = await otpCollection.findOne({ email });
@@ -161,7 +161,6 @@ async function run() {
         }
 
         if (otpDoc.otp === otp) {
-          // Optionally check expiry here if implemented
           await otpCollection.deleteOne({ email }); // Delete OTP after successful verification
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
@@ -173,9 +172,11 @@ async function run() {
       }
     });
 
-    // SMS OTP Verification
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
+      console.log(
+        `Verifying OTP for phone number: ${phoneNumber}, OTP: ${otp}`
+      );
 
       try {
         const otpDoc = await otpCollection.findOne({ phoneNumber });
@@ -187,7 +188,6 @@ async function run() {
         }
 
         if (otpDoc.otp === otp) {
-          // Optionally check expiry here if implemented
           await otpCollection.deleteOne({ phoneNumber }); // Delete OTP after successful verification
           res.status(200).send({ message: "OTP verified successfully" });
         } else {

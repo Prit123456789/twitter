@@ -64,6 +64,12 @@ function Langs() {
   const handleSubmitOtp = async () => {
     if (otpSent) {
       try {
+        console.log("Submitting OTP:", {
+          email: isFrench ? email : undefined,
+          phoneNumber: !isFrench ? phoneNumber : undefined,
+          otp: otp,
+        });
+
         const response = await axios.post(
           isFrench
             ? "https://twitter-cxhu.onrender.com/verify-email-otp"
@@ -74,6 +80,8 @@ function Langs() {
             otp: otp,
           }
         );
+
+        console.log("OTP verification response:", response.data);
 
         if (response.status === 200) {
           await i18n.changeLanguage(languageToChange); // Change language after OTP verification
