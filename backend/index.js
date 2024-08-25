@@ -91,20 +91,21 @@ async function run() {
     // Email OTPs
     app.post("/send-email-otp", async (req, res) => {
       const { email } = req.body;
+      if (!email) {
+        return res.status(400).send({ error: "Email is required" });
+      }
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000); // Generate a random OTP
+        const otp = Math.floor(Math.random() * 9000 + 1000);
 
         const msg = {
           to: email,
-          from: "medikondurusrikanth@gmail.com", // Ensure this is a verified email
+          from: "medikondurusrikanth@gmail.com",
           subject: "Your OTP Code",
           text: `Your OTP code is ${otp}`,
         };
 
         await sgMail.send(msg);
-
-        // Store the OTP in the database
         await otpCollection.insertOne({ email, otp });
 
         res.status(200).send({ message: "OTP sent to your email" });
