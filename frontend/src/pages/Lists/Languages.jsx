@@ -64,14 +64,14 @@ function Langs() {
   const handleSubmitOtp = async () => {
     if (otpSent) {
       try {
+        const identifier = isFrench ? email : phoneNumber;
+        console.log("Submitting OTP for:", identifier);
+
         const response = await axios.post(
-          isFrench
-            ? "https://twitter-cxhu.onrender.com/verify-email-otp"
-            : "https://twitter-cxhu.onrender.com/verify-sms-otp",
+          "https://twitter-cxhu.onrender.com/verify-otp",
           {
-            email: isFrench ? email : undefined,
-            phoneNumber: !isFrench ? phoneNumber : undefined,
-            otp: otp,
+            identifier, // Pass email or phone number as identifier
+            otp,
           }
         );
 
@@ -84,14 +84,8 @@ function Langs() {
           alert("Invalid OTP");
         }
       } catch (error) {
-        console.error(
-          "Error verifying OTP:",
-          error.response ? error.response.data : error.message
-        );
-        alert(
-          "Failed to verify OTP: " +
-            (error.response ? error.response.data.error : error.message)
-        );
+        console.error("Error verifying OTP:", error.response || error.message);
+        alert("Failed to verify OTP.");
       }
     }
   };

@@ -147,54 +147,41 @@ async function run() {
       }
     });
 
-    app.post("/verify-email-otp", async (req, res) => {
-      const { email, otp } = req.body;
+    app.post("/verify-otp", async (req, res) => {
+      const { identifier, otp } = req.body;
 
-      if (!email || !otp) {
-        return res.status(400).send({ error: "Email and OTP are required" });
-      }
-
-      try {
-        const otpDoc = await otpCollection.findOne({ email });
-
-        if (!otpDoc) {
-          return res
-            .status(400)
-            .send({ error: "OTP not found for this email" });
-        }
-
-        if (otpDoc.otp === otp) {
-          await otpCollection.deleteOne({ email }); // Delete OTP after successful verification
-          res.status(200).send({ message: "OTP verified successfully" });
-        } else {
-          res.status(400).send({ error: "Invalid OTP" });
-        }
-      } catch (error) {
-        console.error("Error verifying OTP:", error.message);
-        res.status(500).send({ error: "Error verifying OTP" });
-      }
-    });
-
-    app.post("/verify-sms-otp", async (req, res) => {
-      const { phoneNumber, otp } = req.body;
-
-      if (!phoneNumber || !otp) {
+      if (!identifier || !otp) {
         return res
           .status(400)
-          .send({ error: "Phone number and OTP are required" });
+          .send({ error: "Identifier and OTP are required" });
       }
 
       try {
-        const otpDoc = await otpCollection.findOne({ phoneNumber });
+        // Determine if the identifier is an email or phone number
+        let otpDoc;
+        if (identifier.includes("@")) {
+          // Simple check for email
+          otpDoc = await otpCollection.findOne({ email: identifier });
+        } else {
+          otpDoc = await otpCollection.findOne({ phoneNumber: identifier });
+        }
+
+        console.log("Received OTP:", otp);
+        console.log("Stored OTP:", otpDoc ? otpDoc.otp : "No OTP found");
 
         if (!otpDoc) {
           return res
             .status(400)
-            .send({ error: "OTP not found for this phone number" });
+            .send({ error: "OTP not found for this identifier" });
         }
 
         if (otpDoc.otp === otp) {
-          await otpCollection.deleteOne({ phoneNumber }); // Delete OTP after successful verification
+          // Delete the OTP after successful verification
+          if (identifier.includes("@")) {
+            await otpCollection.deleteOne({ email: identifier });
+          } else {
+            await otpCollection.deleteOne({ phoneNumber: identifier });
+          }
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });
