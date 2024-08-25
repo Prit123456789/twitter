@@ -37,7 +37,7 @@ const client1 = require("twilio")(accountSid, authToken);
 
 sgMail.setApiKey(process.env.sg_ApiKey);
 
-const uri = process.env.MONGO_URI;
+const uri = `mongodb+srv://twitter_admin:8WJMqzWj1QRyiEM6@cluster0.rctficy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
