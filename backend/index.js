@@ -14,7 +14,7 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://twitter-jy1w.onrender.com"], // Allowed origins
+    origin: ["http://localhost:3000", "https://twitter-cxhu.onrender.com"], // Allowed origins
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Allow cookies and other credentials
   })
@@ -25,9 +25,7 @@ app.options("*", cors()); // Allow preflight for all routes
 app.use(express.json());
 app.use(bodyParser.json());
 
-sgMail.setApiKey(
-  SG.JnXbrgDbQi - XViEf2wIr - g.yudiTMMygykPsTi4jzsIl4sYUkdXYw3A0DGmN6RonPk
-);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const uri = `mongodb+srv://twitter_admin:8WJMqzWj1QRyiEM6@cluster0.rctficy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {

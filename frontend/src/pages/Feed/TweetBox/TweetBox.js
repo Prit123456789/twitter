@@ -50,7 +50,7 @@ function TweetBox() {
     e.preventDefault();
 
     if (user?.providerData[0]?.providerId === "password") {
-      fetch(`https://twitter-jy1w.onrender.com/loggedInUser?email=${email}`)
+      fetch(`https://twitter-cxhu.onrender.com/loggedInUser?email=${email}`)
         .then((res) => res.json())
         .then((data) => {
           setName(data[0]?.name);
@@ -73,7 +73,7 @@ function TweetBox() {
       console.log(userPost);
       setPost("");
       setImageURL("");
-      fetch("https://twitter-jy1w.onrender.com/post", {
+      fetch("https://twitter-cxhu.onrender.com/post", {
         method: "POST",
         headers: {
           "content-type": "application/json",

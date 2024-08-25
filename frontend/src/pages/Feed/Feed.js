@@ -4,29 +4,27 @@ import "./Feed.css";
 import TweetBox from "./TweetBox/TweetBox";
 
 function Feed() {
-    const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]);
 
-    useEffect(() => {
-        fetch('https://twitter-jy1w.onrender.com/post')
-            .then(res => res.json())
-            .then(data => {
-                setPosts(data);
-            })
-    }, [posts])
+  useEffect(() => {
+    fetch("https://twitter-cxhu.onrender.com/post")
+      .then((res) => res.json())
+      .then((data) => {
+        setPosts(data);
+      });
+  }, [posts]);
 
-    return (
-        <div className="feed">
-            <div className="feed__header">
-                <h2>Home</h2>
-            </div>
-            <TweetBox />
-            {
-                posts.map(p => <Post key={p._id} p={p} />)
-            }
-        </div>
-
-    )
-
+  return (
+    <div className="feed">
+      <div className="feed__header">
+        <h2>Home</h2>
+      </div>
+      <TweetBox />
+      {posts.map((p) => (
+        <Post key={p._id} p={p} />
+      ))}
+    </div>
+  );
 }
 
-export default Feed
+export default Feed;
