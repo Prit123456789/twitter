@@ -89,23 +89,24 @@ async function run() {
     });
 
     // Email OTP
+    // Email OTPs
     app.post("/send-email-otp", async (req, res) => {
       const { email } = req.body;
+
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
+
         const msg = {
           to: email,
           from: "medikondurusrikanth@gmail.com",
           subject: "Your OTP Code",
-          text: `Your OTP code is ${otp}`,
+          text: ` Your OTP code is ${otp}`,
         };
+
         await sgMail.send(msg);
-        await otpCollection.insertOne({
-          email,
-          otp,
-          createdAt: new Date(),
-          type: "email",
-        });
+
+        await otpCollection.insertOne({ email, otp, createdAt: new Date() });
+
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
         console.error(
@@ -116,33 +117,36 @@ async function run() {
       }
     });
 
-    // SMS OTP
+    const addDefaultCountryCode = (phoneNumber) => {
+      return phoneNumber.startsWith("+") ? phoneNumber : "+91" + phoneNumber;
+    };
+
     app.post("/send-sms-otp", async (req, res) => {
       const { phoneNumber } = req.body;
+
       if (!phoneNumber) {
         return res.status(400).send({ error: "Phone number is required" });
       }
+
       const formattedPhoneNumber = addDefaultCountryCode(phoneNumber);
+
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
+
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: formattedPhoneNumber,
         });
-        await otpCollection.insertOne({
-          phoneNumber,
-          otp,
-          createdAt: new Date(),
-          type: "sms",
-        });
+
+        await otpCollection.insertOne({ phoneNumber, otp });
+
         res.status(200).send({ message: "OTP sent to your mobile number" });
       } catch (error) {
         console.error("Error sending SMS:", error.message);
         res.status(500).send({ error: "Error sending OTP" });
       }
     });
-
     // Verify Email OTP
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
