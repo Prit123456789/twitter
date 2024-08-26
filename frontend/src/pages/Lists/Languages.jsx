@@ -62,31 +62,24 @@ function Langs() {
   };
 
   const handleSubmitOtp = async () => {
-    if (otpSent) {
-      try {
-        const identifier = isFrench ? email : phoneNumber;
-        console.log("Submitting OTP for:", identifier);
-
-        const response = await axios.post(
-          "https://twitter-cxhu.onrender.com/verify-otp",
-          {
-            identifier,
-            otp: otp.trim(), // Trim any extra spaces
-          }
-        );
-
-        if (response.status === 200) {
-          await i18n.changeLanguage(languageToChange);
-          setOtpSent(false);
-          setOtp("");
-          alert("OTP Verified Successfully. Language Changed.");
-        } else {
-          alert("Invalid OTP");
+    try {
+      const response = await axios.post(
+        "https://twitter-cxhu.onrender.com/verify-otp",
+        {
+          identifier,
+          otp,
         }
-      } catch (error) {
-        console.error("Error verifying OTP:", error.response || error.message);
-        alert("Failed to verify OTP.");
-      }
+      );
+      alert("OTP verified successfully");
+    } catch (error) {
+      console.error(
+        "Error verifying OTP:",
+        error.response ? error.response.data : error.message
+      );
+      alert(
+        "Failed to verify OTP: " +
+          (error.response ? error.response.data.error : error.message)
+      );
     }
   };
 
