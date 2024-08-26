@@ -11,6 +11,7 @@
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
+    "@vercel/speed-insights": "^1.0.12",
     "@vis.gl/react-google-maps": "^1.1.0",
     "axios": "^0.27.2",
     "dotenv": "^16.4.5",
