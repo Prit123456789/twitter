@@ -67,7 +67,7 @@ function Langs() {
         const endpoint = isFrench ? "verify-email-otp" : "verify-sms-otp";
         const payload = isFrench
           ? { email, otp: otp.trim() }
-          : { phoneNumber: phoneNumber, otp: otp.trim() };
+          : { phoneNumber, otp: otp.trim() };
 
         const response = await axios.post(
           `https://twitter-cxhu.onrender.com/${endpoint}`,
@@ -112,7 +112,7 @@ function Langs() {
               placeholder={t("Enter your email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && { handleSendOtp }}
+              onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
             />
             <button onClick={handleSendOtp} className="otp-btn">
               {t("Send")}
@@ -126,7 +126,7 @@ function Langs() {
               className="email"
               type="tel"
               placeholder={t("Enter your phone number")}
-              onKeyDown={(e) => e.key === "Enter" && handleSendOtp}
+              onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
               value={phoneNumber}
               onChange={(e) => {
                 const input = e.target.value.replace(/\D/g, ""); // Remove non-digits
@@ -151,7 +151,7 @@ function Langs() {
               placeholder={t("Enter OTP")}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp()}
             />
             <button className="otp-btn" onClick={handleSubmitOtp}>
               {t("Submit OTP")}

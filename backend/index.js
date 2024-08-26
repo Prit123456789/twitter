@@ -146,6 +146,7 @@ async function run() {
         res.status(500).send({ error: "Error sending OTP" });
       }
     });
+    // Verify Email OTP
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
 
@@ -170,7 +171,7 @@ async function run() {
       }
     });
 
-    // Endpoint to verify SMS OTP
+    // Verify SMS OTP
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
 
