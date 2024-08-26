@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const uri = `mongodb+srv://twitter_admin:8WJMqzWj1QRyiEM6@cluster0.rctficy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -88,7 +88,6 @@ async function run() {
       res.send(result);
     });
 
-    // Email OTP
     // Email OTPs
     app.post("/send-email-otp", async (req, res) => {
       const { email } = req.body;
@@ -147,62 +146,57 @@ async function run() {
         res.status(500).send({ error: "Error sending OTP" });
       }
     });
-    // Verify Email OTP
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
-      if (!email || !otp) {
+
+      if (!email || !otp)
         return res.status(400).send({ error: "Email and OTP are required" });
-      }
+
       try {
         const otpDoc = await otpCollection.findOne({ email, type: "email" });
-        if (!otpDoc) {
-          return res.status(400).send({ error: "No OTP found for this email" });
-        }
-        if (otpDoc.otp !== otp.trim()) {
+
+        if (!otpDoc || otpDoc.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
-        }
+
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
-        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
+        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
-        }
+
         await otpCollection.deleteOne({ _id: otpDoc._id });
         res.status(200).send({ message: "Email OTP verified successfully" });
       } catch (error) {
-        console.error("Error verifying email OTP:", error.message);
-        res.status(500).send({ error: "Error verifying email OTP" });
+        console.error("Error verifying OTP:", error.message);
+        res.status(500).send({ error: "Error verifying OTP" });
       }
     });
 
-    // Verify SMS OTP
+    // Endpoint to verify SMS OTP
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
-      if (!phoneNumber || !otp) {
+
+      if (!phoneNumber || !otp)
         return res
           .status(400)
           .send({ error: "Phone number and OTP are required" });
-      }
+
       try {
         const otpDoc = await otpCollection.findOne({
           phoneNumber,
           type: "sms",
         });
-        if (!otpDoc) {
-          return res
-            .status(400)
-            .send({ error: "No OTP found for this phone number" });
-        }
-        if (otpDoc.otp !== otp.trim()) {
+
+        if (!otpDoc || otpDoc.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
-        }
+
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
-        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
+        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
-        }
+
         await otpCollection.deleteOne({ _id: otpDoc._id });
         res.status(200).send({ message: "SMS OTP verified successfully" });
       } catch (error) {
-        console.error("Error verifying SMS OTP:", error.message);
-        res.status(500).send({ error: "Error verifying SMS OTP" });
+        console.error("Error verifying OTP:", error.message);
+        res.status(500).send({ error: "Error verifying OTP" });
       }
     });
   } catch (error) {

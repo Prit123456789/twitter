@@ -112,6 +112,7 @@ function Langs() {
               placeholder={t("Enter your email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && { handleSendOtp }}
             />
             <button onClick={handleSendOtp} className="otp-btn">
               {t("Send")}
@@ -125,6 +126,7 @@ function Langs() {
               className="email"
               type="tel"
               placeholder={t("Enter your phone number")}
+              onKeyDown={(e) => e.key === "Enter" && handleSendOtp}
               value={phoneNumber}
               onChange={(e) => {
                 const input = e.target.value.replace(/\D/g, ""); // Remove non-digits
@@ -133,10 +135,7 @@ function Langs() {
                 );
               }}
             />
-            <button
-              onClick={handleSendOtp}
-              onKeyDown={(e) => e.key === "Enter" && handleSendOtp}
-              className="otp-btn">
+            <button onClick={handleSendOtp} className="otp-btn">
               {t("Send")}
             </button>
           </div>
@@ -152,11 +151,9 @@ function Langs() {
               placeholder={t("Enter OTP")}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp}
             />
-            <button
-              className="otp-btn"
-              onClick={handleSubmitOtp}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp}>
+            <button className="otp-btn" onClick={handleSubmitOtp}>
               {t("Submit OTP")}
             </button>
           </div>
