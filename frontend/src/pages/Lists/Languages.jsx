@@ -65,13 +65,13 @@ function Langs() {
     if (otpSent) {
       try {
         const endpoint = isFrench ? "verify-email-otp" : "verify-sms-otp";
-        const identifier = isFrench ? email : phoneNumber;
+        const payload = isFrench
+          ? { email, otp: otp.trim() }
+          : { phoneNumber: phoneNumber, otp: otp.trim() };
+
         const response = await axios.post(
           `https://twitter-cxhu.onrender.com/${endpoint}`,
-          {
-            [isFrench ? "email" : "phoneNumber"]: identifier,
-            otp: otp.trim(),
-          }
+          payload
         );
 
         if (response.status === 200) {

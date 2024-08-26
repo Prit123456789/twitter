@@ -88,24 +88,24 @@ async function run() {
       res.send(result);
     });
 
-    // Email OTPs
+    // Email OTP
     app.post("/send-email-otp", async (req, res) => {
       const { email } = req.body;
-
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
-
         const msg = {
           to: email,
           from: "medikondurusrikanth@gmail.com",
           subject: "Your OTP Code",
           text: `Your OTP code is ${otp}`,
         };
-
         await sgMail.send(msg);
-
-        await otpCollection.insertOne({ email, otp, createdAt: new Date() });
-
+        await otpCollection.insertOne({
+          email,
+          otp,
+          createdAt: new Date(),
+          type: "email",
+        });
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
         console.error(
@@ -116,30 +116,26 @@ async function run() {
       }
     });
 
-    const addDefaultCountryCode = (phoneNumber) => {
-      return phoneNumber.startsWith("+") ? phoneNumber : "+91" + phoneNumber;
-    };
-
+    // SMS OTP
     app.post("/send-sms-otp", async (req, res) => {
       const { phoneNumber } = req.body;
-
       if (!phoneNumber) {
         return res.status(400).send({ error: "Phone number is required" });
       }
-
       const formattedPhoneNumber = addDefaultCountryCode(phoneNumber);
-
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
-
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: formattedPhoneNumber,
         });
-
-        await otpCollection.insertOne({ phoneNumber, otp });
-
+        await otpCollection.insertOne({
+          phoneNumber,
+          otp,
+          createdAt: new Date(),
+          type: "sms",
+        });
         res.status(200).send({ message: "OTP sent to your mobile number" });
       } catch (error) {
         console.error("Error sending SMS:", error.message);
@@ -147,34 +143,25 @@ async function run() {
       }
     });
 
-    // Verify OTP sent to email
+    // Verify Email OTP
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
-
       if (!email || !otp) {
         return res.status(400).send({ error: "Email and OTP are required" });
       }
-
       try {
         const otpDoc = await otpCollection.findOne({ email, type: "email" });
-
         if (!otpDoc) {
           return res.status(400).send({ error: "No OTP found for this email" });
         }
-
         if (otpDoc.otp !== otp.trim()) {
           return res.status(400).send({ error: "Invalid OTP" });
         }
-
-        // Check OTP expiry
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
         if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
           return res.status(400).send({ error: "OTP expired" });
         }
-
-        // Delete OTP after successful verification
         await otpCollection.deleteOne({ _id: otpDoc._id });
-
         res.status(200).send({ message: "Email OTP verified successfully" });
       } catch (error) {
         console.error("Error verifying email OTP:", error.message);
@@ -182,41 +169,32 @@ async function run() {
       }
     });
 
-    // Verify OTP sent to SMS
+    // Verify SMS OTP
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
-
       if (!phoneNumber || !otp) {
         return res
           .status(400)
           .send({ error: "Phone number and OTP are required" });
       }
-
       try {
         const otpDoc = await otpCollection.findOne({
           phoneNumber,
           type: "sms",
         });
-
         if (!otpDoc) {
           return res
             .status(400)
             .send({ error: "No OTP found for this phone number" });
         }
-
         if (otpDoc.otp !== otp.trim()) {
           return res.status(400).send({ error: "Invalid OTP" });
         }
-
-        // Check OTP expiry
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
         if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
           return res.status(400).send({ error: "OTP expired" });
         }
-
-        // Delete OTP after successful verification
         await otpCollection.deleteOne({ _id: otpDoc._id });
-
         res.status(200).send({ message: "SMS OTP verified successfully" });
       } catch (error) {
         console.error("Error verifying SMS OTP:", error.message);
