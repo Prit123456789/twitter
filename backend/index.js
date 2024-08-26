@@ -147,6 +147,24 @@ async function run() {
       }
     });
 
+    const verifyOTPandDelete = async (otpDoc, otp) => {
+      if (otpDoc.otp !== otp.trim()) {
+        return false;
+      }
+      const session = client.db("database").startSession();
+      session.startTransaction();
+      try {
+        await otpCollection.deleteOne({ _id: otpDoc._id }, { session });
+        await session.commitTransaction();
+        return true;
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    };
+
     app.post("/verify-otp", async (req, res) => {
       const { identifier, otp } = req.body;
 
@@ -164,18 +182,12 @@ async function run() {
           otpDoc = await otpCollection.findOne({ phoneNumber: identifier });
         }
 
-        console.log("Received OTP:", otp);
-        console.log("Stored OTP:", otpDoc ? otpDoc.otp : "No OTP found");
-
-        if (!otpDoc) {
-          return res
-            .status(400)
-            .send({ error: "OTP not found for this identifier" });
+        if (!otpDoc || otpDoc.expiry < Date.now()) {
+          return res.status(400).send({ error: "OTP expired" });
         }
 
-        if (otpDoc.otp === otp.trim()) {
-          // Trim any extra spaces
-          await otpCollection.deleteOne({ _id: otpDoc._id });
+        const verified = await verifyOTPandDelete(otpDoc, otp);
+        if (verified) {
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });
