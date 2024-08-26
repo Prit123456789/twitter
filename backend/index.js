@@ -157,10 +157,8 @@ async function run() {
       }
 
       try {
-        // Determine if the identifier is an email or phone number
         let otpDoc;
         if (identifier.includes("@")) {
-          // Simple check for email
           otpDoc = await otpCollection.findOne({ email: identifier });
         } else {
           otpDoc = await otpCollection.findOne({ phoneNumber: identifier });
@@ -175,13 +173,9 @@ async function run() {
             .send({ error: "OTP not found for this identifier" });
         }
 
-        if (otpDoc.otp === otp) {
-          // Delete the OTP after successful verification
-          if (identifier.includes("@")) {
-            await otpCollection.deleteOne({ email: identifier });
-          } else {
-            await otpCollection.deleteOne({ phoneNumber: identifier });
-          }
+        if (otpDoc.otp === otp.trim()) {
+          // Trim any extra spaces
+          await otpCollection.deleteOne({ _id: otpDoc._id });
           res.status(200).send({ message: "OTP verified successfully" });
         } else {
           res.status(400).send({ error: "Invalid OTP" });

@@ -70,15 +70,15 @@ function Langs() {
         const response = await axios.post(
           "https://twitter-cxhu.onrender.com/verify-otp",
           {
-            identifier, // Pass email or phone number as identifier
-            otp,
+            identifier,
+            otp: otp.trim(), // Trim any extra spaces
           }
         );
 
         if (response.status === 200) {
-          await i18n.changeLanguage(languageToChange); // Change language after OTP verification
+          await i18n.changeLanguage(languageToChange);
           setOtpSent(false);
-          setOtp(""); // Clear OTP field
+          setOtp("");
           alert("OTP Verified Successfully. Language Changed.");
         } else {
           alert("Invalid OTP");
