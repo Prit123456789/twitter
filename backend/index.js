@@ -94,6 +94,7 @@ async function run() {
 
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
+        const expirationTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
 
         const msg = {
           to: email,
@@ -104,7 +105,12 @@ async function run() {
 
         await sgMail.send(msg);
 
-        await otpCollection.insertOne({ email, otp, createdAt: new Date() });
+        await otpCollection.insertOne({
+          email,
+          otp,
+          createdAt: new Date(),
+          expiry: expirationTime,
+        });
 
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
@@ -116,10 +122,6 @@ async function run() {
       }
     });
 
-    const addDefaultCountryCode = (phoneNumber) => {
-      return phoneNumber.startsWith("+") ? phoneNumber : "+91" + phoneNumber;
-    };
-
     app.post("/send-sms-otp", async (req, res) => {
       const { phoneNumber } = req.body;
 
@@ -128,17 +130,22 @@ async function run() {
       }
 
       const formattedPhoneNumber = addDefaultCountryCode(phoneNumber);
+      const otp = Math.floor(Math.random() * 9000 + 1000);
+      const expirationTime = new Date(Date.now() + 5 * 60 * 1000);
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000);
-
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: formattedPhoneNumber,
         });
 
-        await otpCollection.insertOne({ phoneNumber, otp });
+        await otpCollection.insertOne({
+          phoneNumber,
+          otp,
+          createdAt: new Date(),
+          expiry: expirationTime,
+        });
 
         res.status(200).send({ message: "OTP sent to your mobile number" });
       } catch (error) {
@@ -146,24 +153,6 @@ async function run() {
         res.status(500).send({ error: "Error sending OTP" });
       }
     });
-
-    const verifyOTPandDelete = async (otpDoc, otp) => {
-      if (otpDoc.otp !== otp.trim()) {
-        return false;
-      }
-      const session = client.db("database").startSession();
-      session.startTransaction();
-      try {
-        await otpCollection.deleteOne({ _id: otpDoc._id }, { session });
-        await session.commitTransaction();
-        return true;
-      } catch (error) {
-        await session.abortTransaction();
-        throw error;
-      } finally {
-        session.endSession();
-      }
-    };
 
     app.post("/verify-otp", async (req, res) => {
       const { identifier, otp } = req.body;
@@ -182,7 +171,7 @@ async function run() {
           otpDoc = await otpCollection.findOne({ phoneNumber: identifier });
         }
 
-        if (!otpDoc || otpDoc.expiry < Date.now()) {
+        if (!otpDoc || new Date() > otpDoc.expiry) {
           return res.status(400).send({ error: "OTP expired" });
         }
 
