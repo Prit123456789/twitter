@@ -64,11 +64,12 @@ function Langs() {
   const handleSubmitOtp = async () => {
     if (otpSent) {
       try {
+        const endpoint = isFrench ? "verify-email-otp" : "verify-sms-otp";
         const identifier = isFrench ? email : phoneNumber;
         const response = await axios.post(
-          "https://twitter-cxhu.onrender.com/verify-otp",
+          `https://twitter-cxhu.onrender.com/${endpoint}`,
           {
-            identifier,
+            [isFrench ? "email" : "phoneNumber"]: identifier,
             otp: otp.trim(),
           }
         );

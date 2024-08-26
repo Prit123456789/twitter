@@ -147,34 +147,26 @@ async function run() {
       }
     });
 
-    app.post("/verify-otp", async (req, res) => {
-      const { identifier, otp } = req.body;
+    // Verify OTP sent to email
+    app.post("/verify-email-otp", async (req, res) => {
+      const { email, otp } = req.body;
 
-      if (!identifier || !otp) {
-        return res
-          .status(400)
-          .send({ error: "Identifier and OTP are required" });
+      if (!email || !otp) {
+        return res.status(400).send({ error: "Email and OTP are required" });
       }
 
       try {
-        let otpDoc;
-        if (identifier.includes("@")) {
-          otpDoc = await otpCollection.findOne({ email: identifier });
-        } else {
-          otpDoc = await otpCollection.findOne({ phoneNumber: identifier });
-        }
+        const otpDoc = await otpCollection.findOne({ email, type: "email" });
 
         if (!otpDoc) {
-          return res
-            .status(400)
-            .send({ error: "No OTP found for this identifier" });
+          return res.status(400).send({ error: "No OTP found for this email" });
         }
 
         if (otpDoc.otp !== otp.trim()) {
           return res.status(400).send({ error: "Invalid OTP" });
         }
 
-        // Optionally, you can check if the OTP has expired
+        // Check OTP expiry
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
         if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
           return res.status(400).send({ error: "OTP expired" });
@@ -183,10 +175,52 @@ async function run() {
         // Delete OTP after successful verification
         await otpCollection.deleteOne({ _id: otpDoc._id });
 
-        res.status(200).send({ message: "OTP verified successfully" });
+        res.status(200).send({ message: "Email OTP verified successfully" });
       } catch (error) {
-        console.error("Error verifying OTP:", error.message);
-        res.status(500).send({ error: "Error verifying OTP" });
+        console.error("Error verifying email OTP:", error.message);
+        res.status(500).send({ error: "Error verifying email OTP" });
+      }
+    });
+
+    // Verify OTP sent to SMS
+    app.post("/verify-sms-otp", async (req, res) => {
+      const { phoneNumber, otp } = req.body;
+
+      if (!phoneNumber || !otp) {
+        return res
+          .status(400)
+          .send({ error: "Phone number and OTP are required" });
+      }
+
+      try {
+        const otpDoc = await otpCollection.findOne({
+          phoneNumber,
+          type: "sms",
+        });
+
+        if (!otpDoc) {
+          return res
+            .status(400)
+            .send({ error: "No OTP found for this phone number" });
+        }
+
+        if (otpDoc.otp !== otp.trim()) {
+          return res.status(400).send({ error: "Invalid OTP" });
+        }
+
+        // Check OTP expiry
+        const otpExpiry = 5 * 60 * 1000; // 5 minutes
+        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
+          return res.status(400).send({ error: "OTP expired" });
+        }
+
+        // Delete OTP after successful verification
+        await otpCollection.deleteOne({ _id: otpDoc._id });
+
+        res.status(200).send({ message: "SMS OTP verified successfully" });
+      } catch (error) {
+        console.error("Error verifying SMS OTP:", error.message);
+        res.status(500).send({ error: "Error verifying SMS OTP" });
       }
     });
   } catch (error) {
