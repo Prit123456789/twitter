@@ -1,6 +1,6 @@
 .chatbot{
     border-right: 1px solid var(--twitter-background);
-    width: 40vw;
+    min-width: 750px;
     height: 100vh;
     display: flex;
     flex-direction: column;
