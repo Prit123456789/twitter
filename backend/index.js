@@ -97,37 +97,30 @@ async function run() {
 
         const msg = {
           to: email,
-          from: "medikondurusrikanth@gmail.com",
+          from: process.env.SENDGRID_EMAIL,
           subject: "Your OTP Code",
-          text: ` Your OTP code is ${otp}`,
+          text: `Your OTP code is ${otp}`,
         };
 
         await sgMail.send(msg);
 
-        await otpCollection.insertOne({ email, otp, createdAt: new Date() });
+        await otpCollection.insertOne({
+          email,
+          otp,
+          type: "email",
+          createdAt: new Date(),
+        });
 
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
-        console.error(
-          "Error sending email:",
-          error.response ? error.response.body : error.message
-        );
-        res.status(500).send({ error: "Error sending OTP" });
+        console.error("Error sending email OTP:", error);
+        res.status(500).send({ error: "Failed to send OTP" });
       }
     });
 
-    const addDefaultCountryCode = (phoneNumber) => {
-      return phoneNumber.startsWith("+") ? phoneNumber : "+91" + phoneNumber;
-    };
-
+    // SMS OTPs
     app.post("/send-sms-otp", async (req, res) => {
       const { phoneNumber } = req.body;
-
-      if (!phoneNumber) {
-        return res.status(400).send({ error: "Phone number is required" });
-      }
-
-      const formattedPhoneNumber = addDefaultCountryCode(phoneNumber);
 
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000);
@@ -135,39 +128,47 @@ async function run() {
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
           from: process.env.TWILIO_PHONE_NUMBER,
-          to: formattedPhoneNumber,
+          to: phoneNumber,
         });
 
-        await otpCollection.insertOne({ phoneNumber, otp });
+        await otpCollection.insertOne({
+          phoneNumber,
+          otp,
+          type: "sms",
+          createdAt: new Date(),
+        });
 
-        res.status(200).send({ message: "OTP sent to your mobile number" });
+        res.status(200).send({ message: "OTP sent to your phone" });
       } catch (error) {
-        console.error("Error sending SMS:", error.message);
-        res.status(500).send({ error: "Error sending OTP" });
+        console.error("Error sending SMS OTP:", error);
+        res.status(500).send({ error: "Failed to send OTP" });
       }
     });
-    // Verify Email OTP
+
+    // Verify email OTP
     app.post("/verify-email-otp", async (req, res) => {
       const { email, otp } = req.body;
 
-      if (!email || !otp)
-        return res.status(400).send({ error: "Email and OTP are required" });
-
       try {
-        const otpDoc = await otpCollection.findOne({ email, type: "email" });
+        const otpDoc = await otpCollection.findOne({
+          email,
+          otp: otp.trim(),
+          type: "email",
+        });
 
-        if (!otpDoc || otpDoc.otp !== otp.trim())
+        if (!otpDoc) {
           return res.status(400).send({ error: "Invalid OTP" });
+        }
 
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
-        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry)
+        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
           return res.status(400).send({ error: "OTP expired" });
+        }
 
-        await otpCollection.deleteOne({ _id: otpDoc._id });
-        res.status(200).send({ message: "Email OTP verified successfully" });
+        res.status(200).send({ message: "OTP verified successfully" });
       } catch (error) {
-        console.error("Error verifying OTP:", error.message);
-        res.status(500).send({ error: "Error verifying OTP" });
+        console.error("Error verifying email OTP:", error);
+        res.status(500).send({ error: "Failed to verify OTP" });
       }
     });
 
@@ -175,41 +176,36 @@ async function run() {
     app.post("/verify-sms-otp", async (req, res) => {
       const { phoneNumber, otp } = req.body;
 
-      if (!phoneNumber || !otp)
-        return res
-          .status(400)
-          .send({ error: "Phone number and OTP are required" });
-
       try {
         const otpDoc = await otpCollection.findOne({
           phoneNumber,
+          otp: otp.trim(),
           type: "sms",
         });
 
-        if (!otpDoc || otpDoc.otp !== otp.trim())
+        if (!otpDoc) {
           return res.status(400).send({ error: "Invalid OTP" });
+        }
 
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
-        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry)
+        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry) {
           return res.status(400).send({ error: "OTP expired" });
+        }
 
-        await otpCollection.deleteOne({ _id: otpDoc._id });
-        res.status(200).send({ message: "SMS OTP verified successfully" });
+        res.status(200).send({ message: "OTP verified successfully" });
       } catch (error) {
-        console.error("Error verifying OTP:", error.message);
-        res.status(500).send({ error: "Error verifying OTP" });
+        console.error("Error verifying SMS OTP:", error);
+        res.status(500).send({ error: "Failed to verify OTP" });
       }
     });
-  } catch (error) {
-    console.log(error);
+  } finally {
+    // Ensure the client will close when you finish/error
+    // await client.close(); (Don't close it if you want to keep the server running)
   }
 }
+
 run().catch(console.dir);
 
-app.get("/", (req, res) => {
-  res.send("Hello from Twitter Clone!");
-});
-
 app.listen(port, () => {
-  console.log(`Twitter clone is listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });

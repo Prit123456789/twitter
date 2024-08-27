@@ -153,7 +153,7 @@ function Langs() {
               onChange={(e) => setOtp(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp()}
             />
-            <button className="otp-btn" onClick={handleSubmitOtp}>
+            <button className="otp-btn" onClick={handleSubmitOtp()}>
               {t("Submit OTP")}
             </button>
           </div>
