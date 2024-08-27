@@ -6,12 +6,15 @@ body{
   display: flex;
   height: 100vh;
   max-width: 1080px;
-  margin-right: 90px;
-  margin-left: 90px;
+  margin-right: 0;
+  margin-left: 0;
   padding: 0 10px;
 }
 @media screen and (max-width:1080px){
   .app{
     display: block;
   }
+}
+::-webkit-scrollbar{
+  display: none;
 }

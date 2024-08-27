@@ -1,9 +1,11 @@
 const express = require("express");
 require("dotenv").config();
 const app = express();
+const multer = require("multer");
+const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const sgMail = require("@sendgrid/mail");
 const client1 = require("twilio")(
   process.env.TWILIO_ACCOUNT_SID,
@@ -11,16 +13,26 @@ const client1 = require("twilio")(
 );
 
 const port = process.env.PORT || 5000;
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://twitter-seven-puce.vercel.app"], // Allowed origins
+    origin: ["http://localhost:3000", "https://twitter-seven-puce.vercel.app"],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true, // Allow cookies and other credentials
+    credentials: true,
   })
 );
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
-app.options("*", cors()); // Allow preflight for all routes
+const upload = multer({ storage });
+app.options("*", cors());
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -28,17 +40,14 @@ app.use(bodyParser.json());
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1,
-});
+const client = new MongoClient(uri);
 
 async function run() {
   try {
     await client.connect();
-    const postCollection = client.db("database").collection("posts"); // this collection is for team-ekt
-    const userCollection = client.db("database").collection("users"); // this collection is for team-srv
+    const postCollection = client.db("database").collection("posts");
+    const userCollection = client.db("database").collection("users");
+    const audioCollection = client.db("database").collection("audios");
 
     // get
     app.get("/user", async (req, res) => {
@@ -61,12 +70,40 @@ async function run() {
       ).reverse();
       res.send(post);
     });
-
+    app.get("/record", async (req, res) => {
+      const records = (await audioCollection.find().toArray()).reverse();
+      res.send(records);
+    });
     // post
     app.post("/register", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send(result);
+    });
+
+    app.post("/record", upload.single("audio"), async (req, res) => {
+      try {
+        const audioFile = req.file;
+
+        if (!audioFile) {
+          return res.status(400).send({ error: "Audio file is required" });
+        }
+
+        const audioURL = `/uploads/${audioFile.filename}`;
+
+        const record = {
+          audioURL: audioURL,
+          createdAt: new Date(),
+        };
+
+        const result = await audioCollection.insertOne(record);
+        res
+          .status(201)
+          .send({ audioUrl: audioURL, message: "Audio uploaded successfully" });
+      } catch (error) {
+        console.error("Error saving audio:", error);
+        res.status(500).send({ error: "Error saving audio" });
+      }
     });
 
     app.post("/post", async (req, res) => {
@@ -92,8 +129,8 @@ async function run() {
       const { email } = req.body;
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000).toString(); // Ensure OTP is a string
-        otpStore[email] = { otp, createdAt: new Date() }; // Store OTP in memory
+        const otp = Math.floor(Math.random() * 9000 + 1000).toString();
+        otpStore[email] = { otp, createdAt: new Date() };
 
         const msg = {
           to: email,
@@ -119,9 +156,8 @@ async function run() {
       const { phoneNumber } = req.body;
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000).toString(); // Ensure OTP is a string
-        otpStore[phoneNumber] = { otp, createdAt: new Date() }; // Store OTP in memory
-
+        const otp = Math.floor(Math.random() * 9000 + 1000).toString();
+        otpStore[phoneNumber] = { otp, createdAt: new Date() };
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
           from: process.env.TWILIO_PHONE_NUMBER,
@@ -149,11 +185,11 @@ async function run() {
         if (!storedOtp || storedOtp.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
 
-        const otpExpiry = 5 * 60 * 1000; // 5 minutes
+        const otpExpiry = 5 * 60 * 1000;
         if (Date.now() - new Date(storedOtp.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
 
-        delete otpStore[email]; // Clear OTP after successful verification
+        delete otpStore[email];
         res.status(200).send({ message: "Email OTP verified successfully" });
       } catch (error) {
         console.error("Error verifying OTP:", error.message);
@@ -176,11 +212,11 @@ async function run() {
         if (!storedOtp || storedOtp.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
 
-        const otpExpiry = 5 * 60 * 1000; // 5 minutes
+        const otpExpiry = 5 * 60 * 1000;
         if (Date.now() - new Date(storedOtp.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
 
-        delete otpStore[phoneNumber]; // Clear OTP after successful verification
+        delete otpStore[phoneNumber];
         res.status(200).send({ message: "SMS OTP verified successfully" });
       } catch (error) {
         console.error("Error verifying OTP:", error.message);
