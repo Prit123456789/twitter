@@ -61,59 +61,35 @@ function Langs() {
     }
   };
 
-  const handleSubmitEmailOtp = async () => {
-    try {
-      const payload = { email, otp: otp.trim() };
-
-      console.log("Email OTP Payload:", payload); // Debugging log
-
-      const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-email-otp",
-        payload
-      );
-
-      if (response.status === 200) {
-        await i18n.changeLanguage(languageToChange);
-        setOtpSent(false);
-        setOtp("");
-        alert("OTP Verified Successfully. Language Changed.");
-      } else {
-        alert("Invalid OTP");
+  const handleSubmitOtp = async () => {
+    if (otpSent) {
+      // Ensure OTP is exactly 4 characters
+      if (otp.length !== 4) {
+        alert("OTP must be exactly 4 characters.");
+        return;
       }
-    } catch (error) {
-      console.error(
-        "Error verifying email OTP:",
-        error.response?.data || error.message
-      );
-      alert("Failed to verify OTP.");
-    }
-  };
 
-  const handleSubmitSmsOtp = async () => {
-    try {
-      const payload = { phoneNumber, otp: otp.trim() };
+      try {
+        const endpoint = isFrench ? "verify-email-otp" : "verify-sms-otp";
+        const payload = isFrench ? { email, otp } : { phoneNumber, otp };
 
-      console.log("SMS OTP Payload:", payload); // Debugging log
+        const response = await axios.post(
+          `https://twitter-cxhu.onrender.com/${endpoint}`,
+          payload
+        );
 
-      const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-sms-otp",
-        payload
-      );
-
-      if (response.status === 200) {
-        await i18n.changeLanguage(languageToChange);
-        setOtpSent(false);
-        setOtp("");
-        alert("OTP Verified Successfully. Language Changed.");
-      } else {
-        alert("Invalid OTP");
+        if (response.status === 200) {
+          await i18n.changeLanguage(languageToChange);
+          setOtpSent(false);
+          setOtp("");
+          alert("OTP Verified Successfully. Language Changed.");
+        } else {
+          alert("Invalid OTP");
+        }
+      } catch (error) {
+        console.error("Error verifying OTP:", error.response || error.message);
+        alert("Failed to verify OTP.");
       }
-    } catch (error) {
-      console.error(
-        "Error verifying SMS OTP:",
-        error.response?.data || error.message
-      );
-      alert("Failed to verify OTP.");
     }
   };
 
@@ -179,14 +155,10 @@ function Langs() {
               placeholder={t("Enter OTP")}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                (isFrench ? handleSubmitEmailOtp() : handleSubmitSmsOtp())
-              }
+              maxLength="4"
+              onKeyDown={(e) => e.key === "Enter" && handleSubmitOtp()}
             />
-            <button
-              className="otp-btn"
-              onClick={isFrench ? handleSubmitEmailOtp : handleSubmitSmsOtp}>
+            <button className="otp-btn" onClick={handleSubmitOtp}>
               {t("Submit OTP")}
             </button>
           </div>
