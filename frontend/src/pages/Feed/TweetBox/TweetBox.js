@@ -96,7 +96,7 @@ function TweetBox() {
       setImageURL("");
       setAudioURL("");
 
-      fetch("https://localhost:5000/post", {
+      fetch("https://twitter-cxhu.onrender.com/post", {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -135,7 +135,7 @@ function TweetBox() {
         formData.append("audio", audioFile);
 
         axios
-          .post("http://localhost:5000/record", formData) // Adjust URL if necessary
+          .post("https://twitter-cxhu.onrender.com/record", formData) // Adjust URL if necessary
           .then((res) => {
             setAudioURL(res.data.audioUrl);
           })
@@ -150,7 +150,7 @@ function TweetBox() {
 
   const fetchRecordedAudios = () => {
     axios
-      .get("https://localhost:5000/record")
+      .get("https://twitter-cxhu.onrender.com/record")
       .then((response) => {
         setRecordedAudios(response.data);
       })
