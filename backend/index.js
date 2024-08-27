@@ -34,9 +34,6 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-// Store OTPs in a database for better scalability and security
-const otpCollection = client.db("database").collection("otps");
-
 async function run() {
   try {
     await client.connect();
@@ -88,12 +85,15 @@ async function run() {
       res.send(result);
     });
 
+    const otpStore = {};
     // Email OTPs
+
     app.post("/send-email-otp", async (req, res) => {
       const { email } = req.body;
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000);
+        const otp = Math.floor(Math.random() * 9000 + 1000).toString(); // Ensure OTP is a string
+        otpStore[email] = { otp, createdAt: new Date() }; // Store OTP in memory
 
         const msg = {
           to: email,
@@ -104,17 +104,13 @@ async function run() {
 
         await sgMail.send(msg);
 
-        await otpCollection.insertOne({
-          email,
-          otp,
-          type: "email",
-          createdAt: new Date(),
-        });
-
         res.status(200).send({ message: "OTP sent to your email" });
       } catch (error) {
-        console.error("Error sending email OTP:", error);
-        res.status(500).send({ error: "Failed to send OTP" });
+        console.error(
+          "Error sending email:",
+          error.response ? error.response.body : error.message
+        );
+        res.status(500).send({ error: "Error sending OTP" });
       }
     });
 
@@ -123,7 +119,8 @@ async function run() {
       const { phoneNumber } = req.body;
 
       try {
-        const otp = Math.floor(Math.random() * 9000 + 1000);
+        const otp = Math.floor(Math.random() * 9000 + 1000).toString(); // Ensure OTP is a string
+        otpStore[phoneNumber] = { otp, createdAt: new Date() }; // Store OTP in memory
 
         await client1.messages.create({
           body: `Your OTP code is ${otp}`,
@@ -131,17 +128,10 @@ async function run() {
           to: phoneNumber,
         });
 
-        await otpCollection.insertOne({
-          phoneNumber,
-          otp,
-          type: "sms",
-          createdAt: new Date(),
-        });
-
-        res.status(200).send({ message: "OTP sent to your phone" });
+        res.status(200).send({ message: "OTP sent to your mobile number" });
       } catch (error) {
-        console.error("Error sending SMS OTP:", error);
-        res.status(500).send({ error: "Failed to send OTP" });
+        console.error("Error sending SMS:", error.message);
+        res.status(500).send({ error: "Error sending OTP" });
       }
     });
 
@@ -152,21 +142,18 @@ async function run() {
       if (!email || !otp || otp.length !== 4)
         return res
           .status(400)
-          .send({ error: "Email and 4-digit OTP are required" });
+          .send({ error: "Email and a 4-digit OTP are required" });
 
       try {
-        const otpDoc = await otpCollection.findOne({
-          email,
-        });
-
-        if (!otpDoc || otpDoc.otp !== otp)
+        const storedOtp = otpStore[email];
+        if (!storedOtp || storedOtp.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
 
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
-        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry)
+        if (Date.now() - new Date(storedOtp.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
 
-        await otpCollection.deleteOne({ _id: otpDoc._id });
+        delete otpStore[email]; // Clear OTP after successful verification
         res.status(200).send({ message: "Email OTP verified successfully" });
       } catch (error) {
         console.error("Error verifying OTP:", error.message);
@@ -182,21 +169,18 @@ async function run() {
       if (!phoneNumber || !otp || otp.length !== 4)
         return res
           .status(400)
-          .send({ error: "Phone number and 4-digit OTP are required" });
+          .send({ error: "Phone number and a 4-digit OTP are required" });
 
       try {
-        const otpDoc = await otpCollection.findOne({
-          phoneNumber,
-        });
-
-        if (!otpDoc || otpDoc.otp !== otp)
+        const storedOtp = otpStore[phoneNumber];
+        if (!storedOtp || storedOtp.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
 
         const otpExpiry = 5 * 60 * 1000; // 5 minutes
-        if (Date.now() - new Date(otpDoc.createdAt).getTime() > otpExpiry)
+        if (Date.now() - new Date(storedOtp.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
 
-        await otpCollection.deleteOne({ _id: otpDoc._id });
+        delete otpStore[phoneNumber]; // Clear OTP after successful verification
         res.status(200).send({ message: "SMS OTP verified successfully" });
       } catch (error) {
         console.error("Error verifying OTP:", error.message);
