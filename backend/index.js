@@ -13,7 +13,6 @@ const client1 = require("twilio")(
 );
 
 const port = process.env.PORT || 5000;
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(
   cors({
@@ -22,16 +21,7 @@ app.use(
     credentials: true,
   })
 );
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
 
-const upload = multer({ storage });
 app.options("*", cors());
 
 app.use(express.json());
@@ -65,9 +55,8 @@ async function run() {
     });
     app.get("/userPost", async (req, res) => {
       const email = req.query.email;
-      const post = (
-        await postCollection.find({ email: email }).toArray()
-      ).reverse();
+      const post = (await postCollection.find({ email: email }).toArray(),
+      await audioCollection.find({ email: email }).toArray()).reverse();
       res.send(post);
     });
     app.get("/record", async (req, res) => {
@@ -80,32 +69,11 @@ async function run() {
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
-
-    app.post("/record", upload.single("audio"), async (req, res) => {
-      try {
-        const audioFile = req.file;
-
-        if (!audioFile) {
-          return res.status(400).send({ error: "Audio file is required" });
-        }
-
-        const audioURL = `/uploads/${audioFile.filename}`;
-
-        const record = {
-          audioURL: audioURL,
-          createdAt: new Date(),
-        };
-
-        const result = await audioCollection.insertOne(record);
-        res
-          .status(201)
-          .send({ audioUrl: audioURL, message: "Audio uploaded successfully" });
-      } catch (error) {
-        console.error("Error saving audio:", error);
-        res.status(500).send({ error: "Error saving audio" });
-      }
+    app.post("/record", async (req, res) => {
+      const audio = req.body;
+      const result = await audioCollection.insertOne(audio);
+      res.send(result);
     });
-
     app.post("/post", async (req, res) => {
       const post = req.body;
       const result = await postCollection.insertOne(post);
@@ -121,7 +89,7 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
-
+    //OTPs EMAIL AND MOBILE NUMBER
     const otpStore = {};
     // Email OTPs
 

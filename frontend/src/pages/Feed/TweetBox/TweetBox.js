@@ -125,39 +125,23 @@ function TweetBox() {
   const stopRecording = () => {
     Mp3Recorder.stop()
       .getMp3()
-      .then(([buffer, blob]) => {
-        const audioFile = new File(buffer, "audio.mp3", {
-          type: blob.type,
-          lastModified: Date.now(),
-        });
-
-        const formData = new FormData();
-        formData.append("audio", audioFile);
-
-        axios
-          .post("https://twitter-cxhu.onrender.com/record", formData) // Adjust URL if necessary
-          .then((res) => {
-            setAudioURL(res.data.audioUrl);
-          })
-          .catch((error) => {
-            console.error("Error uploading audio:", error);
-          });
-
-        setRecording(false);
-      })
-      .catch((e) => console.error(e));
-  };
-
-  const fetchRecordedAudios = () => {
-    axios
-      .get("https://twitter-cxhu.onrender.com/record")
-      .then((response) => {
-        setRecordedAudios(response.data);
+      .then((res) => {
+        setAudioURL(res.data.audioUrl);
       })
       .catch((error) => {
-        console.error("Error fetching recorded audios:", error);
+        console.error("Error uploading audio:", error);
       });
   };
+  // const fetchRecordedAudios = () => {
+  //   axios
+  //     .get("http://localhost:5000/record")
+  //     .then((response) => {
+  //       setRecordedAudios(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching recorded audios:", error);
+  //     });
+  // };
 
   return (
     <div className="tweetBox">
