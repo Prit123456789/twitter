@@ -69,16 +69,47 @@ async function run() {
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
-    app.post("/record", async (req, res) => {
-      const audio = req.body;
-      const result = await audioCollection.insertOne(audio);
-      res.send(result);
-    });
-    app.post("/post", async (req, res) => {
-      const post = req.body;
-      const result = await postCollection.insertOne(post);
-      res.send(result);
-    });
+
+    const decodeBase64Audio = (audioData) => {
+      return Buffer.from(audioData.split(",")[1], "base64");
+    };
+
+    const handlePostWithAudio = async (req, res) => {
+      try {
+        const { email, post, photo, audio } = req.body;
+
+        // Decode the base64-encoded audio data
+        const decodedAudio = decodeBase64Audio(audio);
+
+        // Insert the decoded audio data into the audio collection
+        const audioRecord = await audioCollection.insertOne({
+          audio: decodedAudio,
+        });
+
+        // Create a new post with a reference to the inserted audio's ID
+        const newPost = {
+          email,
+          post,
+          photo,
+          audio: audioRecord.insertedId, // Storing reference to the audio document
+        };
+
+        // Insert the post into the post collection
+        const postResult = await postCollection.insertOne(newPost);
+
+        // Respond with success message and the inserted post ID
+        res.send({
+          message: "Post created successfully!",
+          postId: postResult.insertedId,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Error creating post" });
+      }
+    };
+
+    // Setting up the POST endpoint to handle the request
+    app.post("/post", handlePostWithAudio);
 
     // patch
     app.patch("/userUpdates/:email", async (req, res) => {

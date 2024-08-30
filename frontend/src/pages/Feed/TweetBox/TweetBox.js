@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./TweetBox.css";
 import { Avatar, Button } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
@@ -21,9 +21,12 @@ function TweetBox() {
   const [loggedInUser] = useLoggedInUser();
   const { user } = useUserAuth();
   const email = user?.email;
-  const [recording, setRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState("");
-  const [recordedAudios, setRecordedAudios] = useState([]);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const mediaRecorderRef = useRef(null);
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [isAudioUploadAllowed, setIsAudioUploadAllowed] = useState(false);
 
   const userProfilePic = loggedInUser[0]?.profileImage
@@ -42,6 +45,23 @@ function TweetBox() {
     // Optionally check time every minute to update the state dynamically
     const interval = setInterval(checkAudioUploadTime, 60000);
     return () => clearInterval(interval);
+  }, []);
+  useEffect(() => {
+    const constraints = { audio: true };
+
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        const options = { mimeType: "audio/wav" }; // Adjust mimeType as needed
+        mediaRecorderRef.current = new MediaRecorder(stream, options);
+
+        mediaRecorderRef.current.addEventListener("dataavailable", (event) => {
+          setAudioBlob(event.data);
+        });
+      })
+      .catch((error) => {
+        console.error("Error accessing microphone:", error);
+      });
   }, []);
 
   const handleUploadImage = (e) => {
@@ -82,116 +102,135 @@ function TweetBox() {
     }
 
     if (name) {
-      const userPost = {
-        profilePhoto: userProfilePic,
-        post: post,
-        photo: imageURL,
-        audio: audioURL,
-        username: username,
-        name: name,
-        email: email,
-      };
+      const formData = new FormData();
+      formData.append("profilePhoto", userProfilePic);
+      formData.append("post", post);
+      formData.append("photo", imageURL);
+      formData.append("username", username);
+      formData.append("name", name);
+      formData.append("email", email);
 
-      setPost("");
-      setImageURL("");
-      setAudioURL("");
+      if (audioBlob) {
+        const audioFile = new File([audioBlob], "audio.mp3", {
+          type: "audio/mp3",
+        });
+        formData.append("audio", audioFile);
+      }
 
       fetch("https://twitter-cxhu.onrender.com/post", {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(userPost),
+        body: formData,
       })
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
+          // Clear the post, image, and audio state after successful submission
+          setPost("");
+          setImageURL("");
+          setAudioURL("");
+          setAudioBlob(null);
         });
     }
   };
 
-  const startRecording = () => {
-    if (isAudioUploadAllowed) {
-      Mp3Recorder.start()
-        .then(() => {
-          setRecording(true);
-        })
-        .catch((e) => console.error(e));
-    } else {
-      alert("Audio uploads are only allowed between 2 PM and 7 PM IST.");
-    }
-  };
-
-  const stopRecording = () => {
-    Mp3Recorder.stop()
-      .getMp3()
-      .then((res) => {
-        setAudioURL(res.data.audioUrl);
-      })
-      .catch((error) => {
-        console.error("Error uploading audio:", error);
-      });
-  };
-  // const fetchRecordedAudios = () => {
-  //   axios
-  //     .get("http://localhost:5000/record")
-  //     .then((response) => {
-  //       setRecordedAudios(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching recorded audios:", error);
-  //     });
+  // const Verify = () => {
+  //   try {
+  //     if (isAudioUploadAllowed) {
+  //       axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
+  //         email,
+  //       });
+  //       alert("OTP sent to your email");
+  //       setOtpSent(true);
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Error sending OTP:",
+  //       error.response ? error.response.data : error.message
+  //     );
+  //     alert(
+  //       "Failed to send OTP: " +
+  //         (error.response ? error.response.data.error : error.message)
+  //     );
+  //   }
   // };
+  const handleStartRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    }
 
-  return (
-    <div className="tweetBox">
-      <form onSubmit={handleTweet}>
-        <div className="tweetBox__input">
-          <Avatar src={userProfilePic} />
-          <input
-            type="text"
-            placeholder={t("What's happening?")}
-            onChange={(e) => setPost(e.target.value)}
-            value={post}
-            required
-          />
-        </div>
-        <div className="mediaIcons_tweetButton">
-          <label htmlFor="image" className="imageIcon">
-            {isLoading ? (
-              <p>{t("Uploading Image")}</p>
-            ) : (
-              <p>
-                {imageURL ? (
-                  "Image Uploaded"
-                ) : (
-                  <AddPhotoAlternateOutlinedIcon />
-                )}
-              </p>
-            )}
-          </label>
-          <input
-            type="file"
-            id="image"
-            className="imageInput"
-            onChange={handleUploadImage}
-          />
+    const handleStopRecording = () => {
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+        setIsRecording(false);
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = () => {
+          const audioDataURL = reader.result;
+          setAudioURL(audioDataURL);
+        };
+      }
+    };
+    const handlePlayAudio = () => {
+      if (audioBlob) {
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audioElement = new Audio(audioUrl);
+        audioElement.play();
+      }
+    };
 
-          <div className="micIcon">
-            {recording ? (
-              <Button onClick={stopRecording}>Stop</Button>
-            ) : (
-              <MicIcon onClick={startRecording} />
-            )}
+    return (
+      <div className="tweetBox">
+        <form onSubmit={handleTweet}>
+          <div className="tweetBox__input">
+            <Avatar src={userProfilePic} />
+            <input
+              type="text"
+              placeholder={t("What's happening?")}
+              onChange={(e) => setPost(e.target.value)}
+              value={post}
+              required
+            />
           </div>
+          <div className="mediaIcons_tweetButton">
+            <label htmlFor="image" className="imageIcon">
+              {isLoading ? (
+                <p>{t("Uploading Image")}</p>
+              ) : (
+                <p>
+                  {imageURL ? (
+                    "Image Uploaded"
+                  ) : (
+                    <AddPhotoAlternateOutlinedIcon />
+                  )}
+                </p>
+              )}
+            </label>
+            <input
+              type="file"
+              id="image"
+              className="imageInput"
+              onChange={handleUploadImage}
+            />
 
-          <Button className="tweetBox__tweetButton" type="submit">
-            Tweet
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
+            <div className="micIcon">
+              {isRecording ? (
+                <Button onClick={handleStopRecording}>Stop</Button>
+              ) : (
+                <MicIcon onClick={handleStartRecording} />
+              )}
+            </div>
+
+            <Button className="tweetBox__tweetButton" type="submit">
+              Tweet
+            </Button>
+          </div>
+        </form>
+        <button onClick={handlePlayAudio} disabled={!audioBlob}>
+          Play
+        </button>
+      </div>
+    );
+  };
 }
-
 export default TweetBox;

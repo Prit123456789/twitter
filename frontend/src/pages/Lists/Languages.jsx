@@ -27,7 +27,7 @@ function Langs() {
     setLanguageToChange(code);
     const isSelectedFrench = code === "fr";
     setIsFrench(isSelectedFrench);
-    setOtpSent(false); // Reset OTP sent state
+    setOtpSent(false);
 
     // Clear the input fields
     setPhoneNumber("");

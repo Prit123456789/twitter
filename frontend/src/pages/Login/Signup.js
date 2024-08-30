@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import GoogleButton from "react-google-button";
 import "./Login.css";
+import PhoneIcon from "@mui/icons-material/Phone";
 
 const Signup = () => {
   const [username, setUsername] = useState(" ");
@@ -17,7 +18,9 @@ const Signup = () => {
   const { signUp } = useUserAuth();
   const { googleSignIn } = useUserAuth();
   let navigate = useNavigate();
-
+  const handlePhone = () => {
+    navigate("/mobile");
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -122,6 +125,16 @@ const Signup = () => {
                 type="light"
                 onClick={handleGoogleSignIn}
               />
+            </div>
+            <div>
+              <button
+                className="phone-btn"
+                type="light"
+                marginLeft="80px"
+                onClick={handlePhone}>
+                <PhoneIcon style={{ color: "green" }} />
+                Sign in with Phone
+              </button>
             </div>
             <div>
               {t("Already have an account?")}
