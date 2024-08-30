@@ -69,6 +69,7 @@ async function run() {
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
+<<<<<<< HEAD
 
     const decodeBase64Audio = (audioData) => {
       return Buffer.from(audioData.split(",")[1], "base64");
@@ -110,6 +111,18 @@ async function run() {
 
     // Setting up the POST endpoint to handle the request
     app.post("/post", handlePostWithAudio);
+=======
+    app.post("/record", async (req, res) => {
+      const audio = req.body;
+      const result = await audioCollection.insertOne(audio);
+      res.send(result);
+    });
+    app.post("/post", async (req, res) => {
+      const post = req.body;
+      const result = await postCollection.insertOne(post);
+      res.send(result);
+    });
+>>>>>>> 622e5a399fa70988d9a7657e1963eea50433c1b5
 
     // patch
     app.patch("/userUpdates/:email", async (req, res) => {
