@@ -1,3 +1,4 @@
+
 .login-container {
     display: flex;
     flex: 1;
@@ -98,7 +99,18 @@ input {
     outline: none;
 
 }
-
+.country-dropdown {
+    appearance: none; /* Remove default browser styling */
+    background-color: #E8F0FE; /* Match input background */
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    width: 70%;
+    cursor: pointer;
+    background-image: url("https://www.flaticon.com/free-icons/down-arrow");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
 
 .phone-btn{
     border-radius: 8px;
@@ -165,8 +177,9 @@ input {
     text-decoration: none;
     color: var(--twitter-color) !important;
 
-}
 
+  }
+  
 @media screen and (max-width:688px) {
     .login-container {
         order: 2;

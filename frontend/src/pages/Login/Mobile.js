@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import "./Mobile.css";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useUserAuth } from "../../context/UserAuthContext";
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { useTranslation } from "react-i18next";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import auth from "../../context/firebase"; // Ensure this path is correct
+import auth from "../../context/firebase";
 
 function Mobile() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -17,10 +16,8 @@ function Mobile() {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation("translations");
-  const { signInWithPhone } = useUserAuth();
 
   useEffect(() => {
-    // Initialize RecaptchaVerifier only once when the component mounts
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
         auth,
@@ -28,11 +25,9 @@ function Mobile() {
         {
           size: "invisible",
           callback: (response) => {
-            // reCAPTCHA solved
             console.log("reCAPTCHA solved");
           },
           "expired-callback": () => {
-            // Response expired. Ask user to solve reCAPTCHA again.
             console.log("reCAPTCHA expired. Please try again.");
           },
         },
@@ -124,6 +119,16 @@ function Mobile() {
             </form>
           )}
         </div>
+        <Link
+          to="/login"
+          style={{
+            textDecoration: "none",
+            color: "var(--twitter-color)",
+            fontWeight: "600",
+            marginLeft: "200px",
+          }}>
+          {t("Back to login page")}
+        </Link>
       </div>
       <div id="recaptcha-container"></div>
     </div>
