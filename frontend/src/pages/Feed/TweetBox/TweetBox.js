@@ -159,7 +159,6 @@ function TweetBox() {
       setIsRecording(true);
     }
 
-<<<<<<< HEAD
     const handleStopRecording = () => {
       if (mediaRecorderRef.current) {
         mediaRecorderRef.current.stop();
@@ -192,69 +191,6 @@ function TweetBox() {
               value={post}
               required
             />
-=======
-  const stopRecording = () => {
-    Mp3Recorder.stop()
-      .getMp3()
-      .then((res) => {
-        setAudioURL(res.data.audioUrl);
-      })
-      .catch((error) => {
-        console.error("Error uploading audio:", error);
-      });
-  };
-  // const fetchRecordedAudios = () => {
-  //   axios
-  //     .get("http://localhost:5000/record")
-  //     .then((response) => {
-  //       setRecordedAudios(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching recorded audios:", error);
-  //     });
-  // };
-
-  return (
-    <div className="tweetBox">
-      <form onSubmit={handleTweet}>
-        <div className="tweetBox__input">
-          <Avatar src={userProfilePic} />
-          <input
-            type="text"
-            placeholder={t("What's happening?")}
-            onChange={(e) => setPost(e.target.value)}
-            value={post}
-            required
-          />
-        </div>
-        <div className="mediaIcons_tweetButton">
-          <label htmlFor="image" className="imageIcon">
-            {isLoading ? (
-              <p>{t("Uploading Image")}</p>
-            ) : (
-              <p>
-                {imageURL ? (
-                  "Image Uploaded"
-                ) : (
-                  <AddPhotoAlternateOutlinedIcon />
-                )}
-              </p>
-            )}
-          </label>
-          <input
-            type="file"
-            id="image"
-            className="imageInput"
-            onChange={handleUploadImage}
-          />
-
-          <div className="micIcon">
-            {recording ? (
-              <Button onClick={stopRecording}>Stop</Button>
-            ) : (
-              <MicIcon onClick={startRecording} />
-            )}
->>>>>>> 622e5a399fa70988d9a7657e1963eea50433c1b5
           </div>
           <div className="mediaIcons_tweetButton">
             <label htmlFor="image" className="imageIcon">
@@ -284,10 +220,39 @@ function TweetBox() {
                 <MicIcon onClick={handleStartRecording} />
               )}
             </div>
+            <div className="mediaIcons_tweetButton">
+              <label htmlFor="image" className="imageIcon">
+                {isLoading ? (
+                  <p>{t("Uploading Image")}</p>
+                ) : (
+                  <p>
+                    {imageURL ? (
+                      "Image Uploaded"
+                    ) : (
+                      <AddPhotoAlternateOutlinedIcon />
+                    )}
+                  </p>
+                )}
+              </label>
+              <input
+                type="file"
+                id="image"
+                className="imageInput"
+                onChange={handleUploadImage}
+              />
 
-            <Button className="tweetBox__tweetButton" type="submit">
-              Tweet
-            </Button>
+              <div className="micIcon">
+                {isRecording ? (
+                  <Button onClick={handleStopRecording}>Stop</Button>
+                ) : (
+                  <MicIcon onClick={handleStartRecording} />
+                )}
+              </div>
+
+              <Button className="tweetBox__tweetButton" type="submit">
+                Tweet
+              </Button>
+            </div>
           </div>
         </form>
         <button onClick={handlePlayAudio} disabled={!audioBlob}>

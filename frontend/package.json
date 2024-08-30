@@ -1,4 +1,6 @@
-<<<<<<< HEAD
+
+
+
 {
   "name": "frontend",
   "version": "0.1.0",
@@ -68,74 +70,4 @@
     "css-loader": "^7.1.2"
   }
 }
-=======
-{
-  "name": "frontend",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@emotion/react": "^11.13.0",
-    "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^5.16.4",
-    "@mui/material": "^5.16.4",
-    "@react-google-maps/api": "^2.19.3",
-    "@testing-library/jest-dom": "^6.4.6",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.2",
-    "@vercel/speed-insights": "^1.0.12",
-    "@vis.gl/react-google-maps": "^1.1.0",
-    "axios": "^0.27.2",
-    "dotenv": "^16.4.5",
-    "firebase": "^10.12.4",
-    "google-geocoder": "^0.2.1",
-    "i18next": "^23.13.0",
-    "i18next-browser-languagedetector": "^8.0.0",
-    "i18next-http-backend": "^2.5.2",
-    "ipapi": "^4.0.0",
-    "mic-recorder-to-mp3": "^2.2.2",
-    "node-modules": "^0.0.1",
-    "openweather-apis": "^4.5.0",
-    "react": "^18.3.1",
-    "react-audio-player": "^0.17.0",
-    "react-axios": "^2.0.6",
-    "react-chatbot-kit": "^2.2.2",
-    "react-dom": "^18.3.1",
-    "react-firebase-hooks": "^5.1.1",
-    "react-google-button": "^0.8.0",
-    "react-i18next": "^15.0.1",
-    "react-router-dom": "^6.25.1",
-    "react-scripts": "^5.0.1",
-    "react-twitter-embed": "^4.0.4",
-    "twilio": "^5.2.2",
-    "twitter-api-v2": "^1.17.2",
-    "web-vitals": "^4.2.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "css-loader": "^7.1.2"
-  }
-}
->>>>>>> 622e5a399fa70988d9a7657e1963eea50433c1b5
+
