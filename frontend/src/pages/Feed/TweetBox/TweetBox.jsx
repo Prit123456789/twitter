@@ -1,16 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./TweetBox.css";
 import { Avatar, Button, TextField } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import axios from "axios";
+import MicRecorder from "mic-recorder-to-mp3";
 import { useTranslation } from "react-i18next";
 import { useUserAuth } from "../../../context/UserAuthContext";
 import useLoggedInUser from "../../../hooks/useLoggedInUser";
-import MicRecorder from "mic-recorder-to-mp3";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
+
+function OtpVerification({ otp, setOtp, verifyOtp }) {
+  return (
+    <div className="otpVerification">
+      <TextField
+        label="Enter OTP"
+        variant="outlined"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        fullWidth
+      />
+      <Button onClick={verifyOtp}>Verify OTP</Button>
+    </div>
+  );
+}
 
 function TweetBox() {
   const { t } = useTranslation("translations");
@@ -26,7 +41,6 @@ function TweetBox() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioURL, setAudioURL] = useState("");
   const [audioBlob, setAudioBlob] = useState(null);
   const mediaRecorderRef = useRef(null);
   const [isAudioUploadAllowed, setIsAudioUploadAllowed] = useState(false);
@@ -35,6 +49,7 @@ function TweetBox() {
     ? loggedInUser[0]?.profileImage
     : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
 
+  // Check if audio upload is allowed based on the current time
   useEffect(() => {
     const checkAudioUploadTime = () => {
       const currentTime = new Date();
@@ -43,11 +58,11 @@ function TweetBox() {
     };
 
     checkAudioUploadTime();
-
     const interval = setInterval(checkAudioUploadTime, 60000);
     return () => clearInterval(interval);
   }, []);
 
+  // Setup media recorder for audio recording
   useEffect(() => {
     const setupMediaRecorder = async () => {
       try {
@@ -79,6 +94,7 @@ function TweetBox() {
     };
   }, []);
 
+  // Handle image upload
   const handleUploadImage = (e) => {
     setIsLoading(true);
     const image = e.target.files[0];
@@ -101,6 +117,7 @@ function TweetBox() {
       });
   };
 
+  // Handle tweet post
   const handleTweet = async (e) => {
     e.preventDefault();
 
@@ -162,19 +179,20 @@ function TweetBox() {
       console.log(data);
       setPost("");
       setImageURL("");
-      setAudioURL("");
       setAudioBlob(null);
     }
   };
 
-  const handlePlayAudio = () => {
+  // Play the recorded audio
+  const handlePlayAudio = useCallback(() => {
     if (audioBlob) {
       const audioUrl = URL.createObjectURL(audioBlob);
       const audioElement = new Audio(audioUrl);
       audioElement.play();
     }
-  };
+  }, [audioBlob]);
 
+  // Send OTP
   const sendOtp = async () => {
     try {
       await axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
@@ -194,13 +212,14 @@ function TweetBox() {
     }
   };
 
+  // Verify OTP
   const verifyOtp = async () => {
     try {
       const response = await axios.post(
         "https://twitter-cxhu.onrender.com/verify-email-otp",
         {
           email,
-          otp,
+          otp: otp.trim(),
         }
       );
       if (response.data.success) {
@@ -221,6 +240,7 @@ function TweetBox() {
     }
   };
 
+  // Start recording audio
   const handleStartRecording = () => {
     if (!otpSent) {
       sendOtp();
@@ -238,6 +258,7 @@ function TweetBox() {
     }
   };
 
+  // Stop recording audio
   const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
@@ -278,36 +299,29 @@ function TweetBox() {
             className="imageInput"
             onChange={handleUploadImage}
           />
-
-          <div className="micIcon">
+          <div className="audio-controls">
             {isRecording ? (
-              <MicOffIcon onClick={handleStopRecording} />
+              <Button onClick={handleStopRecording}>
+                <MicOffIcon />
+              </Button>
             ) : (
-              <MicIcon onClick={handleStartRecording} />
+              <Button onClick={handleStartRecording}>
+                <MicIcon />
+              </Button>
             )}
+            {audioBlob && <Button onClick={handlePlayAudio}>Play Audio</Button>}
           </div>
-
-          {otpSent && !otpVerified && (
-            <div className="otpVerification">
-              <TextField
-                label="Enter OTP"
-                variant="outlined"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                fullWidth
-              />
-              <Button onClick={verifyOtp}>Verify OTP</Button>
-            </div>
-          )}
-
-          <Button className="tweetBox__tweetButton" type="submit">
+          <Button
+            type="submit"
+            className="tweetBox__tweetButton"
+            disabled={isLoading || !post.trim()}>
             Tweet
           </Button>
         </div>
       </form>
-      <button onClick={handlePlayAudio} disabled={!audioBlob}>
-        Play
-      </button>
+      {otpSent && !otpVerified && (
+        <OtpVerification otp={otp} setOtp={setOtp} verifyOtp={verifyOtp} />
+      )}
     </div>
   );
 }
