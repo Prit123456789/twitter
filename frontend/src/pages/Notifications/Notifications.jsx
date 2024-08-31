@@ -41,9 +41,8 @@ function Notifications() {
             loginHistory.map((entry, index) => (
               <div
                 key={index}
-                className={`login-entry ${
-                  index % 2 === 0 ? "user-message" : "other-message"
-                }`}>
+                className={`login-entry 
+                `}>
                 <p>
                   {t("Browser")}: {entry.browser}
                 </p>
