@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./ChatBot.css";
-import botface from'./botface.png'
+import botface from "./botface.png";
 import { Avatar } from "@mui/material";
 import VerifiedUserIcon from "@mui/icons-material/Verified";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -10,7 +10,6 @@ import PublishIcon from "@mui/icons-material/Publish";
 import { useTranslation } from "react-i18next";
 
 const ChatBot = () => {
-
   const [heading, setHeading] = useState("");
 
   const [isLoading, setIsLoading] = useState("");
@@ -18,14 +17,16 @@ const ChatBot = () => {
 
   const [messages, setMessages] = useState([]);
 
-  const {t} = useTranslation('translations');
+  const { t } = useTranslation("translations");
 
   const onSent = async (prompt) => {
-    const url = `https://twitter-api45.p.rapidapi.com/search.php?query=${encodeURIComponent(prompt)}&search_type=Top&count=1000`;
+    const url = `https://twitter-api45.p.rapidapi.com/search.php?query=${encodeURIComponent(
+      prompt
+    )}&search_type=Top&count=1000`;
     const options = {
       method: "GET",
       headers: {
-        "x-rapidapi-key": '4fb7d936e4mshd4d0257d04a4ca3p102f9fjsn1f3a5a6424ba',
+        "x-rapidapi-key": "4fb7d936e4mshd4d0257d04a4ca3p102f9fjsn1f3a5a6424ba",
         "x-rapidapi-host": "twitter-api45.p.rapidapi.com",
       },
     };
@@ -46,7 +47,7 @@ const ChatBot = () => {
     if (input.trim()) {
       onSent(input).finally(() => setIsLoading(false));
     } else {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -54,21 +55,20 @@ const ChatBot = () => {
     <div className="chatbot">
       <div className="head">
         <img src={botface} alt="" />
-        <p className="P">{("Tweet Bot")}</p>
+        <p className="P">{"Tweet Bot"}</p>
       </div>
 
       <div className="Msg">
         <div className="Msg-Box">
           {isLoading ? (
             <div className="loading">
-                <hr/>
+              <hr />
             </div>
           ) : (
             <>
               {heading && (
                 <div className="hr">
                   <h2>{heading}</h2>
-                 
                 </div>
               )}
               {messages.map((message, index) => (
@@ -83,7 +83,9 @@ const ChatBot = () => {
                           {message.user_info.name}
                           <span className="post__headerSpecial">
                             <VerifiedUserIcon className="post__badge" />
-                            <p>@{message.user_info.screen_name.toLowerCase()}</p>
+                            <p>
+                              @{message.user_info.screen_name.toLowerCase()}
+                            </p>
                           </span>
                         </h3>
                       </div>
@@ -96,7 +98,7 @@ const ChatBot = () => {
                         src={message.media.photo[0]?.media_url_https}
                         alt=""
                         width="400"
-                        style={{maxHeight:"500px", objectFit:"cover"}}
+                        style={{ maxHeight: "500px", objectFit: "cover" }}
                       />
                     )}
                     <div className="post__footer">

@@ -6,28 +6,30 @@ import LockResetIcon from "@mui/icons-material/LockReset";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import Post from "./Post/Post";
-import { defer, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import EditProfile from "../EditProfile/EditProfile";
 import axios from "axios";
 import useLoggedInUser from "../../../hooks/useLoggedInUser";
 import "../MyMapComponent";
 import MyMapComponent from "../MyMapComponent";
-import { useTranslation } from "react-i18next";
 
 function MainProfile({ user }) {
   const navigate = useNavigate();
-
   const [isLoading, setIsLoading] = useState(false);
   const [loggedInUser] = useLoggedInUser();
-
   const username = user?.email?.split("@")[0];
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    fetch(`https://twitter-cxhu.onrender.com/userpost?email=${user?.email}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPosts(data);
-      });
+    if (user?.email) {
+      fetch(`https://twitter-cxhu.onrender.com/userPost?email=${user?.email}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setPosts(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user posts:", error);
+        });
+    }
   }, [user?.email]);
 
   const handleUploadCoverImage = (e) => {
@@ -44,8 +46,6 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
-        // setImageURL(url);
-        // console.log(res.data.data.display_url);
         const userCoverImage = {
           email: user?.email,
           coverImage: url,
@@ -90,8 +90,6 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
-        // setImageURL(url);
-        // console.log(res.data.data.display_url);
         const userProfileImage = {
           email: user?.email,
           profileImage: url,
@@ -221,7 +219,7 @@ function MainProfile({ user }) {
                 <hr />
               </div>
               {posts.map((p) => (
-                <Post id={p._id} p={p} />
+                <Post key={p._id} p={p} />
               ))}
             </div>
           }

@@ -367,7 +367,7 @@ i18n
           "Select Language": "భాషను ఎంచుకోండి",
           "Log In": "లాగిన్",
           "Sign Up": "సైన్ అప్ చేయండి",
-          "Forgot password?": "స్‌వర్డ్ మర్చిపోయారా",
+          "Forgot password?": "పాస్వర్డ్ మర్చిపోయారా",
           Password: "పాస్వర్డ్",
           "Don't have an account?": "మీకు ఖాతా లేదు?",
           "Reset Password": "పాస్‌వర్డ్‌ని రీసెట్ చేయండి",

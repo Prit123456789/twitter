@@ -1,3 +1,4 @@
+// App.jsx
 import React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login/Login";
@@ -20,18 +21,21 @@ import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
 import ChatBot from "./pages/ChatBot/ChatBot";
 import "./Translation/Translation";
+// import VerifyLogin from "./VerifyLogin"; // Import the new VerifyLogin component
+
 function App() {
   return (
     <div className="app">
       <SpeedInsights />
       <BrowserRouter>
         <UserAuthContextProvider>
+          {/* Include VerifyLogin at the root level or wherever appropriate */}
+          {/* <VerifyLogin /> */}
           <Routes>
             <Route
               path="/"
               element={
                 <ProtectedRoute>
-                  {" "}
                   <Home />
                 </ProtectedRoute>
               }>

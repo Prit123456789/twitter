@@ -39,6 +39,7 @@
     "react-twitter-embed": "^4.0.4",
     "twilio": "^5.2.2",
     "twitter-api-v2": "^1.17.2",
+    "ua-parser-js": "^1.0.38",
     "web-vitals": "^4.2.2"
   },
   "scripts": {
