@@ -30,7 +30,7 @@ function MainProfile({ user }) {
           console.error("Error fetching user posts:", error);
         });
     }
-  }, [user.email]);
+  }, [user?.email]);
 
   const handleUploadCoverImage = (e) => {
     setIsLoading(true);
@@ -219,7 +219,7 @@ function MainProfile({ user }) {
                 <hr />
               </div>
               {posts.map((p) => (
-                <Post key={p._id} p={p} />
+                <Post p={p} key={p.username} />
               ))}
             </div>
           }
