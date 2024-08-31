@@ -197,7 +197,7 @@ function TweetBox() {
   const verifyOtp = async () => {
     try {
       const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-otp",
+        "https://twitter-cxhu.onrender.com/verify-email-otp",
         {
           email,
           otp,
