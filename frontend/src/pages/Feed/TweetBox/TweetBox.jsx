@@ -14,15 +14,18 @@ const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 function OtpVerification({ otp, setOtp, verifyOtp }) {
   return (
-    <div className="otpVerification">
-      <TextField
+    <div>
+      <input
+        className="otpVerification"
+        type="text"
         label="Enter OTP"
         variant="outlined"
         value={otp}
         onChange={(e) => setOtp(e.target.value)}
-        fullWidth
       />
-      <Button onClick={verifyOtp}>Verify OTP</Button>
+      <button className="otp-btn" onClick={verifyOtp}>
+        Verify OTP
+      </button>
     </div>
   );
 }
@@ -214,29 +217,40 @@ function TweetBox() {
 
   // Verify OTP
   const verifyOtp = async () => {
-    try {
-      const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-email-otp",
-        {
-          email,
-          otp: otp.trim(),
-        }
-      );
-      if (response.data.success) {
-        setOtpVerified(true);
-        alert("OTP verified successfully");
-      } else {
-        alert("Invalid OTP");
+    if (otpSent) {
+      const trimmedOtp = otp.trim();
+      if (trimmedOtp.length !== 4) {
+        // Adjust if needed
+        alert("OTP must be exactly 4 characters.");
+        return;
       }
-    } catch (error) {
-      console.error(
-        "Error verifying OTP:",
-        error.response ? error.response.data : error.message
-      );
-      alert(
-        "Failed to verify OTP: " +
-          (error.response ? error.response.data.error : error.message)
-      );
+      try {
+        const payload = { email, otp: trimmedOtp }; // Use trimmed OTP
+        const response = await axios.post(
+          "https://twitter-cxhu.onrender.com/verify-email-otp",
+          payload,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (response.data.success && response.data.isOtpValid) {
+          setOtpVerified(true);
+          alert("OTP verified successfully");
+        } else {
+          alert("Invalid OTP");
+        }
+      } catch (error) {
+        console.error(
+          "Error verifying OTP:",
+          error.response ? error.response.data : error.message
+        );
+        alert(
+          "Failed to verify OTP: " +
+            (error.response
+              ? error.response.data.error || error.message
+              : error.message)
+        );
+      }
     }
   };
 

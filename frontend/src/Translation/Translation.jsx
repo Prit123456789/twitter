@@ -81,6 +81,7 @@ i18n
           "Uploading Image": "चित्र अपलोड हो रहा है",
           "Enter OTP": "OTP दर्ज करें",
           "Submit OTP": "OTP सबमिट करें",
+          Verify: "सत्यापित करें",
           "Enter your phone number": " अपना फोन नंबर दर्ज करें",
         },
       },
@@ -150,6 +151,7 @@ i18n
           "Enter OTP": "Entrer le OTP",
           "Submit OTP": "Soumettre le OTP",
           "Enter your phone number": "Entrez votre numéro de téléphone",
+          Verify: "Vérifier",
         },
       },
       sp: {
@@ -218,6 +220,7 @@ i18n
           "Enter OTP": "Introducir OTP",
           "Submit OTP": "Enviar OTP",
           "Enter your phone number": "Ingresa tu número de teléfono",
+          Verify: "Verificar",
         },
       },
       po: {
@@ -285,6 +288,7 @@ i18n
           "Enter OTP": "Inserir OTP",
           "Submit OTP": "	Enviar OTP",
           "Enter your phone number": " Insira seu número de telefone",
+          Verify: "Verificar",
         },
       },
       ch: {
@@ -350,6 +354,7 @@ i18n
           "Enter OTP": "输入 OTP",
           "Submit OTP": "提交 OTP",
           "Enter your phone number": " 输入您的电话号码",
+          Verify: "核實",
         },
       },
       te: {
@@ -418,6 +423,7 @@ i18n
           "Enter OTP": "OTP ఎంటర్ చేయండి",
           "Submit OTP": "OTP సమర్పించండి",
           "Enter your phone number": "మీ ఫోన్ నంబర్ నమోదు చేయండి",
+          Verify: "ధృవీకరించండి",
         },
       },
       ta: {
@@ -487,6 +493,7 @@ i18n
           "Enter OTP": "OTP சமர்ப்பிக்கவும்",
           "Submit OTP": "OTP உள்ளிடவும்",
           "Enter your phone number": "உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்",
+          Verify: "சரிபார்க்கவும்",
         },
       },
     },

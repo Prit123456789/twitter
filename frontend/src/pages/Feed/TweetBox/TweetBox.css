@@ -55,7 +55,26 @@
   height: 40px !important;
 
 }
-
+.otpVerification{
+  background-color: #E8F0FE;
+  width: 150px;
+  border-radius: 8px;
+  padding: 14px;
+  border: none;
+  outline: none;
+}
+.otp-btn{
+  width: 5%;
+  border-radius: 8px;
+  height: 45px;
+  background: var(--twitter-color);
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+  margin-top: 20px;
+  border: white;
+  cursor: pointer;
+}
 .tweetBox__tweetButton:hover {
   background-color: var(--twitter-color) !important;
 }

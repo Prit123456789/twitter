@@ -97,10 +97,10 @@ function Mobile() {
               className="email"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder={t("Enter phone number")}
+              placeholder={t("Enter your phone number")}
             />
             <button className="btn" type="submit">
-              {t("Send OTP")}
+              {t("Send")}
             </button>
           </form>
 
@@ -114,7 +114,7 @@ function Mobile() {
                 placeholder={t("Enter OTP")}
               />
               <button className="btn" type="submit">
-                {t("Verify OTP")}
+                {t("Verify")}
               </button>
             </form>
           )}
