@@ -1,4 +1,4 @@
-.page {
+.Log {
   min-width: 680px;
   width: 100%; 
   max-width: 750px; 
@@ -13,7 +13,7 @@
   border-right: 1px solid var(--twitter-background);
 }
 
-.page::-webkit-scrollbar {
+.Log::-webkit-scrollbar {
   display: none;
 }
 
@@ -47,7 +47,9 @@
   height: calc(100vh - 10vh - 40px);
   margin-top: 10px;
 }
-
+.login-history::-webkit-scrollbar{
+  display: none;
+}
 .login-history .login-entry {
   max-width: 90%; /* Adjust width slightly within constraints */
   padding: 10px 15px;

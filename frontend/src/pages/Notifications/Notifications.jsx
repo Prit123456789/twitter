@@ -29,8 +29,27 @@ function Notifications() {
     fetchLoginHistory();
   }, [user]);
 
+  // Helper function to format the timestamp
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString(); // Formats to a readable date-time string
+  };
+  const formatIPs = (ips) => {
+    // Check if ips is a string and split by commas if needed
+    if (typeof ips === "string") {
+      return ips
+        .split(",")
+        .map((ip, index) => <li key={index}>{ip.trim()}</li>);
+    } else if (Array.isArray(ips)) {
+      // If already an array, just map through it
+      return ips.map((ip, index) => <li key={index}>{ip}</li>);
+    }
+    // Fallback if format is unexpected
+    return <li>{ips}</li>;
+  };
+
   return (
-    <div className="page">
+    <div className="Log">
       <h2 className="head">{t("Welcome to Notification Page")}</h2>
       {loading ? (
         <div className="loader" /> /* Ensures loader occupies space correctly */
@@ -39,10 +58,7 @@ function Notifications() {
           <h3 style={{ color: "black" }}>{t("Login History")}</h3>
           {loginHistory.length > 0 ? (
             loginHistory.map((entry, index) => (
-              <div
-                key={index}
-                className={`login-entry 
-                `}>
+              <div key={index} className={`login-entry`}>
                 <p>
                   {t("Browser")}: {entry.browser}
                 </p>
@@ -52,8 +68,10 @@ function Notifications() {
                 <p>
                   {t("Device")}: {entry.device}
                 </p>
+                <p>{t("IP Address")}:</p>
+                <ul>{formatIPs(entry.ip)}</ul>
                 <p>
-                  {t("IP Address")}: {entry.ip}
+                  {t("On")}: {formatDate(entry.timestamp)}{" "}
                 </p>
               </div>
             ))

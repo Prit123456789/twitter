@@ -24,36 +24,11 @@ import ChatBot from "./pages/ChatBot/ChatBot";
 import "./Translation/Translation";
 
 function App() {
-  const [userBrowser, setUserBrowser] = useState();
-  const [userOS, setUserOS] = useState();
-  const [UserDevice, setUserDevice] = useState();
-  const [ip, setIp] = useState();
-  useEffect(() => {
-    const fetchUserAgent = async () => {
-      try {
-        const response = await axios.get(
-          `http://twitter-cxhu.onrender.com/login`
-        );
-        setUserBrowser(response.data.browser.name);
-        setUserOS(response.data.os.name);
-        setUserDevice(response.data.device.type);
-        const ip = await axios.get("https://api.ipify.org?format=json");
-        console.log(ip.data.ip);
-        setIp(ip.data.ip);
-      } catch (error) {
-        console.error("Error fetching user agent data:", error);
-      }
-    };
-
-    fetchUserAgent();
-  }, []);
   return (
     <div className="app">
       <SpeedInsights />
       <BrowserRouter>
         <UserAuthContextProvider>
-          {/* Include VerifyLogin at the root level or wherever appropriate */}
-          {/* <VerifyLogin /> */}
           <Routes>
             <Route
               path="/"
@@ -81,40 +56,10 @@ function App() {
               <Route path="more" element={<More />} />
               <Route path="chatbot" element={<ChatBot />} />
             </Route>
-            <Route
-              path="/login"
-              element={
-                <Login
-                  userIP={ip}
-                  userBrowser={userBrowser}
-                  UserDevice={UserDevice}
-                  userOS={userOS}
-                />
-              }
-            />
+            <Route path="/login" element={<Login />} />
             <Route path="/reset" element={<Reset />} />
-            <Route
-              path="/mobile"
-              element={
-                <Mobile
-                  userIP={ip}
-                  userBrowser={userBrowser}
-                  UserDevice={UserDevice}
-                  userOS={userOS}
-                />
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <Signup
-                  userIP={ip}
-                  userBrowser={userBrowser}
-                  UserDevice={UserDevice}
-                  userOS={userOS}
-                />
-              }
-            />
+            <Route path="/mobile" element={<Mobile />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/maps" element={<MyMapComponent />} />
           </Routes>
         </UserAuthContextProvider>

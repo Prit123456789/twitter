@@ -164,7 +164,9 @@ async function run() {
           timestamp: new Date(),
         };
 
-        const result = await loginHistoryCollection.insertOne(loginHistory);
+        const result = (
+          await loginHistoryCollection.insertOne(loginHistory)
+        ).reverse();
 
         res.send(result);
       } catch (error) {
