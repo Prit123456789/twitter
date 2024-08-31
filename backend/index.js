@@ -80,9 +80,9 @@ async function run() {
       const { email } = req.params;
 
       try {
-        const loginHistory = await loginHistoryCollection
-          .find({ email })
-          .toArray();
+        const loginHistory = (
+          await loginHistoryCollection.find({ email }).toArray()
+        ).reverse();
         res.json(loginHistory);
       } catch (error) {
         res.status(500).json({ error: "Failed to fetch login history" });
@@ -165,7 +165,7 @@ async function run() {
         };
 
         const result = (
-          await loginHistoryCollection.insertOne(loginHistory)
+          await loginHistoryCollection.insertOne(loginHistory).toArray()
         ).reverse();
 
         res.send(result);
