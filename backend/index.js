@@ -41,93 +41,21 @@ async function run() {
     const userCollection = client.db("database").collection("users");
     const audioCollection = client.db("database").collection("audios");
 
-    // Endpoint to fetch login history for a user
-    app.get("/login-history", async (req, res) => {
-      const { email } = req.query; // Email should be passed as a query parameter
-
-      if (!email) {
-        return res.status(400).send({ error: "Email is required" });
-      }
-
-      try {
-        const loginHistoryCollection = client
-          .db("database")
-          .collection("LoginHistory");
-        const history = (
-          await loginHistoryCollection.find({ email }).toArray()
-        ).reverse();
-        res.status(200).send(history);
-      } catch (error) {
-        console.error("Error fetching login history:", error);
-        res.status(500).send({ error: "Error fetching login history" });
-      }
-    });
-    // Collect user login information
-    app.post("/verify-login", async (req, res) => {
-      try {
-        const { email } = req.body;
-        const ip = req.ip;
-        const userAgent = req.headers["user-agent"];
-        const parser = new UAParser(userAgent);
-        const result = parser.getResult();
-        const browser = result.browser.name || "Unknown";
-        const os = result.os.name || "Unknown";
-        const deviceType = result.device.type || "desktop";
-
-        console.log(
-          `Login attempt: IP=${ip}, Browser=${browser}, OS=${os}, DeviceType=${deviceType}`
-        );
-
-        const loginHistory = {
-          email,
-          timestamp: new Date(),
-          ip,
-          browser,
-          os,
-          deviceType,
-        };
-
-        await loginHistoryCollection.insertOne(loginHistory);
-
-        if (browser === "Chrome") {
-          const otp = Math.floor(1000 + Math.random() * 9000).toString();
-          otpStore[email] = { otp, createdAt: new Date() };
-
-          const msg = {
-            to: email,
-            from: process.env.SENDGRID_EMAIL,
-            subject: "Your OTP Code",
-            text: `Your OTP code is ${otp}`,
-          };
-
-          await sgMail.send(msg);
-          res.status(200).json({ message: "OTP sent to your email" });
-        } else if (browser === "Edge") {
-          res.status(200).json({
-            message: "Access granted without additional authentication",
-          });
-        } else if (deviceType === "mobile") {
-          const currentTime = new Date().getHours();
-          if (currentTime >= 10 && currentTime <= 13) {
-            res
-              .status(200)
-              .json({ message: "Access granted during allowed hours" });
-          } else {
-            res
-              .status(401)
-              .json({ error: "Access denied outside allowed hours" });
-          }
-        } else {
-          res.status(403).json({ error: "Unsupported browser or device type" });
-        }
-      } catch (error) {
-        console.error("Error in verify-login:", error.message);
-        res
-          .status(500)
-          .json({ error: "Internal Server Error", details: error.message });
-      }
-    });
     // get
+    // Backend code to fetch login history
+    app.get("/loginHistory/:email", async (req, res) => {
+      const { email } = req.params;
+
+      try {
+        const loginHistory = await loginHistoryCollection
+          .find({ email })
+          .toArray();
+        res.json(loginHistory);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch login history" });
+      }
+    });
+
     app.get("/user", async (req, res) => {
       const user = await userCollection.find().toArray();
       res.send(user);
@@ -179,6 +107,18 @@ async function run() {
         console.error(error);
         res.status(500).send({ message: "Error creating post" });
       }
+    });
+    app.post("/loginHistory", async (req, res) => {
+      console.log(req.body.systemInfo);
+      const { email, browser, os, ip, device } = req.body.systemInfo;
+      const result = await loginHistoryCollection.insertOne({
+        email,
+        browser,
+        os,
+        ip,
+        device,
+      });
+      res.send(result);
     });
 
     // patch

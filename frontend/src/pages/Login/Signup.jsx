@@ -5,47 +5,56 @@ import twitterimg from "../../image/twitter.jpeg";
 import { useTranslation } from "react-i18next";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import GoogleButton from "react-google-button";
-import "./Login.css";
 import PhoneIcon from "@mui/icons-material/Phone";
+import "./Login.css";
 
-const Signup = () => {
-  const [username, setUsername] = useState(" ");
+const Signup = ({ userBrowser, userDevice, userOS, userIP }) => {
+  const [username, setUsername] = useState("");
   const [name, setName] = useState("");
-  const { t } = useTranslation("translations");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
   const [password, setPassword] = useState("");
-  const { signUp } = useUserAuth();
-  const { googleSignIn } = useUserAuth();
+  const [error, setError] = useState("");
+  const { t } = useTranslation("translations");
+  const { signUp, googleSignIn } = useUserAuth();
   let navigate = useNavigate();
+
   const handlePhone = () => {
     navigate("/mobile");
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       await signUp(email, password);
+
       const user = {
-        username: username,
-        name: name,
-        email: email,
+        username,
+        name,
+        email,
+        browser: userBrowser,
+        device: userDevice,
+        os: userOS,
+        ip: userIP,
       };
 
-      fetch("https://twitter-cxhu.onrender.com/register", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(user),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.acknowledged) {
-            console.log(data);
-            navigate("/");
-          }
-        });
+      const response = await fetch(
+        "https://twitter-cxhu.onrender.com/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.acknowledged) {
+        console.log(data);
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message);
       window.alert(err.message);
@@ -59,7 +68,6 @@ const Signup = () => {
       navigate("/");
     } catch (error) {
       console.log(error.message);
-      console.log(error);
     }
   };
 
@@ -71,29 +79,26 @@ const Signup = () => {
         </div>
 
         <div className="form-container">
-          <div className="">
+          <div>
             <TwitterIcon className="Twittericon" style={{ color: "skyblue" }} />
-
             <h2 className="heading">{t("Happening now")}</h2>
 
-            <div class="d-flex align-items-sm-center">
-              <h3 className="heading1"> {t("Join twitter today")} </h3>
+            <div className="d-flex align-items-sm-center">
+              <h3 className="heading1">{t("Join twitter today")}</h3>
             </div>
 
             {error && <p className="errorMessage">{error}</p>}
             <form onSubmit={handleSubmit}>
               <input
                 className="display-name"
-                style={{ backgroudColor: "red" }}
-                type="username"
-                placeholder="@username "
+                type="text"
+                placeholder="@username"
                 onChange={(e) => setUsername(e.target.value)}
               />
 
               <input
                 className="display-name"
-                style={{ backgroudColor: "red" }}
-                type="name"
+                type="text"
                 placeholder={t("Enter Full Name")}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -127,11 +132,7 @@ const Signup = () => {
               />
             </div>
             <div>
-              <button
-                className="phone-btn"
-                type="light"
-                marginLeft="80px"
-                onClick={handlePhone}>
+              <button className="phone-btn" type="button" onClick={handlePhone}>
                 <PhoneIcon style={{ color: "green" }} />
                 Sign in with Phone
               </button>

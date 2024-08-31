@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import "./Login.css";
 import { useNavigate, Link } from "react-router-dom";
-import { useUserAuth } from "../../context/UserAuthContext";
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { useTranslation } from "react-i18next";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import auth from "../../context/firebase";
+import axios from "axios";
 
-function Mobile() {
+function Mobile({ userBrowser, userOS, userDevice, userIP }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
@@ -53,6 +52,24 @@ function Mobile() {
         );
         setConfirmResult(confirmationResult);
         setSuccess(true);
+
+        // Send phone number and login details to backend
+        const loginInfo = {
+          phoneNumber,
+          browser: userBrowser,
+          os: userOS,
+          ip: userIP,
+          device: userDevice,
+        };
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { loginInfo },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       } catch (error) {
         setError(error.message);
       }
