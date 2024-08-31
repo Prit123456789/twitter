@@ -30,7 +30,7 @@ function MainProfile({ user }) {
           console.error("Error fetching user posts:", error);
         });
     }
-  }, [user?.email]);
+  }, [user.email]);
 
   const handleUploadCoverImage = (e) => {
     setIsLoading(true);

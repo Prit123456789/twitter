@@ -141,7 +141,7 @@ async function run() {
       const post = (await postCollection.find().toArray()).reverse();
       res.send(post);
     });
-    app.get("/userPost", async (req, res) => {
+    app.get("/userPost/:email", async (req, res) => {
       const email = req.query.email;
       const post = (await postCollection.find({ email: email }).toArray(),
       await audioCollection.find({ email: email }).toArray()).reverse();
