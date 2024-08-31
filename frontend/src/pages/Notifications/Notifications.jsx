@@ -29,22 +29,21 @@ function Notifications() {
     fetchLoginHistory();
   }, [user]);
 
-  if (loading) {
-    return <p className="spinner" />; // Or use a custom loader here
-  }
-
   return (
     <div className="page">
       <h2 className="head">{t("Welcome to Notification Page")}</h2>
-      <div className="login-history">
-        <h3>{t("Login History")}</h3>
-        {loginHistory.length > 0 ? (
-          <ul>
-            {loginHistory.map((entry, index) => (
-              <li key={index}>
-                <p>
-                  {t("Email")}: {entry.email}
-                </p>
+      {loading ? (
+        <div className="loader" /> /* Ensures loader occupies space correctly */
+      ) : (
+        <div className="login-history">
+          <h3 style={{ color: "black" }}>{t("Login History")}</h3>
+          {loginHistory.length > 0 ? (
+            loginHistory.map((entry, index) => (
+              <div
+                key={index}
+                className={`login-entry ${
+                  index % 2 === 0 ? "user-message" : "other-message"
+                }`}>
                 <p>
                   {t("Browser")}: {entry.browser}
                 </p>
@@ -57,14 +56,13 @@ function Notifications() {
                 <p>
                   {t("IP Address")}: {entry.ip}
                 </p>
-                <hr />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>{t("No login history available")}</p>
-        )}
-      </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-history">{t("No login history available")}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
