@@ -41,6 +41,39 @@ async function run() {
     const userCollection = client.db("database").collection("users");
     const audioCollection = client.db("database").collection("audios");
 
+    // Middleware to enforce time restrictions for mobile devices
+    function enforceMobileTimeRestrictions(req, res, next) {
+      const userAgent = req.headers["user-agent"];
+      const parser = new UAParser(userAgent);
+      const { device } = parser.getResult();
+
+      // Function to check if the current time is within the allowed time range
+      function isWithinTimeframe(startHour, endHour) {
+        const currentISTTime = new Date().toLocaleString("en-US", {
+          timeZone: "Asia/Kolkata",
+        });
+        const currentHour = new Date(currentISTTime).getHours();
+        return currentHour >= startHour && currentHour < endHour;
+      }
+
+      // Check if the user is on a mobile device
+      if (device.type === "mobile") {
+        const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
+        if (!isAllowedTime) {
+          return res.status(403).send({
+            error:
+              "Access is restricted for mobile devices outside of 10 AM to 1 PM IST",
+          });
+        }
+      }
+
+      // If the conditions are met, proceed to the next middleware or route
+      next();
+    }
+
+    // Apply the middleware to all routes or specific routes
+    app.use(enforceMobileTimeRestrictions);
+
     // get
     // Backend code to fetch login history
     app.get("/loginHistory/:email", async (req, res) => {
@@ -109,16 +142,35 @@ async function run() {
       }
     });
     app.post("/loginHistory", async (req, res) => {
-      console.log(req.body.systemInfo);
-      const { email, browser, os, ip, device } = req.body.systemInfo;
-      const result = await loginHistoryCollection.insertOne({
-        email,
-        browser,
-        os,
-        ip,
-        device,
-      });
-      res.send(result);
+      try {
+        const { email } = req.body.systemInfo;
+
+        const ipAddress =
+          req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+        const userAgent = req.headers["user-agent"];
+        const parser = new UAParser(userAgent);
+        const { browser, os, device } = parser.getResult();
+
+        if (browser.name === "Chrome") {
+        }
+
+        const loginHistory = {
+          email,
+          ip: ipAddress,
+          browser: `${browser.name} ${browser.version}`,
+          os: `${os.name} ${os.version}`,
+          device: device.type || "Desktop",
+          timestamp: new Date(),
+        };
+
+        const result = await loginHistoryCollection.insertOne(loginHistory);
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error storing login history:", error.message);
+        res.status(500).send({ error: "Failed to store login history" });
+      }
     });
 
     // patch

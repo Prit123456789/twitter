@@ -6,7 +6,6 @@ import axios from "axios";
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import PhoneIcon from "@mui/icons-material/Phone";
-import UAParser from "ua-parser-js";
 import "./Login.css";
 import { useTranslation } from "react-i18next";
 
@@ -18,40 +17,19 @@ const Login = () => {
   const { logIn, googleSignIn } = useUserAuth();
   const navigate = useNavigate();
 
-  const captureUserDetails = async () => {
-    const parser = new UAParser();
-    const userBrowser = parser.getBrowser().name;
-    const userOS = parser.getOS().name;
-    const userDevice = parser.getDevice().model;
-    // IP Address capture depends on your backend setup.
-    const userIP = ""; // This should be captured appropriately.
-
-    return { userBrowser, userOS, userDevice, userIP };
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
+      // Login using the provided email and password
       await logIn(email, password);
       navigate("/");
 
-      // Capture user details
-      const { userBrowser, userOS, userDevice, userIP } =
-        await captureUserDetails();
-
-      // Post login details
-      const loginInfo = {
-        email,
-        browser: userBrowser,
-        os: userOS,
-        ip: userIP,
-        device: userDevice,
-      };
+      // Send login information to backend
       await axios.post(
         "https://twitter-cxhu.onrender.com/loginHistory",
-        { systemInfo: loginInfo },
+        { systemInfo: { email } },
         {
           headers: {
             "Content-Type": "application/json",
@@ -75,26 +53,13 @@ const Login = () => {
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
     try {
-      // Sign in with Google
-      await googleSignIn();
-
+      const user = await googleSignIn();
       navigate("/");
-      // Capture user details
-      const { userBrowser, userOS, userDevice, userIP } =
-        await captureUserDetails();
 
-      // Post login details
-      const userEmail = ""; // Get user email from Google Sign-In result
-      const loginInfo = {
-        email: userEmail,
-        browser: userBrowser,
-        os: userOS,
-        ip: userIP,
-        device: userDevice,
-      };
+      // Send Google login information to backend
       await axios.post(
         "https://twitter-cxhu.onrender.com/loginHistory",
-        { systemInfo: loginInfo },
+        { systemInfo: { email: user.email } },
         {
           headers: {
             "Content-Type": "application/json",

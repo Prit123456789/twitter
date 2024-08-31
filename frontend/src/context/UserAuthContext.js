@@ -31,7 +31,9 @@ export function UserAuthContextProvider({ children }) {
 
   function googleSignIn() {
     const googleAuthProvider = new GoogleAuthProvider();
-    return signInWithPopup(auth, googleAuthProvider);
+    return signInWithPopup(auth, googleAuthProvider).then((result) => {
+      return result.user; // Return the user object from the result
+    });
   }
 
   function resetPassword(email) {
