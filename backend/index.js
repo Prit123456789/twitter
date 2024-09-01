@@ -88,6 +88,33 @@ async function run() {
         res.status(500).json({ error: "Failed to fetch login history" });
       }
     });
+    app.post("/loginHistory", async (req, res) => {
+      try {
+        // Extract login information from the request body
+        const { phoneNumber, browser, os, ip, device } = req.body;
+
+        // Create login history object
+        const loginHistory = {
+          phoneNumber,
+          ip,
+          browser: `${browser.name} ${browser.version}`,
+          os: `${os.name} ${os.version}`,
+          device: device || "Desktop",
+          timestamp: new Date(),
+        };
+
+        // Insert the login history into the collection
+        const result = await loginHistoryCollection.insertOne(loginHistory);
+
+        // Send success response
+        res
+          .status(201)
+          .json({ message: "Login history captured successfully", result });
+      } catch (error) {
+        console.error("Error storing login history:", error.message);
+        res.status(500).send({ error: "Failed to store login history" });
+      }
+    });
 
     app.get("/user", async (req, res) => {
       const user = await userCollection.find().toArray();

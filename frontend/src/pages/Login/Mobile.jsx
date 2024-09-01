@@ -8,7 +8,7 @@ import auth from "../../context/firebase";
 import axios from "axios";
 
 function Mobile({ userBrowser, userOS, userDevice, userIP }) {
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("+91"); // Initialize with +91
   const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -113,7 +113,13 @@ function Mobile({ userBrowser, userOS, userDevice, userIP }) {
             <input
               className="email"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(e) =>
+                setPhoneNumber(
+                  e.target.value.startsWith("+91")
+                    ? e.target.value
+                    : `+91${e.target.value.replace(/^0+/, "")}`
+                )
+              } // Ensuring +91 prefix
               placeholder={t("Enter your phone number")}
             />
             <button className="btn" type="submit">
