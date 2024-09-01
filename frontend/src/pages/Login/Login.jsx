@@ -119,19 +119,34 @@ const Login = () => {
     e.preventDefault();
     try {
       const user = await googleSignIn();
-      navigate("/");
+      console.log("Google sign-in user data:", user); // Debugging line
 
-      await axios.post(
-        "https://twitter-cxhu.onrender.com/loginHistory",
-        { systemInfo: { email: user.email } },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      // Extract the email safely
+      const email = user.email || user.user?.email || "";
+
+      if (email) {
+        // Make sure to log the email to verify it's correct
+        console.log("User email for login history:", email);
+
+        // Make the request to record the login history
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { systemInfo: { email } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Navigate to the homepage after recording login history
+        navigate("/");
+      } else {
+        console.error("No email found for the Google sign-in user.");
+      }
     } catch (error) {
-      console.log(error.message);
+      console.error("Google Sign-In error:", error.message);
+      setError(error.message);
     }
   };
 
