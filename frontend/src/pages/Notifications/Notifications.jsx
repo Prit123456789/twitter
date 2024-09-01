@@ -24,10 +24,12 @@ function Notifications() {
           console.error(
             "User has neither email nor phoneNumber available for login history."
           );
-          return; // Exit if no identifier is found
+          setLoading(false);
+          return;
         }
 
         const response = await axios.get(endpoint);
+        console.log("Login History Response:", response.data); // Debug line
         setLoginHistory(response.data);
       } catch (error) {
         console.error("Failed to fetch login history:", error);
@@ -67,13 +69,13 @@ function Notifications() {
             loginHistory.map((entry, index) => (
               <div key={index} className={`login-entry`}>
                 <p>
-                  {t("Browser")}: {entry.browser}
+                  {t("Browser")}: {entry.browser || t("Unknown")}
                 </p>
                 <p>
-                  {t("OS")}: {entry.os}
+                  {t("OS")}: {entry.os || t("Unknown")}
                 </p>
                 <p>
-                  {t("Device")}: {entry.device}
+                  {t("Device")}: {entry.device || t("Unknown")}
                 </p>
                 <p>{t("IP Address")}:</p>
                 <ul>{formatIPs(entry.ip)}</ul>

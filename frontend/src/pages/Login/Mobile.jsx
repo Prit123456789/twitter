@@ -8,7 +8,7 @@ import auth from "../../context/firebase";
 import axios from "axios";
 
 function Mobile() {
-  const [phoneNumber, setPhoneNumber] = useState("+91"); // Initialize with +91
+  const [phoneNumber, setPhoneNumber] = useState("+91");
   const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -54,7 +54,11 @@ function Mobile() {
         setConfirmResult(confirmationResult);
         setSuccess(true);
         setError(""); // Clear previous errors
-        await axios.post(
+
+        // Debug: Log the data sent to the backend
+        console.log("Sending phone number to backend:", phoneNumber);
+
+        const response = await axios.post(
           "https://twitter-cxhu.onrender.com/phoneHistory",
           { phoneNumber },
           {
@@ -63,7 +67,11 @@ function Mobile() {
             },
           }
         );
+
+        // Debug: Log the response from the backend
+        console.log("Backend response:", response.data);
       } catch (error) {
+        console.error("Error during OTP sending or logging:", error);
         setError(error.message);
       }
     } else {
@@ -79,6 +87,7 @@ function Mobile() {
         console.log(`Verified: ${userCredential.user.uid}`);
         navigate("/");
       } catch (error) {
+        console.error("Error verifying OTP:", error);
         setError(error.message);
       }
     } else {
@@ -112,7 +121,7 @@ function Mobile() {
                     ? e.target.value
                     : `+91${e.target.value.replace(/^0+/, "")}`
                 )
-              } // Ensuring +91 prefix
+              }
               placeholder={t("Enter your phone number")}
             />
             <button className="btn" type="submit">
