@@ -88,29 +88,15 @@ async function run() {
         res.status(500).json({ error: "Failed to fetch login history" });
       }
     });
-    app.post("/loginHistory", async (req, res) => {
+    app.get("/loginHistory/:phoneNumber", async (req, res) => {
+      const { phoneNumber } = req.params;
       try {
-        // Extract login information from the request body
-        const { phoneNumber, browser, os, ip, device } = req.body;
-
-        // Create login history object
-        const loginHistory = {
-          phoneNumber,
-          ip,
-          browser: `${browser.name} ${browser.version}`,
-          os: `${os.name} ${os.version}`,
-          device: device || "Desktop",
-          timestamp: new Date(),
-        };
-
-        const result = await loginHistoryCollection.insertOne(loginHistory);
-
-        res
-          .status(201)
-          .json({ message: "Login history captured successfully", result });
+        const loginHistory = (
+          await loginHistoryCollection.find({ phoneNumber }).toArray()
+        ).reverse();
+        res.json(loginHistory);
       } catch (error) {
-        console.error("Error storing login history:", error.message);
-        res.status(500).send({ error: "Failed to store login history" });
+        res.status(500).json({ error: "Failed to fetch login history" });
       }
     });
 
@@ -194,6 +180,37 @@ async function run() {
         ).reverse();
 
         res.send(result);
+      } catch (error) {
+        console.error("Error storing login history:", error.message);
+        res.status(500).send({ error: "Failed to store login history" });
+      }
+    });
+    app.post("/phoneHistory", async (req, res) => {
+      try {
+        // Extract login information from the request body
+        const { phoneNumber } = req.body;
+        const ipAddress =
+          req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+        const userAgent = req.headers["user-agent"];
+        const parser = new UAParser(userAgent);
+        const { browser, os, device } = parser.getResult();
+        if (browser.name === chrome) {
+        }
+        // Create login history object
+        const loginHistory = {
+          phoneNumber,
+          ip: ipAddress,
+          browser: `${browser.name} ${browser.version}`,
+          os: `${os.name} ${os.version}`,
+          device: device || "Desktop",
+          timestamp: new Date(),
+        };
+
+        const result = await loginHistoryCollection.insertOne(loginHistory);
+
+        res
+          .status(201)
+          .json({ message: "Login history captured successfully", result });
       } catch (error) {
         console.error("Error storing login history:", error.message);
         res.status(500).send({ error: "Failed to store login history" });

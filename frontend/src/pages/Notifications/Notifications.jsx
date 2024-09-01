@@ -6,26 +6,24 @@ import { useTranslation } from "react-i18next";
 
 function Notifications() {
   const { t } = useTranslation("translations");
-  const { user } = useUserAuth(); // Get the logged-in user
+  const { user } = useUserAuth();
   const [loginHistory, setLoginHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLoginHistory = async () => {
-      setLoading(true); // Set loading before fetching data
+      setLoading(true);
       try {
-        // Check if user has email and fetch specific login history
         const endpoint = user?.email
           ? `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`
-          : "https://twitter-cxhu.onrender.com/loginHistory";
+          : "https://twitter-cxhu.onrender.com/phoneHistory";
 
-        // Fetch the login history data
         const response = await axios.get(endpoint);
         setLoginHistory(response.data);
       } catch (error) {
         console.error("Failed to fetch login history:", error);
       } finally {
-        setLoading(false); // Reset loading state after data fetch or error
+        setLoading(false);
       }
     };
 

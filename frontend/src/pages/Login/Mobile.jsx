@@ -7,7 +7,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import auth from "../../context/firebase";
 import axios from "axios";
 
-function Mobile({ userBrowser, userOS, userDevice, userIP }) {
+function Mobile({}) {
   const [phoneNumber, setPhoneNumber] = useState("+91"); // Initialize with +91
   const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
@@ -49,6 +49,15 @@ function Mobile({ userBrowser, userOS, userDevice, userIP }) {
           auth,
           phoneNumber,
           appVerifier
+        );
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/phoneHistory",
+          { phoneNumber },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
         setConfirmResult(confirmationResult);
         setSuccess(true);
