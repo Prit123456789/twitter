@@ -105,10 +105,41 @@ async function run() {
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
-      const email = req.query.email;
-      const user = await userCollection.find({ email: email }).toArray();
-      res.send(user);
+      try {
+        const { email, phoneNumber } = req.query; // Destructure both email and phoneNumber from the query parameters
+
+        let query = {}; // Initialize an empty query object
+
+        if (email) {
+          // If email is provided, set the query to search by email
+          query.email = email;
+        } else if (phoneNumber) {
+          // If phoneNumber is provided, set the query to search by phoneNumber
+          query.phoneNumber = phoneNumber;
+        } else {
+          // If neither email nor phoneNumber is provided, return an error
+          return res
+            .status(400)
+            .json({ error: "Email or phone number is required" });
+        }
+
+        // Fetch the user from the database based on the constructed query
+        const user = await userCollection.find(query).toArray();
+
+        // If no user is found, respond with a 404 error
+        if (user.length === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        // Send the found user as a response
+        res.send(user);
+      } catch (error) {
+        // Handle any server-side errors
+        console.error("Error fetching logged-in user:", error.message);
+        res.status(500).json({ error: "Failed to fetch logged-in user" });
+      }
     });
+
     app.get("/post", async (req, res) => {
       const post = (await postCollection.find().toArray()).reverse();
       res.send(post);

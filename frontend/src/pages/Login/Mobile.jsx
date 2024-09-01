@@ -7,7 +7,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import auth from "../../context/firebase";
 import axios from "axios";
 
-function Mobile({}) {
+function Mobile() {
   const [phoneNumber, setPhoneNumber] = useState("+91"); // Initialize with +91
   const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
@@ -36,7 +36,7 @@ function Mobile({}) {
   }, []);
 
   const validatePhoneNumber = () => {
-    const regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
+    const regexp = /^\+[0-9]{10,15}$/; // Adjust regex for valid phone numbers
     return regexp.test(phoneNumber);
   };
 
@@ -53,6 +53,7 @@ function Mobile({}) {
 
         setConfirmResult(confirmationResult);
         setSuccess(true);
+        setError(""); // Clear previous errors
         await axios.post(
           "https://twitter-cxhu.onrender.com/phoneHistory",
           { phoneNumber },
