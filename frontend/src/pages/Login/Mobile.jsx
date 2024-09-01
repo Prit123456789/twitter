@@ -52,24 +52,6 @@ function Mobile({ userBrowser, userOS, userDevice, userIP }) {
         );
         setConfirmResult(confirmationResult);
         setSuccess(true);
-
-        // Send phone number and login details to backend
-        const loginInfo = {
-          phoneNumber,
-          browser: userBrowser,
-          os: userOS,
-          ip: userIP,
-          device: userDevice,
-        };
-        await axios.post(
-          "https://twitter-cxhu.onrender.com/loginHistory",
-          { loginInfo },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
       } catch (error) {
         setError(error.message);
       }
@@ -83,7 +65,7 @@ function Mobile({ userBrowser, userOS, userDevice, userIP }) {
     if (otp.length === 6 && confirmResult) {
       try {
         const userCredential = await confirmResult.confirm(otp);
-        alert(`Verified: ${userCredential.user.uid}`);
+        console.log(`Verified: ${userCredential.user.uid}`);
         navigate("/");
       } catch (error) {
         setError(error.message);

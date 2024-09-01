@@ -103,10 +103,8 @@ async function run() {
           timestamp: new Date(),
         };
 
-        // Insert the login history into the collection
         const result = await loginHistoryCollection.insertOne(loginHistory);
 
-        // Send success response
         res
           .status(201)
           .json({ message: "Login history captured successfully", result });

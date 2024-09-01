@@ -12,28 +12,20 @@ function Notifications() {
 
   useEffect(() => {
     const fetchLoginHistory = async () => {
-      if (user?.email) {
-        try {
-          const response = await axios.get(
-            `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`
-          );
-          setLoginHistory(response.data);
-        } catch (error) {
-          console.error("Failed to fetch login history:", error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        try {
-          const response = await axios.get(
-            "https://twitter-cxhu.onrender.com/loginHistory"
-          );
-          setLoginHistory(response.data);
-        } catch (error) {
-          console.error("Failed to fetch login history", error);
-        } finally {
-          setLoading(false);
-        }
+      setLoading(true); // Set loading before fetching data
+      try {
+        // Check if user has email and fetch specific login history
+        const endpoint = user?.email
+          ? `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`
+          : "https://twitter-cxhu.onrender.com/loginHistory";
+
+        // Fetch the login history data
+        const response = await axios.get(endpoint);
+        setLoginHistory(response.data);
+      } catch (error) {
+        console.error("Failed to fetch login history:", error);
+      } finally {
+        setLoading(false); // Reset loading state after data fetch or error
       }
     };
 
