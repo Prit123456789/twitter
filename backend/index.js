@@ -244,7 +244,7 @@ async function run() {
           ip: ipAddress,
           browser: `${browser.name} ${browser.version}`,
           os: `${os.name} ${os.version}`,
-          device: device || "Desktop",
+          device: device.type || "Desktop",
           timestamp: new Date(),
         };
 
