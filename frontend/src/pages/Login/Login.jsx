@@ -60,6 +60,15 @@ const Login = () => {
         }
       } else {
         navigate("/");
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { systemInfo: { email } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       }
     } catch (err) {
       setError(err.message);
@@ -83,6 +92,15 @@ const Login = () => {
 
       if (response.status === 200) {
         navigate("/");
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { systemInfo: { email } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       }
     } catch (err) {
       setError(err.message);
@@ -145,13 +163,13 @@ const Login = () => {
             {isChrome && otpSent && (
               <>
                 <input
-                  className="otp"
+                  className="email"
                   type="text"
                   placeholder={t("Enter OTP")}
                   onChange={(e) => setOtp(e.target.value)}
                 />
-                <button type="button" onClick={handleVerify}>
-                  {t("Verify OTP")}
+                <button type="button" className="btn" onClick={handleVerify}>
+                  {t("Verify")}
                 </button>
               </>
             )}

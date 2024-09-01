@@ -14,9 +14,18 @@ function Notifications() {
     const fetchLoginHistory = async () => {
       setLoading(true);
       try {
-        const endpoint = user?.email
-          ? `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`
-          : `https://twitter-cxhu.onrender.com/phoneHistory/${user.phoneNumber}`;
+        // Determine which endpoint to call based on available user info
+        let endpoint = "";
+        if (user?.email) {
+          endpoint = `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`;
+        } else if (user?.phoneNumber) {
+          endpoint = `https://twitter-cxhu.onrender.com/phoneHistory/${user.phoneNumber}`;
+        } else {
+          console.error(
+            "User has neither email nor phoneNumber available for login history."
+          );
+          return; // Exit if no identifier is found
+        }
 
         const response = await axios.get(endpoint);
         setLoginHistory(response.data);
@@ -30,22 +39,19 @@ function Notifications() {
     fetchLoginHistory();
   }, [user]);
 
-  // Helper function to format the timestamp
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleString(); // Formats to a readable date-time string
+    return date.toLocaleString();
   };
+
   const formatIPs = (ips) => {
-    // Check if ips is a string and split by commas if needed
     if (typeof ips === "string") {
       return ips
         .split(",")
         .map((ip, index) => <li key={index}>{ip.trim()}</li>);
     } else if (Array.isArray(ips)) {
-      // If already an array, just map through it
       return ips.map((ip, index) => <li key={index}>{ip}</li>);
     }
-    // Fallback if format is unexpected
     return <li>{ips}</li>;
   };
 
@@ -53,7 +59,7 @@ function Notifications() {
     <div className="Log">
       <h2 className="head">{t("Welcome to Notification Page")}</h2>
       {loading ? (
-        <div className="loader" /> /* Ensures loader occupies space correctly */
+        <div className="loader" />
       ) : (
         <div className="login-history">
           <h3 style={{ color: "black" }}>{t("Login History")}</h3>
@@ -72,7 +78,7 @@ function Notifications() {
                 <p>{t("IP Address")}:</p>
                 <ul>{formatIPs(entry.ip)}</ul>
                 <p>
-                  {t("On")}: {formatDate(entry.timestamp)}{" "}
+                  {t("On")}: {formatDate(entry.timestamp)}
                 </p>
               </div>
             ))
