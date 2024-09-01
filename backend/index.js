@@ -175,10 +175,7 @@ async function run() {
           timestamp: new Date(),
         };
 
-        const result = (
-          await loginHistoryCollection.insertOne(loginHistory).toArray()
-        ).reverse();
-
+        const result = await loginHistoryCollection.insertOne(loginHistory);
         res.send(result);
       } catch (error) {
         console.error("Error storing login history:", error.message);

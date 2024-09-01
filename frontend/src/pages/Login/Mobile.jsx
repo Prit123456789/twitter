@@ -50,6 +50,9 @@ function Mobile({}) {
           phoneNumber,
           appVerifier
         );
+
+        setConfirmResult(confirmationResult);
+        setSuccess(true);
         await axios.post(
           "https://twitter-cxhu.onrender.com/phoneHistory",
           { phoneNumber },
@@ -59,8 +62,6 @@ function Mobile({}) {
             },
           }
         );
-        setConfirmResult(confirmationResult);
-        setSuccess(true);
       } catch (error) {
         setError(error.message);
       }
