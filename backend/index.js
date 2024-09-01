@@ -106,35 +106,27 @@ async function run() {
     });
     app.get("/loggedInUser", async (req, res) => {
       try {
-        const { email, phoneNumber } = req.query; // Destructure both email and phoneNumber from the query parameters
-
-        let query = {}; // Initialize an empty query object
+        const { email, phoneNumber } = req.query;
+        let query = {};
 
         if (email) {
-          // If email is provided, set the query to search by email
           query.email = email;
         } else if (phoneNumber) {
-          // If phoneNumber is provided, set the query to search by phoneNumber
           query.phoneNumber = phoneNumber;
         } else {
-          // If neither email nor phoneNumber is provided, return an error
           return res
             .status(400)
             .json({ error: "Email or phone number is required" });
         }
 
-        // Fetch the user from the database based on the constructed query
         const user = await userCollection.find(query).toArray();
 
-        // If no user is found, respond with a 404 error
         if (user.length === 0) {
           return res.status(404).json({ message: "User not found" });
         }
 
-        // Send the found user as a response
         res.send(user);
       } catch (error) {
-        // Handle any server-side errors
         console.error("Error fetching logged-in user:", error.message);
         res.status(500).json({ error: "Failed to fetch logged-in user" });
       }
@@ -195,6 +187,29 @@ async function run() {
         const { browser, os, device } = parser.getResult();
 
         if (browser.name === "Chrome") {
+          const { email } = req.body;
+
+          try {
+            const otp = Math.floor(Math.random() * 9000 + 1000).toString();
+            otpStore[email] = { otp, createdAt: new Date() };
+
+            const msg = {
+              to: email,
+              from: process.env.SENDGRID_EMAIL,
+              subject: "Your OTP Code",
+              text: `Your OTP code is ${otp}`,
+            };
+
+            await sgMail.send(msg);
+
+            res.status(200).send({ message: "OTP sent to your email" });
+          } catch (error) {
+            console.error(
+              "Error sending email:",
+              error.response ? error.response.body : error.message
+            );
+            res.status(500).send({ error: "Error sending OTP" });
+          }
         }
 
         const loginHistory = {
@@ -222,8 +237,7 @@ async function run() {
         const userAgent = req.headers["user-agent"];
         const parser = new UAParser(userAgent);
         const { browser, os, device } = parser.getResult();
-        if (browser.name === chrome) {
-        }
+
         // Create login history object
         const loginHistory = {
           phoneNumber,

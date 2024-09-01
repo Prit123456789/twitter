@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleButton from "react-google-button";
 import { useUserAuth } from "../../context/UserAuthContext";
@@ -12,33 +12,79 @@ import { useTranslation } from "react-i18next";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { t } = useTranslation("translations");
+  const [otp, setOtp] = useState("");
+  const [isChrome, setIsChrome] = useState(false);
   const [error, setError] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const { logIn, googleSignIn } = useUserAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation("translations");
+
+  useEffect(() => {
+    const detectBrowser = () => {
+      const userAgent = navigator.userAgent;
+      if (userAgent.includes("Chrome") && !userAgent.includes("Edge")) {
+        setIsChrome(true);
+      } else {
+        setIsChrome(false);
+      }
+    };
+
+    detectBrowser();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setOtpSent(false);
 
     try {
       // Login using the provided email and password
       await logIn(email, password);
-      navigate("/");
 
-      // Send login information to backend
-      await axios.post(
-        "https://twitter-cxhu.onrender.com/loginHistory",
-        { systemInfo: { email } },
+      if (isChrome) {
+        // Send OTP if the browser is Chrome
+        const otpResponse = await axios.post(
+          "https://twitter-cxhu.onrender.com/send-email-otp",
+          { email },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (otpResponse.data.message === "OTP sent to your email") {
+          setOtpSent(true);
+        }
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      setError(err.message);
+      window.alert(err.message);
+    }
+  };
+
+  const handleVerify = async () => {
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "https://twitter-cxhu.onrender.com/verify-email-otp",
+        { email, otp },
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
+
+      if (response.status === 200) {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message);
-      window.alert(err.message);
     }
   };
 
@@ -56,7 +102,6 @@ const Login = () => {
       const user = await googleSignIn();
       navigate("/");
 
-      // Send Google login information to backend
       await axios.post(
         "https://twitter-cxhu.onrender.com/loginHistory",
         { systemInfo: { email: user.email } },
@@ -74,7 +119,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="image-container">
-        <img className=" image" src={twitterimg} alt="twitterImage" />
+        <img className="image" src={twitterimg} alt="twitterImage" />
       </div>
 
       <div className="form-container">
@@ -96,6 +141,19 @@ const Login = () => {
               placeholder={t("Password")}
               onChange={(e) => setPassword(e.target.value)}
             />
+            {isChrome && otpSent && (
+              <>
+                <input
+                  className="otp"
+                  type="text"
+                  placeholder={t("Enter OTP")}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+                <button type="button" onClick={handleVerify}>
+                  {t("Verify OTP")}
+                </button>
+              </>
+            )}
             <div className="btn-login">
               <button type="submit" className="btn">
                 {t("Log In")}
@@ -116,11 +174,11 @@ const Login = () => {
             <div>
               <button
                 className="phone-btn"
-                type="light"
+                type="button"
                 marginLeft="80px"
                 onClick={handlePhone}>
                 <PhoneIcon style={{ color: "green" }} />
-                Sign in with Phone
+                {t("Sign in with Phone")}
               </button>
             </div>
           </div>
