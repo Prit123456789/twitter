@@ -23,11 +23,12 @@ const Login = () => {
   useEffect(() => {
     const detectBrowser = () => {
       const userAgent = navigator.userAgent;
-      if (userAgent.includes("Chrome") && !userAgent.includes("Edge")) {
-        setIsChrome(true);
-      } else {
-        setIsChrome(false);
-      }
+
+      // Detect Chrome and exclude Edge
+      const isChromeBrowser =
+        userAgent.includes("Chrome") && !userAgent.includes("Edg");
+
+      setIsChrome(isChromeBrowser);
     };
 
     detectBrowser();
