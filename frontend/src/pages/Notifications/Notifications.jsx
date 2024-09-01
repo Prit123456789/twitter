@@ -14,7 +14,7 @@ function Notifications() {
     const fetchLoginHistory = async () => {
       setLoading(true);
       try {
-        // Determine which endpoint to call based on available user info
+        // Determine endpoint based on user's login method
         let endpoint = "";
         if (user?.email) {
           endpoint = `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`;
@@ -24,12 +24,11 @@ function Notifications() {
           console.error(
             "User has neither email nor phoneNumber available for login history."
           );
-          setLoading(false);
           return;
         }
 
         const response = await axios.get(endpoint);
-        console.log("Login History Response:", response.data); // Debug line
+        console.log("Login history data:", response.data); // Debugging line
         setLoginHistory(response.data);
       } catch (error) {
         console.error("Failed to fetch login history:", error);
@@ -69,13 +68,20 @@ function Notifications() {
             loginHistory.map((entry, index) => (
               <div key={index} className={`login-entry`}>
                 <p>
-                  {t("Browser")}: {entry.browser || t("Unknown")}
+                  {t("Browser")}: {entry.browser || "Unknown Browser"}
                 </p>
                 <p>
-                  {t("OS")}: {entry.os || t("Unknown")}
+                  {t("OS")}: {entry.os || "Unknown OS"}
                 </p>
                 <p>
-                  {t("Device")}: {entry.device || t("Unknown")}
+                  {t("Device")}:{" "}
+                  {entry.device
+                    ? typeof entry.device === "object"
+                      ? `${entry.device.vendor || "Unknown Vendor"} ${
+                          entry.device.model || "Unknown Model"
+                        } (${entry.device.type || "Unknown Type"})`
+                      : entry.device
+                    : "Unknown Device"}
                 </p>
                 <p>{t("IP Address")}:</p>
                 <ul>{formatIPs(entry.ip)}</ul>
@@ -94,3 +100,4 @@ function Notifications() {
 }
 
 export default Notifications;
+
