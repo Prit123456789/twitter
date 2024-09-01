@@ -23,6 +23,17 @@ function Notifications() {
         } finally {
           setLoading(false);
         }
+      } else {
+        try {
+          const response = await axios.get(
+            "https://twitter-cxhu.onrender.com/loginHistory"
+          );
+          setLoginHistory(response.data);
+        } catch (error) {
+          console.error("Failed to fetch login history", error);
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
