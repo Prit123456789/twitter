@@ -36,7 +36,7 @@ function Mobile() {
   }, []);
 
   const validatePhoneNumber = () => {
-    const regexp = /^\+[0-9]{10,15}$/; // Adjust regex for valid phone numbers
+    const regexp = /^\+[0-9]{10,15}$/;
     return regexp.test(phoneNumber);
   };
 

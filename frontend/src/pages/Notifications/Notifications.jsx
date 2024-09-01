@@ -16,7 +16,7 @@ function Notifications() {
       try {
         const endpoint = user?.email
           ? `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`
-          : "https://twitter-cxhu.onrender.com/phoneHistory";
+          : `https://twitter-cxhu.onrender.com/phoneHistory/${user.phoneNumber}`;
 
         const response = await axios.get(endpoint);
         setLoginHistory(response.data);
