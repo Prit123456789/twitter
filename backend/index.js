@@ -47,18 +47,12 @@ async function run() {
       const parser = new UAParser(userAgent);
       const { device } = parser.getResult();
 
-      // Function to check if the current time is within the allowed time range
-      function isWithinTimeframe(startHour, endHour) {
-        const currentISTTime = new Date().toLocaleString("en-US", {
-          timeZone: "Asia/Kolkata",
-        });
-        const currentHour = new Date(currentISTTime).getHours();
-        return currentHour >= startHour && currentHour < endHour;
-      }
+      console.log("User Agent:", userAgent);
+      console.log("Device Type:", device.type);
 
-      // Check if the user is on a mobile device
       if (device.type === "mobile") {
         const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
+        console.log("Is Allowed Time:", isAllowedTime);
         if (!isAllowedTime) {
           return res.status(403).send({
             error:
@@ -67,7 +61,6 @@ async function run() {
         }
       }
 
-      // If the conditions are met, proceed to the next middleware or route
       next();
     }
 
