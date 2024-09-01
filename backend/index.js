@@ -88,7 +88,7 @@ async function run() {
         res.status(500).json({ error: "Failed to fetch login history" });
       }
     });
-    app.get("/loginHistory/:phoneNumber", async (req, res) => {
+    app.get("/phoneHistory/:phoneNumber", async (req, res) => {
       const { phoneNumber } = req.params;
       try {
         const loginHistory = (
