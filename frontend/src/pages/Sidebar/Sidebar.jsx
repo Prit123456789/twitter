@@ -31,13 +31,23 @@ function Sidebar({ handleLogout, user }) {
   const openMenu = Boolean(anchorEl);
   const [loggedInUser] = useLoggedInUser();
   const navigate = useNavigate();
+
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const result = user?.email?.split("@")[0];
+
+  // Check if loggedInUser is an array and has at least one element
+  const profileData =
+    Array.isArray(loggedInUser) && loggedInUser.length > 0
+      ? loggedInUser[0]
+      : {};
+
   return (
     <div className="sidebar">
       <TwitterIcon className="sidebar__twitterIcon" />
@@ -81,16 +91,14 @@ function Sidebar({ handleLogout, user }) {
       <div className="Profile__info">
         <Avatar
           src={
-            loggedInUser[0]?.profileImage
-              ? loggedInUser[0]?.profileImage
+            profileData.profileImage
+              ? profileData.profileImage
               : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
           }
         />
         <div className="user__info">
           <h4>
-            {loggedInUser[0]?.name
-              ? loggedInUser[0].name
-              : user && user.displayName}
+            {profileData.name ? profileData.name : user && user.displayName}
           </h4>
           <h5>@{result}</h5>
         </div>
@@ -114,16 +122,16 @@ function Sidebar({ handleLogout, user }) {
             onClick={() => navigate("/home/profile")}>
             <Avatar
               src={
-                loggedInUser[0]?.profileImage
-                  ? loggedInUser[0]?.profileImage
+                profileData.profileImage
+                  ? profileData.profileImage
                   : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
               }
             />
             <div className="user__info subUser__info">
               <div>
                 <h4>
-                  {loggedInUser[0]?.name
-                    ? loggedInUser[0].name
+                  {profileData.name
+                    ? profileData.name
                     : user && user.displayName}
                 </h4>
                 <h5>@{result}</h5>

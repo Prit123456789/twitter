@@ -5,9 +5,9 @@ const useLoggedInUser = () => {
   const { user } = useUserAuth();
   const email = user?.email;
   const phoneNumber = user?.phoneNumber; // Assuming `phoneNumber` is available in the auth context
-  const [loggedInUser, setLoggedInUser] = useState({});
-  const [loading, setLoading] = useState(true); // To handle loading state
-  const [error, setError] = useState(null); // To handle errors
+  const [loggedInUser, setLoggedInUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -43,7 +43,7 @@ const useLoggedInUser = () => {
     fetchUserData();
   }, [email, phoneNumber]);
 
-  return { loggedInUser, setLoggedInUser, loading, error };
+  return [loggedInUser, setLoggedInUser];
 };
 
 export default useLoggedInUser;
