@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserAuth } from "../../context/UserAuthContext";
 import twitterimg from "../../image/twitter.jpeg";
@@ -14,10 +14,26 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [isChrome, setIsChrome] = useState(false);
+  const [isGoogleSignUp, setIsGoogleSignUp] = useState(false);
   const { t } = useTranslation("translations");
   const { signUp, googleSignIn } = useUserAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const detectBrowser = () => {
+      const userAgent = navigator.userAgent;
+
+      const isChromeBrowser =
+        userAgent.includes("Chrome") && !userAgent.includes("Edg");
+      setIsChrome(isChromeBrowser);
+    };
+
+    detectBrowser();
+  }, []);
 
   const handlePhone = () => {
     navigate("/mobile");
@@ -26,32 +42,27 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setOtpSent(false);
 
     try {
       await signUp(email, password);
-      navigate("/");
 
-      // Send user data to backend; browser details and IP will be handled server-side
-      const user = {
-        username,
-        name,
-        email,
-      };
+      if (isChrome) {
+        const otpResponse = await axios.post(
+          "https://twitter-cxhu.onrender.com/send-email-otp",
+          { email },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      const response = await fetch(
-        "https://twitter-cxhu.onrender.com/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
+        if (otpResponse.data.message === "OTP sent to your email") {
+          setOtpSent(true);
         }
-      );
-
-      const data = await response.json();
-      if (!data.acknowledged) {
-        throw new Error("Registration failed.");
+      } else {
+        navigate("/");
       }
     } catch (err) {
       setError(err.message);
@@ -60,25 +71,75 @@ const Signup = () => {
 
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
+    setIsGoogleSignUp(true);
 
     try {
       const user = await googleSignIn();
       const userEmail = user.email;
-      navigate("/");
+      setEmail(userEmail);
 
-      // Send login info to backend, including email from Google sign-in
-      await axios.post(
-        "https://twitter-cxhu.onrender.com/loginHistory",
-        { systemInfo: { email: userEmail } },
+      if (isChrome) {
+        const otpResponse = await axios.post(
+          "https://twitter-cxhu.onrender.com/send-email-otp",
+          { email: userEmail },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (otpResponse.data.message === "OTP sent to your email") {
+          setOtpSent(true);
+        }
+      } else {
+        navigate("/");
+
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { systemInfo: { email: userEmail } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+      setError("Google sign-in failed.");
+    }
+  };
+
+  const handleVerify = async () => {
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "https://twitter-cxhu.onrender.com/verify-email-otp",
+        { email, otp },
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-    } catch (error) {
-      console.log(error.message);
-      setError("Google sign-in failed.");
+
+      if (response.status === 200) {
+        navigate("/");
+
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { systemInfo: { email } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -134,6 +195,21 @@ const Signup = () => {
               </button>
             </div>
           </form>
+
+          {otpSent && (
+            <>
+              <input
+                className="email"
+                type="text"
+                placeholder={t("Enter OTP")}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+              <button type="button" className="btn" onClick={handleVerify}>
+                {t("Verify")}
+              </button>
+            </>
+          )}
+
           <hr />
           <GoogleButton
             className="g-btn"

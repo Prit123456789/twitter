@@ -16,6 +16,7 @@ const Login = () => {
   const [isChrome, setIsChrome] = useState(false);
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [googleUserEmail, setGoogleUserEmail] = useState("");
   const { logIn, googleSignIn } = useUserAuth();
   const navigate = useNavigate();
   const { t } = useTranslation("translations");
@@ -82,7 +83,7 @@ const Login = () => {
     try {
       const response = await axios.post(
         "https://twitter-cxhu.onrender.com/verify-email-otp",
-        { email, otp },
+        { email: googleUserEmail || email, otp },
         {
           headers: {
             "Content-Type": "application/json",
@@ -94,7 +95,7 @@ const Login = () => {
         navigate("/");
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email } },
+          { systemInfo: { email: googleUserEmail || email } },
           {
             headers: {
               "Content-Type": "application/json",
@@ -117,21 +118,42 @@ const Login = () => {
 
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
+    setError("");
+    setOtpSent(false);
+
     try {
       const user = await googleSignIn();
-      navigate("/");
+      setGoogleUserEmail(user.email);
 
-      await axios.post(
-        "https://twitter-cxhu.onrender.com/loginHistory",
-        { systemInfo: { email: user.email } },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+      if (isChrome) {
+        // Send OTP if the browser is Chrome
+        const otpResponse = await axios.post(
+          "https://twitter-cxhu.onrender.com/send-email-otp",
+          { email: user.email },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (otpResponse.data.message === "OTP sent to your email") {
+          setOtpSent(true);
         }
-      );
+      } else {
+        navigate("/");
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { systemInfo: { email: user.email } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
     } catch (error) {
-      console.log(error.message);
+      setError(error.message);
     }
   };
 
