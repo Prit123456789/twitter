@@ -50,7 +50,7 @@ async function run() {
       console.log("User Agent:", userAgent);
       console.log("Device Type:", device.type);
 
-      if (device.type === "mobile") {
+      if (device.type === "Mobile") {
         const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
         console.log("Is Allowed Time:", isAllowedTime);
         if (!isAllowedTime) {
@@ -145,6 +145,26 @@ async function run() {
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send(result);
+    });
+    app.post("/checkUser", async (req, res) => {
+      const { phoneNumber } = req.body;
+
+      try {
+        const user = await userCollection.findOne({ phoneNumber });
+
+        if (user) {
+          res.json({
+            exists: true,
+            username: user.username,
+            fullName: user.fullName,
+          });
+        } else {
+          res.json({ exists: false });
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
     });
     //POSTS
     app.post("/post", async (req, res) => {
@@ -253,14 +273,27 @@ async function run() {
     });
 
     // patch
-    app.patch("/userUpdates/:email", async (req, res) => {
-      const filter = req.params;
-      const profile = req.body;
+    app.patch("/userUpdates", async (req, res) => {
+      const { email, phoneNumber, ...profile } = req.body;
+
+      const filter = email ? { email } : { phoneNumber };
+
       const options = { upsert: true };
       const updateDoc = { $set: profile };
-      const result = await userCollection.updateOne(filter, updateDoc, options);
-      res.send(result);
+
+      try {
+        const result = await userCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).send("Internal Server Error");
+      }
     });
+
     //OTPs EMAIL AND MOBILE NUMBER
     const otpStore = {};
     // Email OTPs

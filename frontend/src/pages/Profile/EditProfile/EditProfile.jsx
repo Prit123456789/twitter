@@ -84,17 +84,29 @@ export default function EditProfile({ user, loggedInUser }) {
       website,
       dob,
     };
+
+    if (user?.email) {
+      editedInfo.email = user.email;
+    } else if (user?.phoneNumber) {
+      editedInfo.phoneNumber = user.phoneNumber;
+    }
+
     console.log(editedInfo);
-    fetch(`https://twitter-cxhu.onrender.com/userUpdates/${user?.email}`, {
+
+    fetch("https://twitter-cxhu.onrender.com/userUpdates", {
       method: "PATCH",
       headers: {
-        "content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(editedInfo),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("done", data);
+        console.log("Profile updated successfully", data);
+        setOpen(false);
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
       });
   };
 

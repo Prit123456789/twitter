@@ -13,6 +13,9 @@ function Mobile() {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [userExists, setUserExists] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation("translations");
 
@@ -40,6 +43,40 @@ function Mobile() {
     return regexp.test(phoneNumber);
   };
 
+  const handlePhoneNumberChange = async (e) => {
+    const value = e.target.value.startsWith("+91")
+      ? e.target.value
+      : `+91${e.target.value.replace(/^0+/, "")}`;
+    setPhoneNumber(value);
+
+    if (validatePhoneNumber()) {
+      try {
+        const response = await axios.post(
+          "https://twitter-cxhu.onrender.com/checkUser",
+          { phoneNumber: value },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data.exists) {
+          setUserExists(true);
+          setUsername(response.data.username);
+          setFullName(response.data.fullName);
+        } else {
+          setUserExists(false);
+          setUsername("");
+          setFullName("");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        setError("Error fetching user details");
+      }
+    }
+  };
+
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (validatePhoneNumber()) {
@@ -53,10 +90,7 @@ function Mobile() {
 
         setConfirmResult(confirmationResult);
         setSuccess(true);
-        setError(""); // Clear previous errors
-
-        // Debug: Log the data sent to the backend
-        console.log("Sending phone number to backend:", phoneNumber);
+        setError("");
 
         const response = await axios.post(
           "https://twitter-cxhu.onrender.com/phoneHistory",
@@ -68,7 +102,6 @@ function Mobile() {
           }
         );
 
-        // Debug: Log the response from the backend
         console.log("Backend response:", response.data);
       } catch (error) {
         console.error("Error during OTP sending or logging:", error);
@@ -115,15 +148,27 @@ function Mobile() {
             <input
               className="email"
               value={phoneNumber}
-              onChange={(e) =>
-                setPhoneNumber(
-                  e.target.value.startsWith("+91")
-                    ? e.target.value
-                    : `+91${e.target.value.replace(/^0+/, "")}`
-                )
-              }
+              onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}
             />
+
+            {userExists && (
+              <>
+                <input
+                  className="email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder={t("Username")}
+                />
+                <input
+                  className="email"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder={t("Full Name")}
+                />
+              </>
+            )}
+
             <button className="btn" type="submit">
               {t("Send")}
             </button>
