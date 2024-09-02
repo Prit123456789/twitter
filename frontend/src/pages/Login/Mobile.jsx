@@ -7,6 +7,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import auth from "../../context/firebase";
 import axios from "axios";
 import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 function Mobile() {
   const [phoneNumber, setPhoneNumber] = useState("+91");
@@ -148,6 +149,9 @@ function Mobile() {
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}
+              country="IN"
+              inputComponent={PhoneInput.Input}
+              flagComponent={PhoneInput.Flag}
             />
 
             {userExists && (

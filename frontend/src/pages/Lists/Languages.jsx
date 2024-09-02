@@ -3,6 +3,7 @@ import "./Languages.css";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 function Langs() {
   const { t, i18n } = useTranslation("translations");

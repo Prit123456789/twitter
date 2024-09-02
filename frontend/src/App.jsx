@@ -1,8 +1,7 @@
 // App.jsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login/Login";
-import axios from "axios";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Signup from "./pages/Login/Signup";
 import ProtectedRoute from "./pages/ProtectedRoute";

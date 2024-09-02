@@ -37,12 +37,12 @@ function enforceMobileTimeRestrictions(req, res, next) {
   const parser = new UAParser(userAgent);
   const { device } = parser.getResult();
 
-  console.log("User Agent:", userAgent);
-  console.log("Device Type:", device.type);
+  // console.log("User Agent:", userAgent);
+  // console.log("Device Type:", device.type);
 
   if (device.type === "mobile") {
     const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
-    console.log("Is Allowed Time:", isAllowedTime);
+    // console.log("Is Allowed Time:", isAllowedTime);
     if (!isAllowedTime) {
       return res.status(403).send({
         error:
