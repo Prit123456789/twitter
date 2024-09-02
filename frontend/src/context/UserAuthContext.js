@@ -55,8 +55,17 @@ export function UserAuthContextProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("Auth user:", currentUser);
-      setUser(currentUser);
+      if (currentUser) {
+        // Check if the current user object has an email or phone number, but not both
+        console.log("Auth user:", currentUser);
+        setUser({
+          email: currentUser.email || null,
+          phoneNumber: currentUser.phoneNumber || null,
+          uid: currentUser.uid,
+        });
+      } else {
+        setUser({});
+      }
     });
 
     return () => {

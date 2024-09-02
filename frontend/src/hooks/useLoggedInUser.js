@@ -15,21 +15,18 @@ const useLoggedInUser = () => {
         setLoading(true);
 
         if (!email && !phoneNumber) {
-          console.error("No email or phone number provided."); // Updated error message
+          console.error("No email or phone number provided.");
           setError("No email or phone number provided.");
-          return; // Exit early if both are missing
+          return;
         }
 
-        let url;
-        if (email) {
-          url = `https://twitter-cxhu.onrender.com/loggedInUser?email=${encodeURIComponent(
-            email
-          )}`;
-        } else if (phoneNumber) {
-          url = `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${encodeURIComponent(
-            phoneNumber
-          )}`;
-        }
+        const url = email
+          ? `https://twitter-cxhu.onrender.com/loggedInUser?email=${encodeURIComponent(
+              email
+            )}`
+          : `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${encodeURIComponent(
+              phoneNumber
+            )}`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -48,7 +45,7 @@ const useLoggedInUser = () => {
     fetchUserData();
   }, [email, phoneNumber]);
 
-  return [loggedInUser, setLoggedInUser];
+  return [loggedInUser, setLoggedInUser, loading, error];
 };
 
 export default useLoggedInUser;
