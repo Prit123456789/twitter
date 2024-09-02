@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./Languages.css";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
 function Langs() {
@@ -128,13 +127,16 @@ function Langs() {
       ) : (
         <div className="input">
           <div className="field">
-            <PhoneInput
+            <input
               type="tel"
+              className="email"
               placeholder={t("Enter your phone number")}
               onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
               value={phoneNumber}
               onChange={(e) => {
-                const input = e.target.value.replace(/\D/g, ""); // Remove non-digits
+                const input = e.target.value.startsWith("+91")
+                  ? e.target.value
+                  : `+91${e.target.value.replace(/^0+/, "")}`; // Remove non-digits
                 setPhoneNumber(input);
               }}
             />

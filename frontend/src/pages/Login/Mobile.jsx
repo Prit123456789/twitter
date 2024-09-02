@@ -6,8 +6,6 @@ import { useTranslation } from "react-i18next";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import auth from "../../context/firebase";
 import axios from "axios";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 
 function Mobile() {
   const [phoneNumber, setPhoneNumber] = useState("+91");
@@ -46,7 +44,9 @@ function Mobile() {
   };
 
   const handlePhoneNumberChange = async (e) => {
-    const value = (/^0+/, "");
+    const value = e.target.value.startsWith("+91")
+      ? e.target.value
+      : `+91${e.target.value.replace(/^0+/, "")}`;
     setPhoneNumber(value);
 
     if (validatePhoneNumber()) {
@@ -138,20 +138,17 @@ function Mobile() {
         <div className="form-box">
           <TwitterIcon style={{ color: "skyblue" }} />
           <h2 className="heading">{t("Happening now")}</h2>
-
           {error && <p className="error-message">{error}</p>}
           {success && (
             <p className="success-message">{t("OTP Sent Successfully")}</p>
           )}
 
           <form className="form-container" onSubmit={handleSendOtp}>
-            <PhoneInput
+            <input
+              className="email"
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}
-              country="IN"
-              inputComponent={PhoneInput.Input}
-              flagComponent={PhoneInput.Flag}
             />
 
             {userExists && (
@@ -162,6 +159,7 @@ function Mobile() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder={t("Username")}
                 />
+
                 <input
                   className="email"
                   value={fullName}
@@ -185,12 +183,14 @@ function Mobile() {
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder={t("Enter OTP")}
               />
+
               <button className="btn" type="submit">
                 {t("Verify")}
               </button>
             </form>
           )}
         </div>
+
         <Link
           to="/login"
           style={{
