@@ -13,7 +13,12 @@ const useLoggedInUser = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        let url;
+        let url = "";
+
+        // Debug logs to check the values of email and phoneNumber
+        console.log("User email:", email);
+        console.log("User phoneNumber:", phoneNumber);
+
         if (email) {
           url = `https://twitter-cxhu.onrender.com/loggedInUser?email=${encodeURIComponent(
             email
@@ -26,6 +31,7 @@ const useLoggedInUser = () => {
           throw new Error("No email or phone number provided.");
         }
 
+        // Fetch user data from the appropriate endpoint
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Failed to fetch user data.");
@@ -43,7 +49,14 @@ const useLoggedInUser = () => {
     fetchUserData();
   }, [email, phoneNumber]);
 
-  return [loggedInUser, setLoggedInUser];
+  // If email or phoneNumber is not available, handle it gracefully
+  if (!email && !phoneNumber) {
+    console.warn("No email or phone number found in user object.");
+    setError("No user data available.");
+    setLoading(false);
+  }
+
+  return [loggedInUser, loading, error];
 };
 
 export default useLoggedInUser;

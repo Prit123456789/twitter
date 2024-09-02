@@ -20,6 +20,39 @@ app.use(
     credentials: true,
   })
 );
+// Helper function to check if current time is within allowed timeframe
+function isWithinTimeframe(startHour, endHour) {
+  const currentTime = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  const currentHour = new Date(currentTime).getHours();
+  return currentHour >= startHour && currentHour < endHour;
+}
+// Apply the middleware to all routes or specific routes
+app.use(enforceMobileTimeRestrictions);
+
+// Middleware to enforce time restrictions for mobile devices
+function enforceMobileTimeRestrictions(req, res, next) {
+  const userAgent = req.headers["user-agent"];
+  const parser = new UAParser(userAgent);
+  const { device } = parser.getResult();
+
+  console.log("User Agent:", userAgent);
+  console.log("Device Type:", device.type);
+
+  if (device.type === "mobile") {
+    const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
+    console.log("Is Allowed Time:", isAllowedTime);
+    if (!isAllowedTime) {
+      return res.status(403).send({
+        error:
+          "Access is restricted for mobile devices outside of 10 AM to 1 PM IST",
+      });
+    }
+  }
+
+  next();
+}
 
 app.options("*", cors());
 
@@ -40,32 +73,6 @@ async function run() {
     const postCollection = client.db("database").collection("posts");
     const userCollection = client.db("database").collection("users");
     const audioCollection = client.db("database").collection("audios");
-
-    // Middleware to enforce time restrictions for mobile devices
-    function enforceMobileTimeRestrictions(req, res, next) {
-      const userAgent = req.headers["user-agent"];
-      const parser = new UAParser(userAgent);
-      const { device } = parser.getResult();
-
-      console.log("User Agent:", userAgent);
-      console.log("Device Type:", device.type);
-
-      if (device.type === "Mobile") {
-        const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
-        console.log("Is Allowed Time:", isAllowedTime);
-        if (!isAllowedTime) {
-          return res.status(403).send({
-            error:
-              "Access is restricted for mobile devices outside of 10 AM to 1 PM IST",
-          });
-        }
-      }
-
-      next();
-    }
-
-    // Apply the middleware to all routes or specific routes
-    app.use(enforceMobileTimeRestrictions);
 
     // get
     // Backend code to fetch login history

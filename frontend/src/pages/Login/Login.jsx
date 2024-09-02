@@ -24,11 +24,8 @@ const Login = () => {
   useEffect(() => {
     const detectBrowser = () => {
       const userAgent = navigator.userAgent;
-
-      // Detect Chrome and exclude Edge
       const isChromeBrowser =
         userAgent.includes("Chrome") && !userAgent.includes("Edg");
-
       setIsChrome(isChromeBrowser);
     };
 
@@ -41,11 +38,9 @@ const Login = () => {
     setOtpSent(false);
 
     try {
-      // Login using the provided email and password
       await logIn(email, password);
 
       if (isChrome) {
-        // Send OTP if the browser is Chrome
         const otpResponse = await axios.post(
           "https://twitter-cxhu.onrender.com/send-email-otp",
           { email },
@@ -126,7 +121,6 @@ const Login = () => {
       setGoogleUserEmail(user.email);
 
       if (isChrome) {
-        // Send OTP if the browser is Chrome
         const otpResponse = await axios.post(
           "https://twitter-cxhu.onrender.com/send-email-otp",
           { email: user.email },
@@ -168,7 +162,7 @@ const Login = () => {
           <TwitterIcon style={{ color: "skyblue" }} />
           <h2 className="heading">{t("Happening now")}</h2>
 
-          {error && <p>{error}</p>}
+          {error && <p className="errorMessage">{error}</p>}
           <form onSubmit={handleSubmit}>
             <input
               type="email"
@@ -182,25 +176,29 @@ const Login = () => {
               placeholder={t("Password")}
               onChange={(e) => setPassword(e.target.value)}
             />
-            {isChrome && otpSent && (
-              <>
-                <input
-                  className="email"
-                  type="text"
-                  placeholder={t("Enter OTP")}
-                  onChange={(e) => setOtp(e.target.value)}
-                />
-                <button type="button" className="btn" onClick={handleVerify}>
-                  {t("Verify")}
-                </button>
-              </>
-            )}
+
             <div className="btn-login">
               <button type="submit" className="btn">
                 {t("Log In")}
               </button>
             </div>
           </form>
+
+          {/* OTP fields and button should be placed here for both login and Google sign-in */}
+          {isChrome && otpSent && (
+            <>
+              <input
+                className="otp-field"
+                type="text"
+                placeholder={t("Enter OTP")}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+              <button type="button" className="otp" onClick={handleVerify}>
+                {t("Verify")}
+              </button>
+            </>
+          )}
+
           <p onClick={handleReset} className="forgot">
             {t("Forgot password?")}
           </p>

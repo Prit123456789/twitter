@@ -99,6 +99,29 @@ input {
     outline: none;
 
 }
+.otp-field {
+    background-color: #E8F0FE; /* Matching the .email style */
+    width: 70%; /* Matching the .email width */
+    border-radius: 8px; /* Consistent border radius */
+    padding: 14px; /* Same padding */
+    border: none; /* No border for clean look */
+    outline: none; /* Remove outline for focus */
+    margin-bottom: 20px; /* Add space below */
+    margin-top: 20px; /* Add space above to match .btn */
+}
+.otp {
+    background-color: rgb(92, 199, 241); /* Matching the .btn color */
+    width: 75%; /* Matching the .btn width */
+    margin-right: 20px; /* Same margin */
+    padding: 14px; /* Same padding */
+    color: white; /* Text color */
+    border-radius: 8px; /* Consistent border radius */
+    font-size: 17px; /* Font size */
+    border: none; /* No border */
+    outline: none; /* Remove outline for focus */
+    margin-bottom: 20px; /* Same spacing */
+    margin-top: 15px; /* Same spacing */
+}
 .country-dropdown {
     appearance: none; /* Remove default browser styling */
     background-color: #E8F0FE; /* Match input background */

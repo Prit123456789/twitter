@@ -26,7 +26,6 @@ const Signup = () => {
   useEffect(() => {
     const detectBrowser = () => {
       const userAgent = navigator.userAgent;
-
       const isChromeBrowser =
         userAgent.includes("Chrome") && !userAgent.includes("Edg");
       setIsChrome(isChromeBrowser);
@@ -199,12 +198,12 @@ const Signup = () => {
           {otpSent && (
             <>
               <input
-                className="email"
+                className="otp-field"
                 type="text"
                 placeholder={t("Enter OTP")}
                 onChange={(e) => setOtp(e.target.value)}
               />
-              <button type="button" className="btn" onClick={handleVerify}>
+              <button type="button" className="otp" onClick={handleVerify}>
                 {t("Verify")}
               </button>
             </>

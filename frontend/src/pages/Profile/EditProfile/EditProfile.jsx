@@ -69,6 +69,7 @@ function EditChild({ dob, setDob }) {
 
 export default function EditProfile({ user, loggedInUser }) {
   const [name, setName] = React.useState("");
+  const [username, setUserName] = React.useState("");
   const [bio, setBio] = React.useState("");
   const [location, setLocation] = React.useState("");
   const [website, setWebsite] = React.useState("");
@@ -79,6 +80,7 @@ export default function EditProfile({ user, loggedInUser }) {
   const HandleSave = () => {
     const editedInfo = {
       name,
+      username,
       bio,
       location,
       website,
@@ -147,6 +149,17 @@ export default function EditProfile({ user, loggedInUser }) {
               variant="filled"
               onChange={(e) => setName(e.target.value)}
               defaultValue={loggedInUser[0]?.name ? loggedInUser[0].name : ""}
+            />
+            <TextField
+              className="text-field"
+              fullWidth
+              label={t("Username")}
+              id="fullWidth"
+              variant="filled"
+              onChange={(e) => setUserName(e.target.value)}
+              defaultValue={
+                loggedInUser[0]?.username ? loggedInUser[0].username : ""
+              }
             />
             <TextField
               className="text-field"
