@@ -199,9 +199,7 @@ async function run() {
       try {
         const { email } = req.body.systemInfo;
 
-        const ipAddress =
-          req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-
+        const ipAddress = await axios.get("https://api.ipify.org?format=json");
         const userAgent = req.headers["user-agent"];
         const parser = new UAParser(userAgent);
         const { browser, os, device } = parser.getResult();
@@ -252,8 +250,7 @@ async function run() {
       try {
         // Extract login information from the request body
         const { phoneNumber } = req.body;
-        const ipAddress =
-          req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+        const ipAddress = await axios.get("https://api.ipify.org?format=json");
         const userAgent = req.headers["user-agent"];
         const parser = new UAParser(userAgent);
         const { browser, os, device } = parser.getResult();
