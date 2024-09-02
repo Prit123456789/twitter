@@ -4,7 +4,7 @@ import { useUserAuth } from "../context/UserAuthContext";
 const useLoggedInUser = () => {
   const { user } = useUserAuth();
   const email = user?.email;
-  const phoneNumber = user?.phoneNumber; // Assuming `phoneNumber` is available in the auth context
+  const phoneNumber = user?.phoneNumber;
   const [loggedInUser, setLoggedInUser] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,6 +13,13 @@ const useLoggedInUser = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
+
+        if (!email && !phoneNumber) {
+          console.error("No email or phone number provided."); // Updated error message
+          setError("No email or phone number provided.");
+          return; // Exit early if both are missing
+        }
+
         let url;
         if (email) {
           url = `https://twitter-cxhu.onrender.com/loggedInUser?email=${encodeURIComponent(
@@ -22,8 +29,6 @@ const useLoggedInUser = () => {
           url = `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${encodeURIComponent(
             phoneNumber
           )}`;
-        } else {
-          throw new Error("No email or phone number provided.");
         }
 
         const response = await fetch(url);

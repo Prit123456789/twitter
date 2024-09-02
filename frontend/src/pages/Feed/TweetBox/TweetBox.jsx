@@ -5,12 +5,9 @@ import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternate
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import axios from "axios";
-import MicRecorder from "mic-recorder-to-mp3";
 import { useTranslation } from "react-i18next";
 import { useUserAuth } from "../../../context/UserAuthContext";
 import useLoggedInUser from "../../../hooks/useLoggedInUser";
-
-const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 function OtpVerification({ otp, setOtp, verifyOtp }) {
   return (
@@ -18,8 +15,7 @@ function OtpVerification({ otp, setOtp, verifyOtp }) {
       <input
         className="otpVerification"
         type="text"
-        label="Enter OTP"
-        variant="outlined"
+        placeholder="Enter OTP"
         value={otp}
         onChange={(e) => setOtp(e.target.value)}
       />
@@ -48,16 +44,15 @@ function TweetBox() {
   const mediaRecorderRef = useRef(null);
   const [isAudioUploadAllowed, setIsAudioUploadAllowed] = useState(false);
 
-  const userProfilePic = loggedInUser[0]?.profileImage
-    ? loggedInUser[0]?.profileImage
-    : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
+  const userProfilePic =
+    loggedInUser[0]?.profileImage ||
+    "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
 
   // Check if audio upload is allowed based on the current time
   useEffect(() => {
     const checkAudioUploadTime = () => {
-      const currentTime = new Date();
-      const currentHour = currentTime.getHours();
-      setIsAudioUploadAllowed(currentHour >= 14 && currentHour <= 19);
+      const currentHour = new Date().getHours();
+      setIsAudioUploadAllowed(currentHour >= 14 && currentHour <= 19); // Allow uploads from 2 PM to 7 PM IST
     };
 
     checkAudioUploadTime();
@@ -73,7 +68,6 @@ function TweetBox() {
           audio: true,
         });
         mediaRecorderRef.current = new MediaRecorder(stream);
-
         mediaRecorderRef.current.addEventListener("dataavailable", (event) => {
           setAudioBlob(event.data);
         });
@@ -98,26 +92,24 @@ function TweetBox() {
   }, []);
 
   // Handle image upload
-  const handleUploadImage = (e) => {
+  const handleUploadImage = async (e) => {
     setIsLoading(true);
     const image = e.target.files[0];
 
     const formData = new FormData();
     formData.set("image", image);
 
-    axios
-      .post(
+    try {
+      const response = await axios.post(
         "https://api.imgbb.com/1/upload?key=5ccca74448be7fb4c1a7baebca13e0d2",
         formData
-      )
-      .then((res) => {
-        setImageURL(res.data.data.display_url);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-      });
+      );
+      setImageURL(response.data.data.display_url);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle tweet post
@@ -171,18 +163,22 @@ function TweetBox() {
         }
       }
 
-      const postResponse = await fetch(
-        "https://twitter-cxhu.onrender.com/post",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const data = await postResponse.json();
-      console.log(data);
-      setPost("");
-      setImageURL("");
-      setAudioBlob(null);
+      try {
+        const postResponse = await fetch(
+          "https://twitter-cxhu.onrender.com/post",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        const data = await postResponse.json();
+        console.log(data);
+        setPost("");
+        setImageURL("");
+        setAudioBlob(null);
+      } catch (error) {
+        console.error("Error posting tweet:", error);
+      }
     }
   };
 
@@ -204,52 +200,71 @@ function TweetBox() {
       alert("OTP sent to your email");
       setOtpSent(true);
     } catch (error) {
-      console.error(
-        "Error sending OTP:",
-        error.response ? error.response.data : error.message
-      );
-      alert(
-        "Failed to send OTP: " +
-          (error.response ? error.response.data.error : error.message)
-      );
+      console.error("Error sending OTP:", error);
+      alert("Failed to send OTP. Please try again.");
     }
   };
 
   // Verify OTP
+
   const verifyOtp = async () => {
-    if (otpSent) {
-      const trimmedOtp = otp.trim();
-      if (trimmedOtp.length !== 4) {
-        // Adjust if needed
-        alert("OTP must be exactly 4 characters.");
-        return;
-      }
-      try {
-        const payload = { email, otp: trimmedOtp }; // Use trimmed OTP
-        const response = await axios.post(
-          "https://twitter-cxhu.onrender.com/verify-email-otp",
-          payload,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        if (response.data.success && response.data.isOtpValid) {
-          setOtpVerified(true);
-          alert("OTP verified successfully");
-        } else {
-          alert("Invalid OTP");
+    if (!otpSent) {
+      alert("OTP has not been sent yet.");
+      return;
+    }
+
+    // Validate OTP length
+    if (otp.trim().length !== 4) {
+      alert("OTP must be exactly 4 digits.");
+      return;
+    }
+
+    // Ensure email is available
+    if (!email) {
+      alert("Email is required for verification.");
+      return;
+    }
+
+    try {
+      // Prepare the payload with trimmed and validated data
+      const payload = {
+        email: email.trim(), // Ensure there is no extra whitespace
+        otp: otp.trim(), // Ensure OTP is trimmed
+      };
+
+      // Log the payload to debug if necessary
+      console.log("Sending OTP verification request with payload:", payload);
+
+      // Make the request to verify OTP
+      const response = await axios.post(
+        "https://twitter-cxhu.onrender.com/verify-email-otp",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json", // Explicitly set headers
+          },
         }
-      } catch (error) {
-        console.error(
-          "Error verifying OTP:",
-          error.response ? error.response.data : error.message
-        );
+      );
+
+      // Check the response for success
+      if (response.data.success && response.data.isOtpValid) {
+        setOtpVerified(true);
+        alert("OTP verified successfully.");
+      } else {
+        alert("Invalid OTP, please try again.");
+      }
+    } catch (error) {
+      // Enhanced error handling with specific response feedback
+      if (error.response) {
+        console.error("Error verifying OTP:", error.response.data);
         alert(
-          "Failed to verify OTP: " +
-            (error.response
-              ? error.response.data.error || error.message
-              : error.message)
+          `Failed to verify OTP: ${
+            error.response.data.message || "Unknown error."
+          }`
         );
+      } else {
+        console.error("Error sending verification request:", error.message);
+        alert("Failed to verify OTP. Please try again later.");
       }
     }
   };
@@ -314,22 +329,16 @@ function TweetBox() {
             onChange={handleUploadImage}
           />
           <div className="audio-controls">
-            {isRecording ? (
-              <Button onClick={handleStopRecording}>
-                <MicOffIcon />
-              </Button>
+            {audioBlob ? (
+              <MicOffIcon className="micIcon" onClick={handlePlayAudio} />
+            ) : isRecording ? (
+              <MicOffIcon className="micIcon" onClick={handleStopRecording} />
             ) : (
-              <Button onClick={handleStartRecording}>
-                <MicIcon />
-              </Button>
+              <MicIcon className="micIcon" onClick={handleStartRecording} />
             )}
-            {audioBlob && <Button onClick={handlePlayAudio}>Play Audio</Button>}
           </div>
-          <Button
-            type="submit"
-            className="tweetBox__tweetButton"
-            disabled={isLoading || !post.trim()}>
-            Tweet
+          <Button type="submit" className="tweetBox__tweetButton">
+            {t("Tweet")}
           </Button>
         </div>
       </form>
