@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+// UserAuthContextProvider.js
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -9,39 +10,62 @@ import {
   signInWithPhoneNumber,
   onAuthStateChanged,
   RecaptchaVerifier,
+  setPersistence,
+  browserLocalPersistence,
 } from "firebase/auth";
 import auth from "./firebase";
 
 const userAuthContext = createContext();
 
 export function UserAuthContextProvider({ children }) {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
 
-  function logIn(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
-
-  function signUp(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
-  }
-
-  function logOut() {
-    return signOut(auth);
-  }
-
-  function googleSignIn() {
-    const googleAuthProvider = new GoogleAuthProvider();
-    return signInWithPopup(auth, googleAuthProvider).then((result) => {
-      return result.user; // Return the user object from the result
+  useEffect(() => {
+    // Set persistence to local on initialization
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.error("Failed to set persistence:", error);
     });
-  }
 
-  function resetPassword(email) {
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          email: currentUser.email || null,
+          phoneNumber: currentUser.phoneNumber || null,
+          uid: currentUser.uid,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const logIn = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const signUp = (email, password) => {
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const logOut = () => {
+    return signOut(auth);
+  };
+
+  const googleSignIn = () => {
+    const googleAuthProvider = new GoogleAuthProvider();
+    return signInWithPopup(auth, googleAuthProvider);
+  };
+
+  const resetPassword = (email) => {
     return sendPasswordResetEmail(auth, email);
-  }
+  };
 
-  function signInWithPhone(phoneNumber, recaptchaContainerId) {
-    // Set up RecaptchaVerifier
+  const signInWithPhone = (phoneNumber, recaptchaContainerId) => {
     const appVerifier = new RecaptchaVerifier(
       recaptchaContainerId,
       {
@@ -51,26 +75,7 @@ export function UserAuthContextProvider({ children }) {
     );
 
     return signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-  }
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        console.log("Auth user:", currentUser);
-        setUser({
-          email: currentUser.email || null,
-          phoneNumber: currentUser.phoneNumber || null,
-          uid: currentUser.uid,
-        });
-      } else {
-        setUser({});
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  };
 
   return (
     <userAuthContext.Provider
