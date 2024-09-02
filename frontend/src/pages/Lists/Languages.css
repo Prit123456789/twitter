@@ -58,6 +58,20 @@
     border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
 }
+.PhoneInputInput{
+  background: transparent;
+  outline: none;
+  border: none;
+  margin-bottom: 1rem;
+}
+.PhoneInput {
+display: flex;
+align-items: center;
+  justify-content: center;
+  padding: 0px;
+  margin-left: 10px;
+background: transparent;
+}
 .otp-btn{
   width: 25%;
     border-top-right-radius: 8px;

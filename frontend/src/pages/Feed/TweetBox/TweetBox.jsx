@@ -338,7 +338,7 @@ function TweetBox() {
             )}
           </div>
           <Button type="submit" className="tweetBox__tweetButton">
-            {t("Tweet")}
+            Tweet
           </Button>
         </div>
       </form>

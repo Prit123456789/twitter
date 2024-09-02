@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import auth from "../../context/firebase";
 import axios from "axios";
+import PhoneInput from "react-phone-number-input";
 
 function Mobile() {
   const [phoneNumber, setPhoneNumber] = useState("+91");
@@ -44,9 +45,7 @@ function Mobile() {
   };
 
   const handlePhoneNumberChange = async (e) => {
-    const value = e.target.value.startsWith("+91")
-      ? e.target.value
-      : `+91${e.target.value.replace(/^0+/, "")}`;
+    const value = (/^0+/, "");
     setPhoneNumber(value);
 
     if (validatePhoneNumber()) {
@@ -145,8 +144,7 @@ function Mobile() {
           )}
 
           <form className="form-container" onSubmit={handleSendOtp}>
-            <input
-              className="email"
+            <PhoneInput
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}

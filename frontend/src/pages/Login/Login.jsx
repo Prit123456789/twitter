@@ -53,6 +53,7 @@ const Login = () => {
 
         if (otpResponse.data.message === "OTP sent to your email") {
           setOtpSent(true);
+          alert("OTP sent to your email");
         }
       } else {
         navigate("/");
@@ -133,6 +134,7 @@ const Login = () => {
 
         if (otpResponse.data.message === "OTP sent to your email") {
           setOtpSent(true);
+          alert("OTP sent to your email");
         }
       } else {
         navigate("/");

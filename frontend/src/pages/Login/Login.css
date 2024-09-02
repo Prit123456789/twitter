@@ -122,17 +122,19 @@ input {
     margin-bottom: 20px; /* Same spacing */
     margin-top: 15px; /* Same spacing */
 }
-.country-dropdown {
-    appearance: none; /* Remove default browser styling */
-    background-color: #E8F0FE; /* Match input background */
+.PhoneInputInput{
+    background: transparent;
+    outline: none;
     border: none;
-    border-radius: 8px;
-    padding: 14px;
-    width: 70%;
-    cursor: pointer;
-    background-image: url("https://www.flaticon.com/free-icons/down-arrow");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
+    margin-bottom: 1rem;
+  }
+  .PhoneInput {
+  display: flex;
+  align-items: center;
+    justify-content: center;
+    padding: 0px;
+    margin-left: 10px;
+  background: transparent;
   }
 
 .phone-btn{

@@ -231,7 +231,6 @@ async function run() {
         }
 
         const loginHistory = {
-          email,
           ip: ipAddress,
           browser: `${browser.name} ${browser.version}`,
           os: `${os.name} ${os.version}`,
@@ -257,7 +256,6 @@ async function run() {
 
         // Create login history object
         const loginHistory = {
-          phoneNumber,
           ip: ipAddress,
           browser: `${browser.name} ${browser.version}`,
           os: `${os.name} ${os.version}`,
