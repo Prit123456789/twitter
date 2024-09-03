@@ -106,11 +106,17 @@ async function run() {
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
-      const email = req.query.email;
-      const user = await userCollection.find({ email: email }).toArray();
+      const { email, phoneNumber } = req.query.email;
+      let query = {};
+      if (email) {
+        query.email = email;
+      } else if (phoneNumber) {
+        query.phoneNumber = phoneNumber;
+      }
+
+      const user = await userCollection.find({ query }).toArray();
       res.send(user);
     });
-
     app.get("/post", async (req, res) => {
       const post = (await postCollection.find().toArray()).reverse();
       res.send(post);
@@ -128,32 +134,16 @@ async function run() {
     });
     // post
     app.post("/register", async (req, res) => {
-      const user = req.body;
-      // console.log(user)
-      const result = await userCollection.insertOne(user);
+      const { username, phoneNumber, name, email } = req.body.user;
+      const result = await userCollection.create({
+        username,
+        phoneNumber,
+        name,
+        email,
+      });
       res.send(result);
     });
 
-    app.post("/checkUser", async (req, res) => {
-      const { phoneNumber } = req.body;
-
-      try {
-        const user = await userCollection.findOne({ phoneNumber });
-
-        if (user) {
-          res.json({
-            exists: true,
-            username: user.username,
-            fullName: user.fullName,
-          });
-        } else {
-          res.json({ exists: false });
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    });
     //POSTS
     app.post("/post", async (req, res) => {
       try {

@@ -50,9 +50,16 @@ export function UserAuthContextProvider({ children }) {
     return signInWithPhoneNumber(auth, phoneNumber, appVerifier);
   };
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentuser) => {
-      // console.log("Auth", currentuser);
-      setUser(currentuser);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          email: currentUser.email ? currentUser.email : null,
+          phoneNumber: currentUser.phoneNumber ? currentUser.phoneNumber : null,
+          uid: currentUser.uid,
+        });
+      } else {
+        setUser(null);
+      }
     });
 
     return () => {
