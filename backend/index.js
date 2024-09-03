@@ -1,5 +1,5 @@
 const express = require("express");
-import axios from "axios";
+const axios = require("axios");
 require("dotenv").config();
 const app = express();
 const UAParser = require("ua-parser-js");
