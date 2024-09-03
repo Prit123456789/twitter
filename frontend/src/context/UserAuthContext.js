@@ -9,8 +9,6 @@ import {
   signInWithPhoneNumber,
   onAuthStateChanged,
   RecaptchaVerifier,
-  setPersistence,
-  browserLocalPersistence,
 } from "firebase/auth";
 import auth from "./firebase";
 
@@ -18,32 +16,6 @@ const userAuthContext = createContext();
 
 export function UserAuthContextProvider({ children }) {
   const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    setPersistence(auth, browserLocalPersistence).catch((error) => {
-      console.error("Failed to set persistence:", error);
-    });
-
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("onAuthStateChanged triggered. Current user:", currentUser);
-      if (currentUser) {
-        const userData = {
-          identifier: currentUser.email || currentUser.phoneNumber,
-          type: currentUser.email ? "email" : "phoneNumber",
-          uid: currentUser.uid,
-        };
-        setUser(userData);
-        console.log("User data set:", userData);
-      } else {
-        setUser(null);
-        console.log("No user logged in");
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   const logIn = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
@@ -77,7 +49,16 @@ export function UserAuthContextProvider({ children }) {
 
     return signInWithPhoneNumber(auth, phoneNumber, appVerifier);
   };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentuser) => {
+      // console.log("Auth", currentuser);
+      setUser(currentuser);
+    });
 
+    return () => {
+      unsubscribe();
+    };
+  }, []);
   return (
     <userAuthContext.Provider
       value={{

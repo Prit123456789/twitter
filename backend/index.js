@@ -1,4 +1,5 @@
 const express = require("express");
+import axios from "axios";
 require("dotenv").config();
 const app = express();
 const UAParser = require("ua-parser-js");
@@ -105,31 +106,9 @@ async function run() {
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
-      try {
-        const { email, phoneNumber } = req.query;
-
-        // Ensure only one of email or phoneNumber is provided
-        if ((email && phoneNumber) || (!email && !phoneNumber)) {
-          return res.status(400).json({
-            error: "Provide either email or phone number, but not both.",
-          });
-        }
-
-        // Prepare the query based on the provided parameter
-        const query = email ? { email } : { phoneNumber };
-
-        // Fetch the user from the database
-        const users = await userCollection.find(query).toArray();
-
-        if (users.length === 0) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        res.json(users[0]); // Return the single user object
-      } catch (error) {
-        console.error("Error fetching logged-in user:", error.message);
-        res.status(500).json({ error: "Failed to fetch logged-in user" });
-      }
+      const email = req.query.email;
+      const user = await userCollection.find({ email: email }).toArray();
+      res.send(user);
     });
 
     app.get("/post", async (req, res) => {
@@ -149,41 +128,10 @@ async function run() {
     });
     // post
     app.post("/register", async (req, res) => {
-      const { email, phoneNumber, ...userData } = req.body;
-
-      // Ensure only one of email or phoneNumber is provided
-      if ((email && phoneNumber) || (!email && !phoneNumber)) {
-        return res
-          .status(400)
-          .json({
-            error: "Provide either email or phone number, but not both.",
-          });
-      }
-
-      try {
-        const existingUser = await userCollection.findOne({
-          $or: [{ email }, { phoneNumber }],
-        });
-
-        if (existingUser) {
-          return res
-            .status(400)
-            .json({
-              error:
-                "User already exists with the provided email or phone number.",
-            });
-        }
-
-        const result = await userCollection.insertOne({
-          email,
-          phoneNumber,
-          ...userData,
-        });
-        res.send(result);
-      } catch (error) {
-        console.error("Error registering user:", error.message);
-        res.status(500).json({ error: "Failed to register user" });
-      }
+      const user = req.body;
+      // console.log(user)
+      const result = await userCollection.insertOne(user);
+      res.send(result);
     });
 
     app.post("/checkUser", async (req, res) => {
