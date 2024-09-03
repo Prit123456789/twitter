@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -9,61 +9,34 @@ import {
   signInWithPhoneNumber,
   onAuthStateChanged,
   RecaptchaVerifier,
+  setPersistence,
+  browserLocalPersistence,
 } from "firebase/auth";
 import auth from "./firebase";
 
 const userAuthContext = createContext();
 
 export function UserAuthContextProvider({ children }) {
-  const [user, setUser] = useState({});
-
-  function logIn(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
-
-  function signUp(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
-  }
-
-  function logOut() {
-    return signOut(auth);
-  }
-
-  function googleSignIn() {
-    const googleAuthProvider = new GoogleAuthProvider();
-    return signInWithPopup(auth, googleAuthProvider).then((result) => {
-      return result.user; // Return the user object from the result
-    });
-  }
-
-  function resetPassword(email) {
-    return sendPasswordResetEmail(auth, email);
-  }
-
-  function signInWithPhone(phoneNumber, recaptchaContainerId) {
-    // Set up RecaptchaVerifier
-    const appVerifier = new RecaptchaVerifier(
-      recaptchaContainerId,
-      {
-        size: "invisible", // Can be "normal" for a visible recaptcha
-      },
-      auth
-    );
-
-    return signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-  }
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.error("Failed to set persistence:", error);
+    });
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log("onAuthStateChanged triggered. Current user:", currentUser);
       if (currentUser) {
-        console.log("Auth user:", currentUser);
-        setUser({
-          email: currentUser.email || null,
-          phoneNumber: currentUser.phoneNumber || null,
+        const userData = {
+          identifier: currentUser.email || currentUser.phoneNumber,
+          type: currentUser.email ? "email" : "phoneNumber",
           uid: currentUser.uid,
-        });
+        };
+        setUser(userData);
+        console.log("User data set:", userData);
       } else {
-        setUser({});
+        setUser(null);
+        console.log("No user logged in");
       }
     });
 
@@ -71,6 +44,39 @@ export function UserAuthContextProvider({ children }) {
       unsubscribe();
     };
   }, []);
+
+  const logIn = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const signUp = (email, password) => {
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const logOut = () => {
+    return signOut(auth);
+  };
+
+  const googleSignIn = () => {
+    const googleAuthProvider = new GoogleAuthProvider();
+    return signInWithPopup(auth, googleAuthProvider);
+  };
+
+  const resetPassword = (email) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
+  const signInWithPhone = (phoneNumber, recaptchaContainerId) => {
+    const appVerifier = new RecaptchaVerifier(
+      recaptchaContainerId,
+      {
+        size: "invisible",
+      },
+      auth
+    );
+
+    return signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+  };
 
   return (
     <userAuthContext.Provider

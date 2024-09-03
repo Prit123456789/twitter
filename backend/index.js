@@ -107,25 +107,25 @@ async function run() {
     app.get("/loggedInUser", async (req, res) => {
       try {
         const { email, phoneNumber } = req.query;
-        let query = {};
 
-        if (email) {
-          query.email = email;
-        } else if (phoneNumber) {
-          query.phoneNumber = phoneNumber;
-        } else {
-          return res
-            .status(400)
-            .json({ error: "Email or phone number is required" });
+        // Ensure only one of email or phoneNumber is provided
+        if ((email && phoneNumber) || (!email && !phoneNumber)) {
+          return res.status(400).json({
+            error: "Provide either email or phone number, but not both.",
+          });
         }
 
-        const user = await userCollection.find(query).toArray();
+        // Prepare the query based on the provided parameter
+        const query = email ? { email } : { phoneNumber };
 
-        if (user.length === 0) {
+        // Fetch the user from the database
+        const users = await userCollection.find(query).toArray();
+
+        if (users.length === 0) {
           return res.status(404).json({ message: "User not found" });
         }
 
-        res.send(user);
+        res.json(users[0]); // Return the single user object
       } catch (error) {
         console.error("Error fetching logged-in user:", error.message);
         res.status(500).json({ error: "Failed to fetch logged-in user" });
@@ -149,10 +149,43 @@ async function run() {
     });
     // post
     app.post("/register", async (req, res) => {
-      const user = req.body;
-      const result = await userCollection.insertOne(user);
-      res.send(result);
+      const { email, phoneNumber, ...userData } = req.body;
+
+      // Ensure only one of email or phoneNumber is provided
+      if ((email && phoneNumber) || (!email && !phoneNumber)) {
+        return res
+          .status(400)
+          .json({
+            error: "Provide either email or phone number, but not both.",
+          });
+      }
+
+      try {
+        const existingUser = await userCollection.findOne({
+          $or: [{ email }, { phoneNumber }],
+        });
+
+        if (existingUser) {
+          return res
+            .status(400)
+            .json({
+              error:
+                "User already exists with the provided email or phone number.",
+            });
+        }
+
+        const result = await userCollection.insertOne({
+          email,
+          phoneNumber,
+          ...userData,
+        });
+        res.send(result);
+      } catch (error) {
+        console.error("Error registering user:", error.message);
+        res.status(500).json({ error: "Failed to register user" });
+      }
     });
+
     app.post("/checkUser", async (req, res) => {
       const { phoneNumber } = req.body;
 

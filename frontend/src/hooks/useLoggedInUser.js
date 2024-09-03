@@ -5,12 +5,19 @@ const useLoggedInUser = () => {
   const { user } = useUserAuth();
   const email = user?.email;
   const phoneNumber = user?.phoneNumber;
-  const [loggedInUser, setLoggedInUser] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
+      console.log(
+        "Fetching user data with email:",
+        email,
+        "or phoneNumber:",
+        phoneNumber
+      );
+
       try {
         setLoading(true);
 
@@ -30,20 +37,26 @@ const useLoggedInUser = () => {
 
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error("Failed to fetch user data.");
+          throw new Error(
+            `Failed to fetch user data. Status: ${response.status}`
+          );
         }
+
         const data = await response.json();
+        console.log("Fetched user data:", data);
         setLoggedInUser(data);
       } catch (error) {
-        console.error("Error fetching logged-in user data:", error);
+        console.error("Error fetching logged-in user data:", error.message);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserData();
-  }, [email, phoneNumber]);
+    if (email || phoneNumber) {
+      fetchUserData();
+    }
+  }, [email, phoneNumber, user]);
 
   return [loggedInUser, setLoggedInUser, loading, error];
 };
