@@ -101,7 +101,9 @@ async function run() {
     });
 
     app.get("/user", async (req, res) => {
-      const user = await userCollection.find().toArray();
+      const { email, phoneNumber } = req.body;
+      const query = email ? { email } : { phoneNumber };
+      const user = await userCollection.find(query).toArray();
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
@@ -117,7 +119,9 @@ async function run() {
       res.send(user);
     });
     app.get("/post", async (req, res) => {
-      const post = (await postCollection.find().toArray()).reverse();
+      const { email, phoneNumber } = req.body;
+      const query = email ? { email } : { phoneNumber };
+      const post = (await postCollection.find(query).toArray()).reverse();
       res.send(post);
     });
     app.get("/userPost", async (req, res) => {

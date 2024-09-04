@@ -64,6 +64,7 @@ function TweetBox() {
         });
       } catch (error) {
         console.error("Error accessing microphone:", error);
+        alert("Microphone access is required to record audio.");
       }
     };
 
@@ -263,22 +264,18 @@ function TweetBox() {
         </div>
       </form>
 
-      {isAudioUploadAllowed ? (
-        <div className="audio-record-controls">
-          {isRecording ? (
-            <MicIcon onClick={handleStopRecording} />
-          ) : (
-            <MicOffIcon onClick={handleStartRecording} />
-          )}
-          {audioBlob && (
-            <Button onClick={handlePlayAudio} color="primary" variant="text">
-              Play
-            </Button>
-          )}
-        </div>
-      ) : (
-        <p>Audio uploads are only allowed between 2 PM and 7 PM IST.</p>
-      )}
+      <div className="audio-record-controls">
+        {isRecording ? (
+          <MicIcon onClick={handleStopRecording} />
+        ) : (
+          <MicOffIcon onClick={handleStartRecording} />
+        )}
+        {audioBlob && (
+          <Button onClick={handlePlayAudio} color="primary" variant="text">
+            Play
+          </Button>
+        )}
+      </div>
 
       {phoneNumber && !otpVerified && (
         <div>

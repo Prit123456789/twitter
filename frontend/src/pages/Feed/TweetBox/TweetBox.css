@@ -63,6 +63,17 @@
   border: none;
   outline: none;
 }
+.audio-record-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+.audio-record-controls .MuiSvgIcon-root {
+  cursor: pointer;
+  font-size: 24px; 
+}
+
 .otp-btn{
   width: 5%;
   border-radius: 8px;
