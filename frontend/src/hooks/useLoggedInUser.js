@@ -26,7 +26,7 @@ const useLoggedInUser = () => {
           setLoggedInUser(data);
         });
     }
-  }, [email, phoneNumber, loggedInUser]);
+  }, [email, loggedInUser]);
   return [loggedInUser, setLoggedInUser];
 };
 

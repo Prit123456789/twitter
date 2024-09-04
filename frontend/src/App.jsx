@@ -24,9 +24,9 @@ import "./Translation/Translation";
 function App() {
   return (
     <div className="app">
-      <SpeedInsights />
       <BrowserRouter>
         <UserAuthContextProvider>
+          <SpeedInsights />
           <Routes>
             <Route
               path="/"

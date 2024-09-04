@@ -33,11 +33,7 @@ export function UserAuthContextProvider({ children }) {
 
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        setUser({
-          email: currentUser.email || null,
-          phoneNumber: currentUser.phoneNumber || null,
-          uid: currentUser.uid,
-        });
+        setUser(currentUser);
       } else {
         setUser(null);
       }
