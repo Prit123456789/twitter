@@ -30,7 +30,6 @@ function isWithinTimeframe(startHour, endHour) {
   return currentHour >= startHour && currentHour < endHour;
 }
 // Apply the middleware to all routes or specific routes
-app.use(enforceMobileTimeRestrictions);
 
 // Middleware to enforce time restrictions for mobile devices
 function enforceMobileTimeRestrictions(req, res, next) {
@@ -114,7 +113,7 @@ async function run() {
         query.phoneNumber = phoneNumber;
       }
 
-      const user = await userCollection.find({ query }).toArray();
+      const user = await userCollection.find(query).toArray();
       res.send(user);
     });
     app.get("/post", async (req, res) => {
@@ -200,6 +199,9 @@ async function run() {
             res.status(500).send({ error: "Error sending OTP" });
           }
         }
+        if (device.type === "mobile") {
+          app.use(enforceMobileTimeRestrictions);
+        }
 
         const loginHistory = {
           email,
@@ -235,6 +237,9 @@ async function run() {
           device: device.type || "Desktop",
           timestamp: new Date(),
         };
+        if (device.type === "mobile") {
+          app.use(enforceMobileTimeRestrictions);
+        }
 
         const result = await loginHistoryCollection.insertOne(loginHistory);
 

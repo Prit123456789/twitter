@@ -30,7 +30,6 @@ export function UserAuthContextProvider({ children }) {
     };
 
     initializeAuthPersistence();
-
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
