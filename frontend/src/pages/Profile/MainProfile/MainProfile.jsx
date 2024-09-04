@@ -17,7 +17,7 @@ function MainProfile({ user }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [loggedInUser] = useLoggedInUser();
-  const username = user?.email?.split("@")[0];
+  const username = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
   const [posts, setPosts] = useState([]);
   useEffect(() => {
     if (user?.email) {
@@ -29,8 +29,19 @@ function MainProfile({ user }) {
         .catch((error) => {
           console.error("Error fetching user posts:", error);
         });
+    } else if (user?.phoneNumber) {
+      fetch(
+        `https://twitter-cxhu.onrender.com/userPost?phoneNumber=${user?.phoneNumber}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setPosts(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user posts:", error);
+        });
     }
-  }, [user?.email]);
+  }, [user?.email, user?.phoneNumber]);
 
   const handleUploadCoverImage = (e) => {
     setIsLoading(true);
@@ -46,23 +57,21 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
+        const identifier = user?.email ? user?.email : user?.phoneNumber;
         const userCoverImage = {
-          email: user?.email,
+          identifier: identifier,
           coverImage: url,
         };
         setIsLoading(false);
 
         if (url) {
-          fetch(
-            `https://twitter-cxhu.onrender.com/userUpdates/${user?.email}`,
-            {
-              method: "PATCH",
-              headers: {
-                "content-type": "application/json",
-              },
-              body: JSON.stringify(userCoverImage),
-            }
-          )
+          fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
+            method: "PATCH",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(userCoverImage),
+          })
             .then((res) => res.json())
             .then((data) => {
               console.log("done", data);
@@ -90,22 +99,20 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
+        const identifier = user?.email ? user?.email : user?.phoneNumber;
         const userProfileImage = {
-          email: user?.email,
+          identifier: identifier,
           profileImage: url,
         };
         setIsLoading(false);
         if (url) {
-          fetch(
-            `https://twitter-cxhu.onrender.com/userUpdates/${user?.email}`,
-            {
-              method: "PATCH",
-              headers: {
-                "content-type": "application/json",
-              },
-              body: JSON.stringify(userProfileImage),
-            }
-          )
+          fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
+            method: "PATCH",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(userProfileImage),
+          })
             .then((res) => res.json())
             .then((data) => {
               console.log("done", data);
@@ -122,7 +129,7 @@ function MainProfile({ user }) {
   return (
     <div className="body">
       <ArrowBackIcon className="arrow-icon" onClick={() => navigate("/")} />
-      <h4 className="heading-4">{username}</h4>
+      <h4 className="heading-4">@{username}</h4>
       <div className="mainprofile">
         <div className="profile-bio">
           {

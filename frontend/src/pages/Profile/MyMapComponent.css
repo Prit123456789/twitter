@@ -8,7 +8,10 @@
     display: none;
   }
   
-
+.location-display{
+  font-size: medium;
+  font-style: bold;
+}
   .header {
     margin-top: 0px;
     display: flex;

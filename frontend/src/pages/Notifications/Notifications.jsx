@@ -28,7 +28,7 @@ function Notifications() {
         }
 
         const response = await axios.get(endpoint);
-        console.log("Login history data:", response.data); // Debugging line
+
         setLoginHistory(response.data);
       } catch (error) {
         console.error("Failed to fetch login history:", error);

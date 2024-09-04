@@ -121,14 +121,15 @@ async function run() {
       res.send(post);
     });
     app.get("/userPost", async (req, res) => {
-      const email = req.query.email;
-      const post = (
-        await postCollection.find({ email: email }).toArray()
-      ).reverse();
+      const { email, phoneNumber } = req.query.email;
+      const query = email ? { email } : { phoneNumber };
+      const post = (await postCollection.find(query).toArray()).reverse();
       res.send(post);
     });
     app.get("/record", async (req, res) => {
-      const records = (await audioCollection.find().toArray()).reverse();
+      const { email, phoneNumber } = req.query.email;
+      const query = email ? { email } : { phoneNumber };
+      const records = (await audioCollection.find(query).toArray()).reverse();
       res.send(records);
     });
     // post
@@ -146,14 +147,37 @@ async function run() {
     //POSTS
     app.post("/post", async (req, res) => {
       try {
-        const { email, post, photo, audio } = req.body;
+        const { email, phoneNumber, post, photo, audio } = req.body;
+
+        // Validate input
+        if (!post && !photo && !audio) {
+          return res
+            .status(400)
+            .send({ message: "Post content cannot be empty" });
+        }
+
+        // Construct query
+        const query = email ? { email } : { phoneNumber };
+        if (!query) {
+          return res.status(400).send({ message: "Invalid user identifier" });
+        }
+
+        // Server-side restriction for audio uploads (2 PM to 7 PM IST)
+        if (audio && !isWithinTimeframe(14, 19)) {
+          return res.status(403).send({
+            message: "Audio uploads are only allowed between 2 PM and 7 PM IST",
+          });
+        }
 
         const newPost = {
-          email,
+          ...query,
           post,
           photo,
           audio,
+          createdAt: new Date(),
         };
+
+        // Insert post into the database
         const postResult = await postCollection.insertOne(newPost);
 
         res.send({
@@ -165,6 +189,7 @@ async function run() {
         res.status(500).send({ message: "Error creating post" });
       }
     });
+
     app.post("/loginHistory", async (req, res) => {
       try {
         const { email } = req.body.systemInfo;

@@ -40,13 +40,8 @@ function Sidebar({ handleLogout, user }) {
     setAnchorEl(null);
   };
 
-  const result = user?.email?.split("@")[0];
-
-  // Check if loggedInUser is an array and has at least one element
-  const profileData =
-    Array.isArray(loggedInUser) && loggedInUser.length > 0
-      ? loggedInUser[0]
-      : {};
+  const result = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
+  const phoneNumber = user?.phoneNumber;
 
   return (
     <div className="sidebar">
@@ -91,14 +86,14 @@ function Sidebar({ handleLogout, user }) {
       <div className="Profile__info">
         <Avatar
           src={
-            profileData.profileImage
-              ? profileData.profileImage
+            loggedInUser[0]?.profileImage
+              ? loggedInUser[0]?.profileImage
               : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
           }
         />
         <div className="user__info">
           <h4>
-            {profileData?.name ? profileData?.name : user && user?.displayName}
+            {loggedInUser[0]?.name || user?.displayName || user?.phoneNumber}
           </h4>
           <h5>@{result}</h5>
         </div>
@@ -122,19 +117,19 @@ function Sidebar({ handleLogout, user }) {
             onClick={() => navigate("/home/profile")}>
             <Avatar
               src={
-                profileData?.profileImage
-                  ? profileData?.profileImage
+                loggedInUser[0]?.profileImage
+                  ? loggedInUser[0]?.profileImage
                   : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
               }
             />
             <div className="user_info subUser_info">
               <div>
                 <h4>
-                  {profileData?.name
-                    ? profileData?.name
-                    : user && user?.displayName}
+                  {loggedInUser[0]?.name ||
+                    user?.displayName ||
+                    user?.phoneNumber}
                 </h4>
-                <h5>@{result}</h5>
+                <h5>@{result ? result : phoneNumber}</h5>
               </div>
               <ListItemIcon className="done__icon" color="blue">
                 <DoneIcon />
@@ -146,7 +141,7 @@ function Sidebar({ handleLogout, user }) {
             {t("Add an existing account")}
           </MenuItem>
           <MenuItem onClick={handleLogout}>
-            {t("Log Out")} @{result}
+            {t("Log Out")} @{result ? result : phoneNumber}
           </MenuItem>
         </Menu>
       </div>
