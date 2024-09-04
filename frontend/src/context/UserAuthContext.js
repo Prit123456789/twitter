@@ -9,27 +9,14 @@ import {
   signInWithPhoneNumber,
   onAuthStateChanged,
   RecaptchaVerifier,
-  setPersistence,
-  browserLocalPersistence,
 } from "firebase/auth";
-import auth from "./firebase"; // Ensure this imports your configured Firebase auth instance
-
+import auth from "./firebase";
 const userAuthContext = createContext();
 
 export function UserAuthContextProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const initializeAuthPersistence = async () => {
-      try {
-        await setPersistence(auth, browserLocalPersistence);
-        console.log("Auth persistence set to local storage.");
-      } catch (error) {
-        console.error("Failed to set persistence:", error);
-      }
-    };
-
-    initializeAuthPersistence();
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser({

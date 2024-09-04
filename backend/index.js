@@ -30,6 +30,35 @@ function isWithinTimeframe(startHour, endHour) {
   return currentHour >= startHour && currentHour < endHour;
 }
 // Apply the middleware to all routes or specific routes
+function isWithinTimeframe(startHour, endHour) {
+  const currentHour = new Date()
+    .toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    .getHours();
+  return currentHour >= startHour && currentHour < endHour;
+}
+
+function enforceMobileTimeRestrictions(req, res, next) {
+  if (req.device.type === "mobile" && !isWithinTimeframe(10, 13)) {
+    // 10 AM to 1 PM IST
+    return res.status(403).send({
+      error:
+        "Access is restricted for mobile devices outside of 10 AM to 1 PM IST",
+    });
+  }
+  next();
+}
+
+function enforceAudioTimeRestrictions(req, res, next) {
+  if (req.body.audio && !isWithinTimeframe(14, 19)) {
+    // 2 PM to 7 PM IST
+    return res.status(403).send({
+      message: "Audio uploads are only allowed between 2 PM and 7 PM IST",
+    });
+  }
+  next();
+}
+
+app.use(enforceMobileTimeRestrictions);
 
 // Middleware to enforce time restrictions for mobile devices
 function enforceMobileTimeRestrictions(req, res, next) {
@@ -107,17 +136,27 @@ async function run() {
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
-      const { email, phoneNumber } = req.query.email;
+      const { email, phoneNumber } = req.query;
       let query = {};
+
       if (email) {
         query.email = email;
       } else if (phoneNumber) {
         query.phoneNumber = phoneNumber;
       }
 
-      const user = await userCollection.find(query).toArray();
-      res.send(user);
+      try {
+        const user = await userCollection.findOne(query);
+        if (!user) {
+          return res.status(404).send({ message: "User not found" });
+        }
+        res.send(user);
+      } catch (error) {
+        console.error("Error fetching logged-in user data:", error);
+        res.status(500).send({ error: "Internal Server Error" });
+      }
     });
+
     app.get("/post", async (req, res) => {
       const { email, phoneNumber } = req.body;
       const query = email ? { email } : { phoneNumber };
@@ -125,13 +164,13 @@ async function run() {
       res.send(post);
     });
     app.get("/userPost", async (req, res) => {
-      const { email, phoneNumber } = req.query.email;
+      const { email, phoneNumber } = req.body;
       const query = email ? { email } : { phoneNumber };
       const post = (await postCollection.find(query).toArray()).reverse();
       res.send(post);
     });
     app.get("/record", async (req, res) => {
-      const { email, phoneNumber } = req.query.email;
+      const { email, phoneNumber } = req.body;
       const query = email ? { email } : { phoneNumber };
       const records = (await audioCollection.find(query).toArray()).reverse();
       res.send(records);
@@ -149,28 +188,19 @@ async function run() {
     });
 
     //POSTS
-    app.post("/post", async (req, res) => {
+    app.post("/post", enforceAudioTimeRestrictions, async (req, res) => {
       try {
         const { email, phoneNumber, post, photo, audio } = req.body;
 
-        // Validate input
         if (!post && !photo && !audio) {
           return res
             .status(400)
             .send({ message: "Post content cannot be empty" });
         }
 
-        // Construct query
         const query = email ? { email } : { phoneNumber };
         if (!query) {
           return res.status(400).send({ message: "Invalid user identifier" });
-        }
-
-        // Server-side restriction for audio uploads (2 PM to 7 PM IST)
-        if (audio && !isWithinTimeframe(14, 19)) {
-          return res.status(403).send({
-            message: "Audio uploads are only allowed between 2 PM and 7 PM IST",
-          });
         }
 
         const newPost = {
@@ -181,9 +211,7 @@ async function run() {
           createdAt: new Date(),
         };
 
-        // Insert post into the database
         const postResult = await postCollection.insertOne(newPost);
-
         res.send({
           message: "Post created successfully!",
           postId: postResult.insertedId,
@@ -250,14 +278,12 @@ async function run() {
     });
     app.post("/phoneHistory", async (req, res) => {
       try {
-        // Extract login information from the request body
         const { phoneNumber } = req.body;
         const ipAddress = await axios.get("https://api.ipify.org?format=json");
         const userAgent = req.headers["user-agent"];
         const parser = new UAParser(userAgent);
         const { browser, os, device } = parser.getResult();
 
-        // Create login history object
         const loginHistory = {
           phoneNumber,
           ip: ipAddress.data.ip,

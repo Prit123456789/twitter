@@ -52,7 +52,7 @@ function Mobile() {
     if (validatePhoneNumber()) {
       try {
         const response = await axios.post(
-          "https://twitter-cxhu.onrender.com/checkUser",
+          "https://twitter-cxhu.onrender.com/user",
           { phoneNumber: value },
           {
             headers: {
