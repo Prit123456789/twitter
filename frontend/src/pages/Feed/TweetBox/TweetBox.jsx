@@ -119,7 +119,7 @@ function TweetBox() {
       formData.append("photo", imageURL);
       formData.append("username", username);
       formData.append("name", name);
-      formData.append("email", email || enteredEmail); // Use entered email if logged in with phone
+      formData.append("email", email || enteredEmail);
       formData.append("phoneNumber", phoneNumber || "");
 
       if (audioBlob) {
@@ -127,25 +127,6 @@ function TweetBox() {
           type: "audio/mp3",
         });
         formData.append("audio", audioFile);
-
-        try {
-          const cloudinaryResponse = await axios.post(
-            "https://api.cloudinary.com/v1_1/dgziwljwc/raw/upload",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Basic ${btoa(
-                  "819573983982481:wkmuP9qfqbaTHAdfmFnAfMxR1SE"
-                )}`,
-              },
-            }
-          );
-          const cloudinaryAudioURL = cloudinaryResponse.data.secure_url;
-          formData.append("audio", cloudinaryAudioURL);
-        } catch (error) {
-          console.error("Error uploading audio to Cloudinary:", error);
-        }
       }
 
       try {

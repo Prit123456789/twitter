@@ -14,16 +14,14 @@ import auth from "./firebase";
 const userAuthContext = createContext();
 
 export function UserAuthContextProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        setUser({
-          email: currentUser.email || null,
-          phoneNumber: currentUser.phoneNumber || null,
-          uid: currentUser.uid,
-        });
+        setUser(currentUser
+          
+        );
       } else {
         setUser(null);
       }

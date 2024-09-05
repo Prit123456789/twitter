@@ -158,17 +158,26 @@ async function run() {
     });
 
     app.get("/post", async (req, res) => {
-      const { email, phoneNumber } = req.body;
+      const { email, phoneNumber } = req.query;
       const query = email ? { email } : { phoneNumber };
       const post = (await postCollection.find(query).toArray()).reverse();
       res.send(post);
     });
     app.get("/userPost", async (req, res) => {
-      const { email, phoneNumber } = req.body;
+      const { email, phoneNumber } = req.query;
+
       const query = email ? { email } : { phoneNumber };
-      const post = (await postCollection.find(query).toArray()).reverse();
-      res.send(post);
+
+      try {
+        const posts = await postCollection.find(query).toArray();
+
+        res.send(posts.reverse());
+      } catch (error) {
+        console.error("Error fetching user posts:", error);
+        res.status(500).send("Internal Server Error");
+      }
     });
+
     app.get("/record", async (req, res) => {
       const { email, phoneNumber } = req.body;
       const query = email ? { email } : { phoneNumber };
@@ -308,20 +317,25 @@ async function run() {
     });
 
     // patch
+
     app.patch("/userUpdates", async (req, res) => {
-      const { email, phoneNumber, ...profile } = req.body;
+      const { email, phoneNumber, coverImage, profileImage, ...profile } =
+        req.body;
 
       const filter = email ? { email } : { phoneNumber };
 
-      const options = { upsert: true };
-      const updateDoc = { $set: profile };
+      const updateDoc = { $set: { ...profile } };
+
+      if (coverImage) updateDoc.$set.coverImage = coverImage;
+      if (profileImage) updateDoc.$set.profileImage = profileImage;
 
       try {
-        const result = await userCollection.updateOne(
-          filter,
-          updateDoc,
-          options
-        );
+        const result = await userCollection.updateOne(filter, updateDoc);
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send("User not found");
+        }
+
         res.send(result);
       } catch (error) {
         console.error("Error updating user:", error);
