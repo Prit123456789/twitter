@@ -320,11 +320,12 @@ async function run() {
     // patch
     app.patch("/userUpdates/:identifier", async (req, res) => {
       const { identifier } = req.params;
-      const profile = req.body;
+      const { coverImage, profileImage } = req.body;
+
       const filter = {
         $or: [{ email: identifier }, { phoneNumber: identifier }],
       };
-      const updateDoc = { $set: profile };
+      const updateDoc = { $set: { coverImage, profileImage } };
 
       try {
         const result = await userCollection.updateOne(filter, updateDoc);
