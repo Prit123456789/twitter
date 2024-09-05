@@ -352,11 +352,12 @@ async function run() {
     });
 
     // patch
-    app.patch("/userUpdates", async (req, res) => {
-      const { email, phoneNumber, ...profile } = req.body;
-
-      const filter = email ? { email } : { phoneNumber };
-
+    app.patch("/userUpdates/:identifier", async (req, res) => {
+      const { identifier } = req.params;
+      const profile = req.body;
+      const filter = {
+        $or: [{ email: identifier }, { phoneNumber: identifier }],
+      };
       const options = { upsert: true };
       const updateDoc = { $set: profile };
 
@@ -366,6 +367,7 @@ async function run() {
           updateDoc,
           options
         );
+        console.log("Database Update Result:", result); // Debugging log
         res.send(result);
       } catch (error) {
         console.error("Error updating user:", error);
