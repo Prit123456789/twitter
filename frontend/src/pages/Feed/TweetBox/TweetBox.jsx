@@ -265,7 +265,7 @@ function TweetBox() {
             variant="outlined"
             color="primary"
             type="submit">
-            {t("Tweet")}
+            Tweet
           </Button>
         </div>
       </form>

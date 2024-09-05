@@ -57,16 +57,6 @@ function enforceMobileTimeRestrictions(req, res, next) {
   next();
 }
 
-function enforceAudioTimeRestrictions(req, res, next) {
-  if (req.body.audio && !isWithinTimeframe(14, 19)) {
-    // 2 PM to 7 PM IST
-    return res.status(403).send({
-      message: "Audio uploads are only allowed between 2 PM and 7 PM IST",
-    });
-  }
-  next();
-}
-
 app.use(enforceMobileTimeRestrictions);
 
 // Middleware to enforce time restrictions for mobile devices
