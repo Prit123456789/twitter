@@ -324,15 +324,10 @@ async function run() {
       const filter = {
         $or: [{ email: identifier }, { phoneNumber: identifier }],
       };
-      const options = { upsert: true };
       const updateDoc = { $set: profile };
 
       try {
-        const result = await userCollection.updateOne(
-          filter,
-          updateDoc,
-          options
-        );
+        const result = await userCollection.updateOne(filter, updateDoc);
         console.log("Database Update Result:", result);
         res.send(result);
       } catch (error) {
