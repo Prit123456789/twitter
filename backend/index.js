@@ -131,9 +131,15 @@ async function run() {
     });
 
     app.get("/user", async (req, res) => {
-      const { email, phoneNumber } = req.body;
-      const query = email ? { email } : { phoneNumber };
-      const user = await userCollection.find(query).toArray();
+      const { email, phoneNumber } = req.query;
+      let query = {};
+
+      if (email) {
+        query.email = email;
+      } else if (phoneNumber) {
+        query.phoneNumber = phoneNumber;
+      }
+      const user = await userCollection.find({ query }).toArray();
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
@@ -147,7 +153,7 @@ async function run() {
       }
 
       try {
-        const user = await userCollection.findOne(query);
+        const user = await userCollection.findOne({ query }).toArray();
         if (!user) {
           return res.status(404).send({ message: "User not found" });
         }
