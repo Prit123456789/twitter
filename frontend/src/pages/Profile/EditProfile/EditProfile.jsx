@@ -51,7 +51,13 @@ function EditChild({ dob, setDob }) {
               {t("Make sure you enter the age of the")} <br />
               {t("person using the account.")}{" "}
             </p>
-            {/* <Button className='e-button'>Edit</Button> */}
+            <Button
+              className="e-button"
+              onClick={() => {
+                setOpen(false);
+              }}>
+              {t("Save")}
+            </Button>
             <input type="date" onChange={(e) => setDob(e.target.value)} />
             <Button
               className="e-button"

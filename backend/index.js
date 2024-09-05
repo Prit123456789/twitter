@@ -328,7 +328,14 @@ async function run() {
       const updateDoc = { $set: { coverImage, profileImage } };
 
       try {
-        const result = await userCollection.updateOne(filter, updateDoc);
+        const result = await userCollection.updateOne(filter, updateDoc, {
+          upsert: false,
+        }); // Ensure upsert is false
+        if (result.matchedCount === 0) {
+          return res
+            .status(404)
+            .send({ message: "User not found, no document updated" });
+        }
         console.log("Database Update Result:", result);
         res.send(result);
       } catch (error) {

@@ -59,7 +59,6 @@ function MainProfile({ user }) {
         const url = res.data.data.display_url;
         const identifier = user?.email ? user?.email : user?.phoneNumber;
         const userCoverImage = {
-          identifier: identifier,
           coverImage: url,
         };
         setIsLoading(false);
@@ -68,19 +67,21 @@ function MainProfile({ user }) {
           fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
             method: "PATCH",
             headers: {
-              "content-type": "application/json",
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(userCoverImage),
           })
             .then((res) => res.json())
             .then((data) => {
-              console.log("done", data);
+              console.log("Cover image updated successfully", data);
+            })
+            .catch((error) => {
+              console.error("Error updating cover image:", error);
             });
         }
       })
       .catch((error) => {
-        console.log(error);
-        window.alert(error);
+        console.error("Error uploading cover image:", error);
         setIsLoading(false);
       });
   };
@@ -101,27 +102,29 @@ function MainProfile({ user }) {
         const url = res.data.data.display_url;
         const identifier = user?.email ? user?.email : user?.phoneNumber;
         const userProfileImage = {
-          identifier: identifier,
           profileImage: url,
         };
         setIsLoading(false);
+
         if (url) {
           fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
             method: "PATCH",
             headers: {
-              "content-type": "application/json",
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(userProfileImage),
           })
             .then((res) => res.json())
             .then((data) => {
-              console.log("done", data);
+              console.log("Profile image updated successfully", data);
+            })
+            .catch((error) => {
+              console.error("Error updating profile image:", error);
             });
         }
       })
       .catch((error) => {
-        console.log(error);
-        window.alert(error);
+        console.error("Error uploading profile image:", error);
         setIsLoading(false);
       });
   };
