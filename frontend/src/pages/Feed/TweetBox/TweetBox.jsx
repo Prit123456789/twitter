@@ -126,7 +126,26 @@ function TweetBox() {
         const audioFile = new File([audioBlob], "audio.mp3", {
           type: "audio/mp3",
         });
-        formData.append("audio", audioFile);
+        const audioFormData = new FormData();
+        audioFormData.append("audio", audioFile);
+
+        try {
+          // Upload to Cloudinary
+          const audioUploadResponse = await fetch(
+            "https://twitter-cxhu.onrender.com/upload-audio",
+            {
+              method: "POST",
+              body: audioFormData,
+            }
+          );
+          const audioData = await audioUploadResponse.json();
+          console.log(audioData);
+
+          // Append Cloudinary URL to your formData
+          formData.append("audioURL", audioData.secure_url);
+        } catch (error) {
+          console.error("Error uploading audio:", error);
+        }
       }
 
       try {

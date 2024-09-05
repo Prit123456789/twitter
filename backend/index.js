@@ -7,12 +7,21 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 const sgMail = require("@sendgrid/mail");
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const streamifier = require("streamifier");
 const client1 = require("twilio")(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
 
 const port = process.env.PORT || 5000;
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+const upload = multer();
 
 app.use(
   cors({
@@ -103,6 +112,9 @@ async function run() {
     const userCollection = client.db("database").collection("users");
 
     // get
+    app.get("/", async (req, res) => {
+      res.send("Welcome to the Twitter Clone's backend!!!!");
+    });
     // Backend code to fetch login history
     app.get("/loginHistory/:email", async (req, res) => {
       const { email } = req.params;
@@ -188,10 +200,80 @@ async function run() {
     });
 
     //POSTS
-    app.post("/post", async (req, res) => {
-      const post = req.body;
-      const result = await postCollection.insertOne(post);
-      res.send(result);
+    app.post("/post", upload.single("audio"), async (req, res) => {
+      try {
+        // Extract form data
+        const { post, photo, username, name, email, phoneNumber } = req.body;
+        const audioFile = req.file; // Audio file from multer
+
+        // Prepare data to store
+        const postData = {
+          text: post,
+          imageURL: photo,
+          username,
+          name,
+          email,
+          phoneNumber,
+          audioURL: null,
+        };
+
+        if (audioFile) {
+          const uploadAudio = (file) => {
+            return new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream(
+                { resource_type: "auto" },
+                (error, result) => {
+                  if (result) {
+                    resolve(result);
+                  } else {
+                    reject(error);
+                  }
+                }
+              );
+              streamifier.createReadStream(file.buffer).pipe(stream);
+            });
+          };
+
+          const audioResult = await uploadAudio(audioFile);
+          postData.audioURL = audioResult.secure_url;
+        }
+
+        const result = await postCollection.insertOne(postData);
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error in /post endpoint:", error);
+        res.status(500).send({ error: "Failed to post" });
+      }
+    });
+    app.post("/upload-audio", upload.single("audio"), async (req, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).send({ error: "No file uploaded" });
+        }
+
+        const streamUpload = (file) => {
+          return new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { resource_type: "auto" },
+              (error, result) => {
+                if (result) {
+                  resolve(result);
+                } else {
+                  reject(error);
+                }
+              }
+            );
+            streamifier.createReadStream(file.buffer).pipe(stream);
+          });
+        };
+
+        const result = await streamUpload(req.file);
+        res.send(result);
+      } catch (error) {
+        console.error("Error uploading to Cloudinary:", error);
+        res.status(500).send({ error: "Failed to upload audio" });
+      }
     });
 
     app.post("/loginHistory", async (req, res) => {
