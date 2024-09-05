@@ -101,7 +101,6 @@ async function run() {
       .collection("Login History");
     const postCollection = client.db("database").collection("posts");
     const userCollection = client.db("database").collection("users");
-    const audioCollection = client.db("database").collection("audios");
 
     // get
     // Backend code to fetch login history
@@ -158,9 +157,7 @@ async function run() {
     });
 
     app.get("/post", async (req, res) => {
-      const { email, phoneNumber } = req.query;
-      const query = email ? { email } : { phoneNumber };
-      const post = (await postCollection.find(query).toArray()).reverse();
+      const post = (await postCollection.find().toArray()).reverse();
       res.send(post);
     });
     app.get("/userPost", async (req, res) => {
@@ -178,12 +175,6 @@ async function run() {
       }
     });
 
-    app.get("/record", async (req, res) => {
-      const { email, phoneNumber } = req.body;
-      const query = email ? { email } : { phoneNumber };
-      const records = (await audioCollection.find(query).toArray()).reverse();
-      res.send(records);
-    });
     // post
     app.post("/register", async (req, res) => {
       const { username, phoneNumber, name, email } = req.body.user;
@@ -197,38 +188,10 @@ async function run() {
     });
 
     //POSTS
-    app.post("/post", enforceAudioTimeRestrictions, async (req, res) => {
-      try {
-        const { email, phoneNumber, post, photo, audio } = req.body;
-
-        if (!post && !photo && !audio) {
-          return res
-            .status(400)
-            .send({ message: "Post content cannot be empty" });
-        }
-
-        const query = email ? { email } : { phoneNumber };
-        if (!query) {
-          return res.status(400).send({ message: "Invalid user identifier" });
-        }
-
-        const newPost = {
-          ...query,
-          post,
-          photo,
-          audio,
-          createdAt: new Date(),
-        };
-
-        const postResult = await postCollection.insertOne(newPost);
-        res.send({
-          message: "Post created successfully!",
-          postId: postResult.insertedId,
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "Error creating post" });
-      }
+    app.post("/post", async (req, res) => {
+      const post = req.body;
+      const result = await postCollection.insertOne(post);
+      res.send(result);
     });
 
     app.post("/loginHistory", async (req, res) => {
@@ -317,25 +280,20 @@ async function run() {
     });
 
     // patch
-
     app.patch("/userUpdates", async (req, res) => {
-      const { email, phoneNumber, coverImage, profileImage, ...profile } =
-        req.body;
+      const { email, phoneNumber, ...profile } = req.body;
 
       const filter = email ? { email } : { phoneNumber };
 
-      const updateDoc = { $set: { ...profile } };
-
-      if (coverImage) updateDoc.$set.coverImage = coverImage;
-      if (profileImage) updateDoc.$set.profileImage = profileImage;
+      const options = { upsert: true };
+      const updateDoc = { $set: profile };
 
       try {
-        const result = await userCollection.updateOne(filter, updateDoc);
-
-        if (result.matchedCount === 0) {
-          return res.status(404).send("User not found");
-        }
-
+        const result = await userCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
         res.send(result);
       } catch (error) {
         console.error("Error updating user:", error);

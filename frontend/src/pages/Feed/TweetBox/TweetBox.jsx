@@ -230,11 +230,17 @@ function TweetBox() {
           <input
             type="file"
             id="image"
-            className="imageFile"
+            className="imageInput"
             accept="image/*"
             onChange={handleUploadImage}
           />
-
+          <div className="audio-record-controls">
+            {isRecording ? (
+              <MicOffIcon onClick={handleStopRecording} />
+            ) : (
+              <MicIcon onClick={handleStartRecording} />
+            )}
+          </div>
           <Button
             className="tweetBox__tweetButton"
             variant="outlined"
@@ -245,19 +251,11 @@ function TweetBox() {
         </div>
       </form>
 
-      <div className="audio-record-controls">
-        {isRecording ? (
-          <MicIcon onClick={handleStopRecording} />
-        ) : (
-          <MicOffIcon onClick={handleStartRecording} />
-        )}
-        {audioBlob && (
-          <Button onClick={handlePlayAudio} color="primary" variant="text">
-            Play
-          </Button>
-        )}
-      </div>
-
+      {audioBlob && (
+        <Button onClick={handlePlayAudio} color="primary" variant="text">
+          Play
+        </Button>
+      )}
       {phoneNumber && !otpVerified && (
         <div>
           <input
