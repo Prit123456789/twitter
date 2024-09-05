@@ -139,7 +139,7 @@ async function run() {
       } else if (phoneNumber) {
         query.phoneNumber = phoneNumber;
       }
-      const user = await userCollection.find({ query }).toArray();
+      const user = await userCollection.find(query).toArray();
       res.send(user);
     });
     app.get("/loggedInUser", async (req, res) => {
@@ -153,7 +153,7 @@ async function run() {
       }
 
       try {
-        const user = await userCollection.findOne({ query }).toArray();
+        const user = await userCollection.findOne(query).toArray();
         if (!user) {
           return res.status(404).send({ message: "User not found" });
         }
@@ -196,52 +196,13 @@ async function run() {
     });
 
     //POSTS
-    app.post("/post", upload.single("audio"), async (req, res) => {
-      try {
-        // Extract form data
-        const { post, photo, username, name, email, phoneNumber } = req.body;
-        const audioFile = req.file; // Audio file from multer
 
-        // Prepare data to store
-        const postData = {
-          text: post,
-          imageURL: photo,
-          username,
-          name,
-          email,
-          phoneNumber,
-          audioURL: null,
-        };
-
-        if (audioFile) {
-          const uploadAudio = (file) => {
-            return new Promise((resolve, reject) => {
-              const stream = cloudinary.uploader.upload_stream(
-                { resource_type: "auto" },
-                (error, result) => {
-                  if (result) {
-                    resolve(result);
-                  } else {
-                    reject(error);
-                  }
-                }
-              );
-              streamifier.createReadStream(file.buffer).pipe(stream);
-            });
-          };
-
-          const audioResult = await uploadAudio(audioFile);
-          postData.audioURL = audioResult.secure_url;
-        }
-
-        const result = await postCollection.insertOne(postData);
-
-        res.send(result);
-      } catch (error) {
-        console.error("Error in /post endpoint:", error);
-        res.status(500).send({ error: "Failed to post" });
-      }
+    app.post("/post", async (req, res) => {
+      const post = req.body;
+      const result = await postCollection.insertOne(post);
+      res.send(result);
     });
+
     app.post("/upload-audio", upload.single("audio"), async (req, res) => {
       try {
         if (!req.file) {
@@ -373,7 +334,7 @@ async function run() {
           updateDoc,
           options
         );
-        console.log("Database Update Result:", result); // Debugging log
+        console.log("Database Update Result:", result);
         res.send(result);
       } catch (error) {
         console.error("Error updating user:", error);

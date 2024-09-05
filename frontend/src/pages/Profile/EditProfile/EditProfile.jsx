@@ -76,7 +76,7 @@ export default function EditProfile({ user, loggedInUser }) {
   const [open, setOpen] = React.useState(false);
   const [dob, setDob] = React.useState("");
   const { t } = useTranslation("translations");
-
+  const identifier = user?.email ? user?.email : user?.phoneNumber;
   const HandleSave = () => {
     const editedInfo = {
       name,
@@ -87,15 +87,7 @@ export default function EditProfile({ user, loggedInUser }) {
       dob,
     };
 
-    if (user?.email) {
-      editedInfo.email = user.email;
-    } else if (user?.phoneNumber) {
-      editedInfo.phoneNumber = user.phoneNumber;
-    }
-
-    console.log(editedInfo);
-
-    fetch("https://twitter-cxhu.onrender.com/userUpdates", {
+    fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
