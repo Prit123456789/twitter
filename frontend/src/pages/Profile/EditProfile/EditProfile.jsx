@@ -152,7 +152,7 @@ export default function EditProfile({ user, loggedInUser }) {
               label={t("Name")}
               id="fullWidth"
               variant="filled"
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               defaultValue={loggedInUser[0]?.name ? loggedInUser[0].name : ""}
             />
             <TextField
@@ -161,7 +161,7 @@ export default function EditProfile({ user, loggedInUser }) {
               label={t("Username")}
               id="fullWidth"
               variant="filled"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
               defaultValue={
                 loggedInUser[0]?.username ? loggedInUser[0].username : ""
               }

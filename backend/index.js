@@ -30,6 +30,13 @@ app.use(
     credentials: true,
   })
 );
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+
+  next();
+});
 // Helper function to check if current time is within allowed timeframe
 function isWithinTimeframe(startHour, endHour) {
   const currentTime = new Date().toLocaleString("en-US", {
