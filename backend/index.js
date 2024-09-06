@@ -334,7 +334,6 @@ async function run() {
     app.patch("/userUpdates/:identifier", async (req, res) => {
       const { identifier } = req.params;
       const profileUpdates = req.body;
-      const options = { upsert: false };
 
       const filter = identifier.includes("@")
         ? { email: identifier }
@@ -349,15 +348,9 @@ async function run() {
             .send({ message: "User not found, no document updated" });
         }
 
-        const updatedProfile = { ...existingUser, ...profileUpdates };
+        const updateDoc = { $set: profileUpdates };
 
-        const updateDoc = { $set: updatedProfile };
-
-        const result = await userCollection.updateOne(
-          filter,
-          updateDoc,
-          options
-        );
+        const result = await userCollection.updateOne(filter, updateDoc);
 
         if (result.matchedCount === 0) {
           return res
