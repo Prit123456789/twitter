@@ -164,9 +164,15 @@ async function run() {
     });
 
     app.get("/post", async (req, res) => {
-      const post = (await postCollection.find().toArray()).reverse();
-      res.send(post);
+      try {
+        const post = (await postCollection.find().toArray()).reverse();
+        res.send(post);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        res.status(500).send({ error: "Failed to fetch posts" });
+      }
     });
+
     app.get("/userPost", async (req, res) => {
       const { email, phoneNumber } = req.query;
 
@@ -196,7 +202,7 @@ async function run() {
 
     //POSTS
 
-    app.post("/post", async (req, res) => {
+    app.post("/post", upload.none(), async (req, res) => {
       console.log("Post Data Received:", req.body); // Add this line to log incoming post data
       try {
         const post = req.body;
@@ -230,12 +236,16 @@ async function run() {
           });
         };
 
-        const result = await streamUpload(req.file);
+        const result = await streamUpload(req.file.buffer);
         res.send(result);
       } catch (error) {
         console.error("Error uploading to Cloudinary:", error);
         res.status(500).send({ error: "Failed to upload audio" });
       }
+    });
+
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
 
     app.post("/loginHistory", async (req, res) => {

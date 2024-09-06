@@ -13,9 +13,6 @@ function Mobile() {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [userExists, setUserExists] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation("translations");
 
@@ -123,24 +120,6 @@ function Mobile() {
               onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}
             />
-
-            {userExists && (
-              <>
-                <input
-                  className="email"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder={t("Username")}
-                />
-
-                <input
-                  className="email"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder={t("Full Name")}
-                />
-              </>
-            )}
 
             <button className="btn" type="submit">
               {t("Send")}

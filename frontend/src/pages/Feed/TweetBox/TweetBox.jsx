@@ -12,6 +12,8 @@ import useLoggedInUser from "../../../hooks/useLoggedInUser";
 function TweetBox() {
   const { t } = useTranslation("translations");
   const [post, setPost] = useState("");
+  const [imageurl, setimageurl] = useState("");
+  const [isloading, setisloading] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
@@ -142,7 +144,7 @@ function TweetBox() {
           const audioData = await audioUploadResponse.json();
           console.log("Audio Upload Response:", audioData);
 
-          formData.append("audioURL", audioData.secure_url);
+          formData.append("audioURL", audioData.secure_url); // Append audio URL to the main form data
         } catch (error) {
           console.error("Error uploading audio:", error);
         }
@@ -157,8 +159,8 @@ function TweetBox() {
             body: formData,
           }
         );
-        const data = await postResponse.json();
-        console.log("Post Response:", data);
+        const postData = await postResponse.json();
+        console.log("Post Response:", postData);
         setPost("");
         setImageURL("");
         setAudioBlob(null);
@@ -236,7 +238,11 @@ function TweetBox() {
         </div>
         <div className="mediaIcons_tweetButton">
           <label htmlFor="file" className="imageIcon">
-            <AddPhotoAlternateOutlinedIcon />
+            {isloading ? (
+              <p>{t("Uploading Image")}</p>
+            ) : (
+              <p>{imageurl ? "Uploaded" : <AddPhotoAlternateOutlinedIcon />}</p>
+            )}
             <input
               type="file"
               id="file"
