@@ -83,13 +83,20 @@ export default function EditProfile({ user, loggedInUser }) {
   const { t } = useTranslation("translations");
   const identifier = user?.email ? user?.email : user?.phoneNumber;
   const HandleSave = () => {
+    // Only include fields that are not empty
     const editedInfo = {
-      name,
-      bio,
-      location,
-      website,
-      dob,
+      ...(name && { name }),
+      ...(bio && { bio }),
+      ...(location && { location }),
+      ...(website && { website }),
+      ...(dob && { dob }),
     };
+
+    // Check if there is any data to update
+    if (Object.keys(editedInfo).length === 0) {
+      console.log("No changes made to profile");
+      return;
+    }
 
     fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
       method: "PATCH",

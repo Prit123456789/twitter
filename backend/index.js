@@ -335,11 +335,13 @@ async function run() {
       const { identifier } = req.params;
       const profileUpdates = req.body;
 
+      // Determine the filter based on identifier
       const filter = identifier.includes("@")
         ? { email: identifier }
         : { phoneNumber: identifier };
 
       try {
+        // Check if the user exists
         const existingUser = await userCollection.findOne(filter);
 
         if (!existingUser) {
@@ -348,8 +350,22 @@ async function run() {
             .send({ message: "User not found, no document updated" });
         }
 
-        const updateDoc = { $set: profileUpdates };
+        // Filter out undefined or unwanted fields from profileUpdates
+        const validUpdates = Object.fromEntries(
+          Object.entries(profileUpdates).filter(
+            ([key, value]) => value != null && value !== ""
+          )
+        );
 
+        if (Object.keys(validUpdates).length === 0) {
+          return res
+            .status(400)
+            .send({ message: "No valid fields provided for update" });
+        }
+
+        const updateDoc = { $set: validUpdates };
+
+        // Perform the update operation
         const result = await userCollection.updateOne(filter, updateDoc);
 
         if (result.matchedCount === 0) {
