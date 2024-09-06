@@ -48,33 +48,6 @@ function Mobile() {
       ? e.target.value
       : `+91${e.target.value.replace(/^0+/, "")}`;
     setPhoneNumber(value);
-
-    if (validatePhoneNumber()) {
-      try {
-        const response = await axios.post(
-          "https://twitter-cxhu.onrender.com/user",
-          { phoneNumber: value },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (response.data.exists) {
-          setUserExists(true);
-          setUsername(response.data.username);
-          setFullName(response.data.fullName);
-        } else {
-          setUserExists(false);
-          setUsername("");
-          setFullName("");
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-        setError("Error fetching user details");
-      }
-    }
   };
 
   const handleSendOtp = async (e) => {

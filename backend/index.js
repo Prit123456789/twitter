@@ -324,19 +324,17 @@ async function run() {
     });
 
     // patch
-    // Combine both routes into one and handle updates by email or phoneNumber
+
     app.patch("/userUpdates/:identifier", async (req, res) => {
       const { identifier } = req.params;
       const profileUpdates = req.body;
       const options = { upsert: false };
 
-      // Determine if the identifier is an email or phoneNumber
       const filter = identifier.includes("@")
         ? { email: identifier }
         : { phoneNumber: identifier };
 
       try {
-        // Fetch the existing user data
         const existingUser = await userCollection.findOne(filter);
 
         if (!existingUser) {
@@ -345,10 +343,8 @@ async function run() {
             .send({ message: "User not found, no document updated" });
         }
 
-        // Merge existing user data with the incoming updates
         const updatedProfile = { ...existingUser, ...profileUpdates };
 
-        // Update the user document with the merged data
         const updateDoc = { $set: updatedProfile };
 
         const result = await userCollection.updateOne(
