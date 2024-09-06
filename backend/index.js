@@ -197,9 +197,15 @@ async function run() {
     //POSTS
 
     app.post("/post", async (req, res) => {
-      const post = req.body;
-      const result = await postCollection.insertOne(post);
-      res.send(result);
+      console.log("Post Data Received:", req.body); // Add this line to log incoming post data
+      try {
+        const post = req.body;
+        const result = await postCollection.insertOne(post);
+        res.send(result);
+      } catch (error) {
+        console.error("Error posting:", error);
+        res.status(500).send({ error: "Failed to post data" });
+      }
     });
 
     app.post("/upload-audio", upload.single("audio"), async (req, res) => {
@@ -318,28 +324,42 @@ async function run() {
     });
 
     // patch
-    app.patch("/userUpdates", async (req, res) => {
-      const { email, phoneNumber, coverImage, profileImage } = req.body;
-
-      // Construct filter based on provided identifier
-      const filter = email
-        ? { email: email }
-        : phoneNumber
-        ? { phoneNumber: phoneNumber }
-        : null;
-
-      if (!filter) {
-        return res
-          .status(400)
-          .send({ message: "Email or Phone Number is required" });
-      }
-
-      const updateDoc = { $set: { coverImage, profileImage } };
+    app.patch("/userUpdates/:email", async (req, res) => {
+      const filter = req.params;
+      const profile = req.body;
+      const options = { upsert: true };
+      const updateDoc = { $set: profile };
 
       try {
-        const result = await userCollection.updateOne(filter, updateDoc, {
-          upsert: false,
-        }); // Ensure upsert is false
+        const result = await userCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        if (result.matchedCount === 0) {
+          return res
+            .status(404)
+            .send({ message: "User not found, no document updated" });
+        }
+        console.log("Database Update Result:", result);
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    app.patch("/userUpdates/:phoneNumber", async (req, res) => {
+      const filter = req.params;
+      const profile = req.body;
+      const options = { upsert: true };
+      const updateDoc = { $set: profile };
+
+      try {
+        const result = await userCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
         if (result.matchedCount === 0) {
           return res
             .status(404)

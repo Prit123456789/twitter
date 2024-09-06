@@ -20,17 +20,15 @@ function TweetBox() {
   const { user } = useUserAuth();
   const email = user?.email;
   const phoneNumber = user?.phoneNumber;
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpSent] = useState(false);
+  const [otpVerified] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
-  const [enteredEmail, setEnteredEmail] = useState(""); // For entering email if logged in with phone number
-  const [emailOtp, setEmailOtp] = useState(""); // For OTP verification for email
+  const [enteredEmail] = useState("");
   const [isEmailOtpSent, setIsEmailOtpSent] = useState(false);
   const [isAudioUploadAllowed, setIsAudioUploadAllowed] = useState(false);
   const mediaRecorderRef = useRef(null);
-  const audioChunks = useRef([]); // To store chunks of audio data
+  const audioChunks = useRef([]);
 
   const userProfilePic =
     loggedInUser[0]?.profileImage ||
@@ -48,44 +46,28 @@ function TweetBox() {
     return () => clearInterval(interval);
   }, []);
 
-  // Setup media recorder without starting the recording
-  useEffect(() => {
-    const setupMediaRecorder = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        mediaRecorderRef.current = new MediaRecorder(stream);
+  // Setup media recorder
+  const setupMediaRecorder = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
 
-        // Accumulate audio chunks
-        mediaRecorderRef.current.addEventListener("dataavailable", (event) => {
-          audioChunks.current.push(event.data);
-        });
+      // Accumulate audio chunks
+      mediaRecorderRef.current.addEventListener("dataavailable", (event) => {
+        audioChunks.current.push(event.data);
+      });
 
-        mediaRecorderRef.current.addEventListener("stop", () => {
-          const audioBlob = new Blob(audioChunks.current, {
-            type: "audio/mp3",
-          });
-          setAudioBlob(audioBlob);
-          audioChunks.current = []; // Reset chunks
-          stream.getTracks().forEach((track) => track.stop());
-        });
-      } catch (error) {
-        console.error("Error accessing microphone:", error);
-        alert("Microphone access is required to record audio.");
-      }
-    };
-
-    setupMediaRecorder();
-
-    return () => {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stream
-          .getTracks()
-          .forEach((track) => track.stop());
-      }
-    };
-  }, []);
+      mediaRecorderRef.current.addEventListener("stop", () => {
+        const audioBlob = new Blob(audioChunks.current, { type: "audio/mp3" });
+        setAudioBlob(audioBlob);
+        audioChunks.current = []; // Reset chunks
+        stream.getTracks().forEach((track) => track.stop());
+      });
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      alert("Microphone access is required to record audio.");
+    }
+  };
 
   // Handle image upload
   const handleUploadImage = async (e) => {
@@ -111,6 +93,7 @@ function TweetBox() {
   // Handle tweet post
   const handleTweet = async (e) => {
     e.preventDefault();
+    console.log("Starting Tweet Post");
 
     const identifier = email ? `email=${email}` : `phoneNumber=${phoneNumber}`;
     const response = await fetch(
@@ -119,6 +102,16 @@ function TweetBox() {
     const data = await response.json();
     setName(data[0]?.name);
     setUsername(data[0]?.username);
+
+    console.log("Form Data:", {
+      profilePhoto: userProfilePic,
+      post,
+      photo: imageURL,
+      username,
+      name,
+      email: email || enteredEmail,
+      phoneNumber: phoneNumber || "",
+    });
 
     if (name) {
       const formData = new FormData();
@@ -138,7 +131,7 @@ function TweetBox() {
         audioFormData.append("audio", audioFile);
 
         try {
-          // Upload to Cloudinary
+          console.log("Uploading Audio");
           const audioUploadResponse = await fetch(
             "https://twitter-cxhu.onrender.com/upload-audio",
             {
@@ -147,9 +140,8 @@ function TweetBox() {
             }
           );
           const audioData = await audioUploadResponse.json();
-          console.log(audioData);
+          console.log("Audio Upload Response:", audioData);
 
-          // Append Cloudinary URL to your formData
           formData.append("audioURL", audioData.secure_url);
         } catch (error) {
           console.error("Error uploading audio:", error);
@@ -157,6 +149,7 @@ function TweetBox() {
       }
 
       try {
+        console.log("Sending Post Request");
         const postResponse = await fetch(
           "https://twitter-cxhu.onrender.com/post",
           {
@@ -165,7 +158,7 @@ function TweetBox() {
           }
         );
         const data = await postResponse.json();
-        console.log(data);
+        console.log("Post Response:", data);
         setPost("");
         setImageURL("");
         setAudioBlob(null);
@@ -201,15 +194,16 @@ function TweetBox() {
   };
 
   // Start recording audio
-  const handleStartRecording = () => {
+  const handleStartRecording = async () => {
     const emailForOtp = email || enteredEmail;
+
     if (!otpSent && phoneNumber && emailForOtp) {
       sendOtp(emailForOtp);
-    } else if (
-      otpVerified &&
-      mediaRecorderRef.current &&
-      isAudioUploadAllowed
-    ) {
+    } else if (otpVerified && isAudioUploadAllowed) {
+      if (!mediaRecorderRef.current) {
+        await setupMediaRecorder(); // Set up media recorder if not already set up
+      }
+
       mediaRecorderRef.current.start(); // Start recording only when mic icon is clicked
       setIsRecording(true);
     } else if (!otpVerified && phoneNumber) {
@@ -241,8 +235,8 @@ function TweetBox() {
           />
         </div>
         <div className="mediaIcons_tweetButton">
-          <label htmlFor="file">
-            <AddPhotoAlternateOutlinedIcon className="imageIcon" />
+          <label htmlFor="file" className="imageIcon">
+            <AddPhotoAlternateOutlinedIcon />
             <input
               type="file"
               id="file"
@@ -251,16 +245,20 @@ function TweetBox() {
             />
           </label>
 
-          <button
+          <div
             type="button"
             onClick={isRecording ? handleStopRecording : handleStartRecording}
             disabled={isLoading}>
             {isRecording ? (
-              <MicOffIcon className="micIcon" />
+              <label className="micOffIcon">
+                <MicOffIcon />
+              </label>
             ) : (
-              <MicIcon className="micOffIcon" />
+              <label className="micIcon">
+                <MicIcon />
+              </label>
             )}
-          </button>
+          </div>
 
           {audioBlob && (
             <Button onClick={handlePlayAudio} disabled={isLoading}>
