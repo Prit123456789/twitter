@@ -327,7 +327,7 @@ async function run() {
     app.patch("/userUpdates/:email", async (req, res) => {
       const filter = req.params;
       const profile = req.body;
-      const options = { upsert: true };
+      const options = { upsert: false };
       const updateDoc = { $set: profile };
 
       try {
