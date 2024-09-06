@@ -244,10 +244,6 @@ async function run() {
       }
     });
 
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
-
     app.post("/loginHistory", async (req, res) => {
       try {
         const { email } = req.body.systemInfo;
