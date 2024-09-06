@@ -210,11 +210,13 @@ const Signup = () => {
           )}
 
           <hr />
-          <GoogleButton
-            className="g-btn"
-            type="light"
-            onClick={handleGoogleSignIn}
-          />
+          {!isGoogleSignUp && (
+            <GoogleButton
+              className="g-btn"
+              type="light"
+              onClick={handleGoogleSignIn}
+            />
+          )}
           <button className="phone-btn" type="button" onClick={handlePhone}>
             <PhoneIcon style={{ color: "green" }} />
             {t("Sign in with Phone")}

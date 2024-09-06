@@ -26,17 +26,24 @@ const upload = multer();
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://twitter-seven-puce.vercel.app"],
+    "Cross-Origin-Embedder-Policy": "unsafe-none",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
 );
+app.options("*", cors());
 app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-
-  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-
+  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
   next();
 });
+app.use(express.json());
+app.use(bodyParser.json());
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const uri = process.env.MONGO_URI;
+const client = new MongoClient(uri);
+
 // Helper function to check if current time is within allowed timeframe
 function isWithinTimeframe(startHour, endHour) {
   const currentTime = new Date().toLocaleString("en-US", {
@@ -88,16 +95,6 @@ function enforceMobileTimeRestrictions(req, res, next) {
 
   next();
 }
-
-app.options("*", cors());
-
-app.use(express.json());
-app.use(bodyParser.json());
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
 
 async function run() {
   try {
