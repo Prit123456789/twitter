@@ -318,13 +318,22 @@ async function run() {
     });
 
     // patch
-    app.patch("/userUpdates/:identifier", async (req, res) => {
-      const { identifier } = req.params;
-      const { coverImage, profileImage } = req.body;
+    app.patch("/userUpdates", async (req, res) => {
+      const { email, phoneNumber, coverImage, profileImage } = req.body;
 
-      const filter = {
-        $or: [{ email: identifier }, { phoneNumber: identifier }],
-      };
+      // Construct filter based on provided identifier
+      const filter = email
+        ? { email: email }
+        : phoneNumber
+        ? { phoneNumber: phoneNumber }
+        : null;
+
+      if (!filter) {
+        return res
+          .status(400)
+          .send({ message: "Email or Phone Number is required" });
+      }
+
       const updateDoc = { $set: { coverImage, profileImage } };
 
       try {

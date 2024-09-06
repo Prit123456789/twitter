@@ -82,7 +82,7 @@ export default function EditProfile({ user, loggedInUser }) {
   const [open, setOpen] = React.useState(false);
   const [dob, setDob] = React.useState("");
   const { t } = useTranslation("translations");
-  const identifier = user?.email ? user?.email : user?.phoneNumber;
+
   const HandleSave = () => {
     const editedInfo = {
       name,
@@ -92,22 +92,45 @@ export default function EditProfile({ user, loggedInUser }) {
       website,
       dob,
     };
-
-    fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(editedInfo),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Profile updated successfully", data);
-        setOpen(false);
-      })
-      .catch((error) => {
-        console.error("Error updating profile:", error);
-      });
+    if (user?.email) {
+      fetch(
+        `https://twitter-cxhu.onrender.com/userUpdates?email=${user?.email}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editedInfo),
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Profile updated successfully", data);
+          setOpen(false);
+        })
+        .catch((error) => {
+          console.error("Error updating profile:", error);
+        });
+    } else {
+      fetch(
+        `https://twitter-cxhu.onrender.com/userUpdates?email=${user?.email}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editedInfo),
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Profile updated successfully", data);
+          setOpen(false);
+        })
+        .catch((error) => {
+          console.error("Error updating profile:", error);
+        });
+    }
   };
 
   return (
