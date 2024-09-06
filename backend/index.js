@@ -324,47 +324,45 @@ async function run() {
     });
 
     // patch
-    app.patch("/userUpdates/:email", async (req, res) => {
-      const filter = req.params;
-      const profile = req.body;
+    // Combine both routes into one and handle updates by email or phoneNumber
+    app.patch("/userUpdates/:identifier", async (req, res) => {
+      const { identifier } = req.params;
+      const profileUpdates = req.body;
       const options = { upsert: false };
-      const updateDoc = { $set: profile };
+
+      // Determine if the identifier is an email or phoneNumber
+      const filter = identifier.includes("@")
+        ? { email: identifier }
+        : { phoneNumber: identifier };
 
       try {
+        // Fetch the existing user data
+        const existingUser = await userCollection.findOne(filter);
+
+        if (!existingUser) {
+          return res
+            .status(404)
+            .send({ message: "User not found, no document updated" });
+        }
+
+        // Merge existing user data with the incoming updates
+        const updatedProfile = { ...existingUser, ...profileUpdates };
+
+        // Update the user document with the merged data
+        const updateDoc = { $set: updatedProfile };
+
         const result = await userCollection.updateOne(
           filter,
           updateDoc,
           options
         );
-        if (result.matchedCount === 0) {
-          return res
-            .status(404)
-            .send({ message: "User not found, no document updated" });
-        }
-        console.log("Database Update Result:", result);
-        res.send(result);
-      } catch (error) {
-        console.error("Error updating user:", error);
-        res.status(500).send("Internal Server Error");
-      }
-    });
-    app.patch("/userUpdates/:phoneNumber", async (req, res) => {
-      const filter = req.params;
-      const profile = req.body;
-      const options = { upsert: true };
-      const updateDoc = { $set: profile };
 
-      try {
-        const result = await userCollection.updateOne(
-          filter,
-          updateDoc,
-          options
-        );
         if (result.matchedCount === 0) {
           return res
             .status(404)
             .send({ message: "User not found, no document updated" });
         }
+
         console.log("Database Update Result:", result);
         res.send(result);
       } catch (error) {
