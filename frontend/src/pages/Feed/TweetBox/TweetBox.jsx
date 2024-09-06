@@ -33,7 +33,10 @@ function TweetBox() {
   const userProfilePic =
     loggedInUser[0]?.profileImage ||
     "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
-  const username = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
+  const username =
+    loggedInUser[0]?.username || user.email
+      ? user?.email?.split("@")[0]
+      : user.phoneNumber;
 
   useEffect(() => {
     const checkAudioUploadTime = () => {

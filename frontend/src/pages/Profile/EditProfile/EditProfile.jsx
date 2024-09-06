@@ -75,6 +75,7 @@ function EditChild({ dob, setDob }) {
 
 export default function EditProfile({ user, loggedInUser }) {
   const [name, setName] = React.useState("");
+  const [username, setUsername] = React.useState("");
   const [bio, setBio] = React.useState("");
   const [location, setLocation] = React.useState("");
   const [website, setWebsite] = React.useState("");
@@ -86,6 +87,7 @@ export default function EditProfile({ user, loggedInUser }) {
     // Only include fields that are not empty
     const editedInfo = {
       ...(name && { name }),
+      ...(username && { username }),
       ...(bio && { bio }),
       ...(location && { location }),
       ...(website && { website }),
@@ -150,10 +152,20 @@ export default function EditProfile({ user, loggedInUser }) {
               label={t("Name")}
               id="fullWidth"
               variant="filled"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
               defaultValue={loggedInUser[0]?.name ? loggedInUser[0].name : ""}
             />
-
+            <TextField
+              className="text-field"
+              fullWidth
+              label={t("Username")}
+              id="fullWidth"
+              variant="filled"
+              onChange={(e) => setName(e.target.value)}
+              defaultValue={
+                loggedInUser[0]?.username ? loggedInUser[0].username : ""
+              }
+            />
             <TextField
               className="text-field"
               fullWidth

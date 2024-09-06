@@ -17,7 +17,10 @@ function MainProfile({ user }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [loggedInUser] = useLoggedInUser();
-  const username = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
+  const username =
+    loggedInUser[0]?.username || user.email
+      ? user?.email?.split("@")[0]
+      : user.phoneNumber;
   const [posts, setPosts] = useState([]);
   useEffect(() => {
     if (user?.email) {

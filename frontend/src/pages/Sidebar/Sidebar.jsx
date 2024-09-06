@@ -40,7 +40,10 @@ function Sidebar({ handleLogout, user }) {
     setAnchorEl(null);
   };
 
-  const result = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
+  const result =
+    loggedInUser[0]?.username || user.email
+      ? user?.email?.split("@")[0]
+      : user.phoneNumber;
   const phoneNumber = user?.phoneNumber;
 
   return (
