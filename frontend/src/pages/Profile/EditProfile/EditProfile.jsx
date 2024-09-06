@@ -75,62 +75,37 @@ function EditChild({ dob, setDob }) {
 
 export default function EditProfile({ user, loggedInUser }) {
   const [name, setName] = React.useState("");
-  const [username, setUserName] = React.useState("");
   const [bio, setBio] = React.useState("");
   const [location, setLocation] = React.useState("");
   const [website, setWebsite] = React.useState("");
   const [open, setOpen] = React.useState(false);
   const [dob, setDob] = React.useState("");
   const { t } = useTranslation("translations");
-
+  const identifier = user?.email ? user?.email : user?.phoneNumber;
   const HandleSave = () => {
     const editedInfo = {
       name,
-      username,
       bio,
       location,
       website,
       dob,
     };
-    if (user?.email) {
-      fetch(
-        `https://twitter-cxhu.onrender.com/userUpdates?email=${user?.email}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editedInfo),
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Profile updated successfully", data);
-          setOpen(false);
-        })
-        .catch((error) => {
-          console.error("Error updating profile:", error);
-        });
-    } else {
-      fetch(
-        `https://twitter-cxhu.onrender.com/userUpdates?email=${user?.email}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editedInfo),
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Profile updated successfully", data);
-          setOpen(false);
-        })
-        .catch((error) => {
-          console.error("Error updating profile:", error);
-        });
-    }
+
+    fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editedInfo),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Profile updated successfully", data);
+        setOpen(false);
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
+      });
   };
 
   return (
@@ -171,17 +146,7 @@ export default function EditProfile({ user, loggedInUser }) {
               onChange={(e) => setName(e.target.value)}
               defaultValue={loggedInUser[0]?.name ? loggedInUser[0].name : ""}
             />
-            <TextField
-              className="text-field"
-              fullWidth
-              label={t("Username")}
-              id="fullWidth"
-              variant="filled"
-              onChange={(e) => setUserName(e.target.value)}
-              defaultValue={
-                loggedInUser[0]?.username ? loggedInUser[0].username : ""
-              }
-            />
+
             <TextField
               className="text-field"
               fullWidth

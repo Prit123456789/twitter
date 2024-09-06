@@ -49,81 +49,41 @@ function MainProfile({ user }) {
 
     const formData = new FormData();
     formData.set("image", image);
-    if (user?.email) {
-      axios
-        .post(
-          "https://api.imgbb.com/1/upload?key=5ccca74448be7fb4c1a7baebca13e0d2",
-          formData
-        )
-        .then((res) => {
-          const url = res.data.data.display_url;
-          const userCoverImage = {
-            coverImage: url,
-          };
-          setIsLoading(false);
 
-          if (url) {
-            fetch(
-              `https://twitter-cxhu.onrender.com/userUpdates?email=${user?.email}`,
-              {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userCoverImage),
-              }
-            )
-              .then((res) => res.json())
-              .then((data) => {
-                console.log("Cover image updated successfully", data);
-              })
-              .catch((error) => {
-                console.error("Error updating cover image:", error);
-              });
-          }
-        })
-        .catch((error) => {
-          console.error("Error uploading cover image:", error);
-          setIsLoading(false);
-        });
-    } else {
-      axios
-        .post(
-          "https://api.imgbb.com/1/upload?key=5ccca74448be7fb4c1a7baebca13e0d2",
-          formData
-        )
-        .then((res) => {
-          const url = res.data.data.display_url;
-          const userCoverImage = {
-            coverImage: url,
-          };
-          setIsLoading(false);
+    axios
+      .post(
+        "https://api.imgbb.com/1/upload?key=5ccca74448be7fb4c1a7baebca13e0d2",
+        formData
+      )
+      .then((res) => {
+        const url = res.data.data.display_url;
+        const identifier = user?.email ? user?.email : user?.phoneNumber;
+        const userCoverImage = {
+          coverImage: url,
+        };
+        setIsLoading(false);
 
-          if (url) {
-            fetch(
-              `https://twitter-cxhu.onrender.com/userUpdates?phoneNumber=${user?.phoneNumber}`,
-              {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userCoverImage),
-              }
-            )
-              .then((res) => res.json())
-              .then((data) => {
-                console.log("Cover image updated successfully", data);
-              })
-              .catch((error) => {
-                console.error("Error updating cover image:", error);
-              });
-          }
-        })
-        .catch((error) => {
-          console.error("Error uploading cover image:", error);
-          setIsLoading(false);
-        });
-    }
+        if (url) {
+          fetch(`https://twitter-cxhu.onrender.com/userUpdates/${identifier}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userCoverImage),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log("Cover image updated successfully", data);
+            })
+            .catch((error) => {
+              console.error("Error updating cover image:", error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error("Error uploading cover image:", error);
+        setIsLoading(false);
+      });
   };
 
   const handleUploadProfileImage = (e) => {
