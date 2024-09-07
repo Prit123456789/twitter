@@ -200,23 +200,9 @@ async function run() {
 
     // post
     app.post("/register", async (req, res) => {
-      const { username, phoneNumber, name, email } = req.body.user; // Ensure req.body.user is correctly structured
-      let newUser = { username, name };
-
-      if (email) {
-        newUser.email = email;
-      }
-
-      if (phoneNumber) {
-        newUser.phoneNumber = phoneNumber;
-      }
-
-      try {
-        const result = await userCollection.insertOne(newUser); // Use insertOne() to insert the user document
-        res.send(result);
-      } catch (error) {
-        res.status(500).send({ message: "Error registering user", error });
-      }
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
     });
 
     //POSTS
