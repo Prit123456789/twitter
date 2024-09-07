@@ -132,25 +132,8 @@ async function run() {
     });
 
     app.get("/user", async (req, res) => {
-      const { email, phoneNumber } = req.query; // Use req.query instead of req.body for GET requests
-      let query = {};
-
-      if (email) {
-        query.email = email;
-      } else if (phoneNumber) {
-        query.phoneNumber = phoneNumber;
-      }
-
-      try {
-        const user = await userCollection.findOne(query); // Use findOne() if you expect a single user
-        if (user) {
-          res.send(user);
-        } else {
-          res.status(404).send({ message: "User not found" });
-        }
-      } catch (error) {
-        res.status(500).send({ message: "Error fetching user", error });
-      }
+      const user = await userCollection.find().toArray();
+      res.send(user);
     });
 
     app.get("/loggedInUser", async (req, res) => {
