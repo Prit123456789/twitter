@@ -195,11 +195,11 @@ async function run() {
     // post
     app.post("/register", async (req, res) => {
       const { username, phoneNumber, name, email } = req.body.user;
+      const query = email ? email : phoneNumber;
       const result = await userCollection.create({
         username,
-        phoneNumber,
+        query,
         name,
-        email,
       });
       res.send(result);
     });
