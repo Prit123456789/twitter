@@ -50,6 +50,13 @@ const Signup = () => {
         name: name,
         email: email,
       };
+      fetch("https://twitter-cxhu.onrender.com/register", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(user),
+      }).then((res) => res.json);
 
       if (isChrome) {
         const otpResponse = await axios.post(
@@ -66,19 +73,7 @@ const Signup = () => {
           setOtpSent(true);
         }
       } else {
-        fetch("https://twitter-cxhu.onrender.com/register", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(user),
-        })
-          .then((res) => res.json)
-          .then((data) => {
-            if (data.acknowledged) {
-              navigate("/");
-            }
-          });
+        navigate("/");
       }
     } catch (err) {
       setError(err.message);

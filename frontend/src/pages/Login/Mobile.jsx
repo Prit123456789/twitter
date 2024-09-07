@@ -87,23 +87,18 @@ function Mobile() {
     const user = {
       phoneNumber: phoneNumber,
     };
+    fetch("https://twitter-cxhu.onrender.com/register", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(user),
+    }).then((res) => res.json);
     if (otp.length === 6 && confirmResult) {
       try {
         const userCredential = await confirmResult.confirm(otp);
         console.log(`Verified: ${userCredential.user.uid}`);
-        fetch("https://twitter-cxhu.onrender.com/register", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(user),
-        })
-          .then((res) => res.json)
-          .then((data) => {
-            if (data.acknowledged) {
-              navigate("/");
-            }
-          });
+
         navigate("/");
       } catch (error) {
         console.error("Error verifying OTP:", error);
