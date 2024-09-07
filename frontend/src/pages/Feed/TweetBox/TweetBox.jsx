@@ -172,21 +172,44 @@ function TweetBox() {
   };
 
   // Verify OTP
+
+  // Verify OTP
   const verifyOtp = async () => {
+    const emailForOtp = email || enteredEmail;
+
+    if (!emailForOtp) {
+      alert("Please provide an email address to verify OTP.");
+      return;
+    }
+
+    console.log(
+      "Attempting to verify OTP for:",
+      emailForOtp,
+      "with OTP:",
+      otp.trim()
+    );
+
     try {
       const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-otp",
+        "https://twitter-cxhu.onrender.com/verify-email-otp",
         {
-          email: enteredEmail,
-          otp,
+          email: emailForOtp,
+          otp: otp.trim(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
+
+      console.log("Response from OTP verification:", response.data);
 
       if (response.data.success) {
         setOtpVerified(true);
         alert("OTP verified successfully");
       } else {
-        alert("Invalid OTP. Please try again.");
+        alert(response.data.error || "Invalid OTP. Please try again.");
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -198,38 +221,48 @@ function TweetBox() {
   const handleStartRecording = async () => {
     const emailForOtp = email || enteredEmail;
 
-    if (!otpSent && phoneNumber && emailForOtp) {
+    console.log("Checking conditions for starting recording");
+    console.log("OTP Sent:", otpSent);
+    console.log("OTP Verified:", otpVerified);
+    console.log("Is Audio Upload Allowed:", isAudioUploadAllowed);
+    console.log("Phone Number:", phoneNumber);
+    console.log("Email or Entered Email:", emailForOtp);
+
+    // If OTP has not been sent, send it first
+    if (!otpSent && emailForOtp) {
       await sendOtp(emailForOtp);
     } else if (otpVerified && isAudioUploadAllowed) {
-      if (!recorderRef.current) {
-        // Request microphone access and start recording
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-          });
-          recorderRef.current = new RecordRTC(stream, {
-            type: "audio",
-            mimeType: "audio/mp3",
-            recorderType: RecordRTC.MediaStreamRecorder,
-            timeSlice: 1000, // Optional: interval in ms to get Blob URL
-            ondataavailable: (blob) => {
-              setAudioBlob(blob);
-            },
-          });
-          recorderRef.current.startRecording();
-          setIsRecording(true);
-        } catch (error) {
-          console.error("Error accessing microphone:", error);
-          alert("Microphone access is required to record audio.");
-        }
-      } else if (recorderRef.current) {
-        recorderRef.current.startRecording();
-        setIsRecording(true);
-      }
-    } else if (!otpVerified && phoneNumber) {
+      // Start recording only if OTP is verified and within allowed hours
+      startRecording();
+    } else if (!otpVerified) {
       alert("Please verify the OTP before starting recording.");
     } else if (!isAudioUploadAllowed) {
       alert("Audio uploads are only allowed between 2 PM and 7 PM IST.");
+    }
+  };
+
+  const startRecording = async () => {
+    if (!recorderRef.current) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        recorderRef.current = new RecordRTC(stream, {
+          type: "audio",
+          mimeType: "audio/mp3",
+          recorderType: RecordRTC.MediaStreamRecorder,
+          timeSlice: 1000,
+          ondataavailable: (blob) => {
+            setAudioBlob(blob);
+          },
+        });
+        recorderRef.current.startRecording();
+        setIsRecording(true);
+        console.log("Recording started successfully");
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+        alert("Microphone access is required to record audio.");
+      }
     }
   };
 
@@ -294,10 +327,10 @@ function TweetBox() {
             type="submit"
             className="tweetBox__tweetButton"
             disabled={!post && !imageURL && !audioBlob}>
-            {t("Tweet")}
+            Tweet
           </Button>
         </div>
-        {!email && (
+        {!email && isLoading && (
           <>
             <input
               placeholder={t("Enter Email")}
@@ -316,8 +349,11 @@ function TweetBox() {
             <input
               placeholder={t("Enter OTP")}
               className="email"
+              type="text"
               value={otp}
+              maxLength={4}
               onChange={(e) => setOtp(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && verifyOtp()}
               required
             />
             <button onClick={verifyOtp} className="otp-btn">

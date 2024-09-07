@@ -450,7 +450,7 @@ async function run() {
         if (!storedOtp || storedOtp.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
 
-        const otpExpiry = 5 * 60 * 1000;
+        const otpExpiry = 2 * 60 * 1000;
         if (Date.now() - new Date(storedOtp.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
 
