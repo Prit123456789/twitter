@@ -53,12 +53,17 @@ function isWithinTimeframe(startHour, endHour) {
   return currentHour >= startHour && currentHour < endHour;
 }
 // Apply the middleware to all routes or specific routes
-function isWithinTimeframe(startHour, endHour) {
-  const currentHour = new Date()
-    .toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    .getHours();
-  return currentHour >= startHour && currentHour < endHour;
-}
+const isWithinTimeframe = () => {
+  const currentTime = new Date();
+  const currentHour = currentTime.getHours(); // Get the hour directly from the Date object
+
+  // Alternatively, if you need the hour in IST specifically:
+  const options = { timeZone: "Asia/Kolkata" };
+  const currentHourIST = new Date().toLocaleString("en-US", options);
+  const hour = new Date(currentHourIST).getHours(); // Correctly parse the hour in IST
+
+  // Continue with your time comparison logic
+};
 
 function enforceMobileTimeRestrictions(req, res, next) {
   if (req.device.type === "mobile" && !isWithinTimeframe(10, 13)) {
@@ -143,8 +148,17 @@ async function run() {
       } else if (phoneNumber) {
         query.phoneNumber = phoneNumber;
       }
-      const user = await userCollection.find(query).toArray();
-      res.send(user);
+
+      try {
+        const user = await userCollection.findOne(query);
+        if (user) {
+          res.send(user);
+        } else {
+          res.status(404).send({ message: "User not found" });
+        }
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching user", error });
+      }
     });
 
     app.get("/loggedInUser", async (req, res) => {
@@ -195,13 +209,22 @@ async function run() {
     // post
     app.post("/register", async (req, res) => {
       const { username, phoneNumber, name, email } = req.body.user;
-      const query = email ? email : phoneNumber;
-      const result = await userCollection.create({
-        username,
-        query,
-        name,
-      });
-      res.send(result);
+      let newUser = { username, name };
+
+      if (email) {
+        newUser.email = email;
+      }
+
+      if (phoneNumber) {
+        newUser.phoneNumber = phoneNumber;
+      }
+
+      try {
+        const result = await userCollection.insertOne(newUser);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error registering user", error });
+      }
     });
 
     //POSTS
