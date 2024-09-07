@@ -44,14 +44,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
-// Helper function to check if current time is within allowed timeframe
-function isWithinTimeframe(startHour, endHour) {
-  const currentTime = new Date().toLocaleString("en-US", {
-    timeZone: "Asia/Kolkata",
-  });
-  const currentHour = new Date(currentTime).getHours();
-  return currentHour >= startHour && currentHour < endHour;
-}
 // Apply the middleware to all routes or specific routes
 const isWithinTimeframe = () => {
   const currentTime = new Date();
@@ -140,8 +132,25 @@ async function run() {
     });
 
     app.get("/user", async (req, res) => {
-      const user = await userCollection.find().toArray();
-      res.send(user);
+      const { email, phoneNumber } = req.query; // Use req.query instead of req.body for GET requests
+      let query = {};
+
+      if (email) {
+        query.email = email;
+      } else if (phoneNumber) {
+        query.phoneNumber = phoneNumber;
+      }
+
+      try {
+        const user = await userCollection.findOne(query); // Use findOne() if you expect a single user
+        if (user) {
+          res.send(user);
+        } else {
+          res.status(404).send({ message: "User not found" });
+        }
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching user", error });
+      }
     });
 
     app.get("/loggedInUser", async (req, res) => {
@@ -191,9 +200,23 @@ async function run() {
 
     // post
     app.post("/register", async (req, res) => {
-      const user = req.body;
-      const result = await userCollection.insertOne(user);
-      res.send(result);
+      const { username, phoneNumber, name, email } = req.body.user; // Ensure req.body.user is correctly structured
+      let newUser = { username, name };
+
+      if (email) {
+        newUser.email = email;
+      }
+
+      if (phoneNumber) {
+        newUser.phoneNumber = phoneNumber;
+      }
+
+      try {
+        const result = await userCollection.insertOne(newUser); // Use insertOne() to insert the user document
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error registering user", error });
+      }
     });
 
     //POSTS
