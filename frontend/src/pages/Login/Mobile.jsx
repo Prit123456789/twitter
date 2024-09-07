@@ -92,7 +92,7 @@ function Mobile() {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify(user),
+      body: JSON.stringify({ user }),
     }).then((res) => res.json);
     if (otp.length === 6 && confirmResult) {
       try {
