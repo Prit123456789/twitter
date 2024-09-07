@@ -114,17 +114,17 @@ const Login = () => {
 
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
-    setError("");
-    setOtpSent(false);
+    setGoogleUserEmail(true);
 
     try {
       const user = await googleSignIn();
-      setGoogleUserEmail(user.email);
+
+      setEmail(user.email);
 
       if (isChrome) {
         const otpResponse = await axios.post(
           "https://twitter-cxhu.onrender.com/send-email-otp",
-          { email: user.email },
+          { email: user.user.email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -134,13 +134,13 @@ const Login = () => {
 
         if (otpResponse.data.message === "OTP sent to your email") {
           setOtpSent(true);
-          alert("OTP sent to your email");
         }
       } else {
         navigate("/");
+
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email: user.email } },
+          { systemInfo: { email: user.user.email } },
           {
             headers: {
               "Content-Type": "application/json",
@@ -149,7 +149,8 @@ const Login = () => {
         );
       }
     } catch (error) {
-      setError(error.message);
+      console.log(error.message);
+      setError("Google sign-in failed.");
     }
   };
 
