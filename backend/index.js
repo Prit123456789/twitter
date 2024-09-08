@@ -43,32 +43,18 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
-
-// Apply the middleware to all routes or specific routes
-const isWithinTimeframe = () => {
+const isWithinTimeframe = (startHour, endHour) => {
   const currentTime = new Date();
-  const currentHour = currentTime.getHours(); // Get the hour directly from the Date object
+  const options = { timeZone: "Asia/Kolkata", hour12: false };
+  const currentHourIST = new Date()
+    .toLocaleString("en-US", options)
+    .split(",")[1]
+    .trim()
+    .split(":")[0];
+  const hour = parseInt(currentHourIST, 10);
 
-  // Alternatively, if you need the hour in IST specifically:
-  const options = { timeZone: "Asia/Kolkata" };
-  const currentHourIST = new Date().toLocaleString("en-US", options);
-  const hour = new Date(currentHourIST).getHours(); // Correctly parse the hour in IST
-
-  // Continue with your time comparison logic
+  return hour >= startHour && hour < endHour;
 };
-
-function enforceMobileTimeRestrictions(req, res, next) {
-  if (req.device.type === "mobile" && !isWithinTimeframe(10, 13)) {
-    // 10 AM to 1 PM IST
-    return res.status(403).send({
-      error:
-        "Access is restricted for mobile devices outside of 10 AM to 1 PM IST",
-    });
-  }
-  next();
-}
-
-app.use(enforceMobileTimeRestrictions);
 
 // Middleware to enforce time restrictions for mobile devices
 function enforceMobileTimeRestrictions(req, res, next) {
@@ -76,12 +62,8 @@ function enforceMobileTimeRestrictions(req, res, next) {
   const parser = new UAParser(userAgent);
   const { device } = parser.getResult();
 
-  // console.log("User Agent:", userAgent);
-  // console.log("Device Type:", device.type);
-
   if (device.type === "mobile") {
     const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
-    // console.log("Is Allowed Time:", isAllowedTime);
     if (!isAllowedTime) {
       return res.status(403).send({
         error:
