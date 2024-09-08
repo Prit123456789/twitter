@@ -63,7 +63,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { email: email, name: name, username: username },
+          { email, name, username },
           {
             headers: {
               "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { email: user.user.email, name: name, username: username },
+          { email: user.user.email, name, username },
           {
             headers: {
               "Content-Type": "application/json",

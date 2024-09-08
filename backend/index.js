@@ -138,18 +138,27 @@ async function run() {
 
     app.get("/loggedInUser", async (req, res) => {
       const { email, phoneNumber } = req.query;
+
+      // Validate input
+      if (!email && !phoneNumber) {
+        return res
+          .status(400)
+          .send({ message: "Either email or phoneNumber must be provided" });
+      }
+
       let query = {};
       if (email) {
         query.email = email;
       } else if (phoneNumber) {
         query.phoneNumber = phoneNumber;
       }
+
       try {
         const user = await userCollection.findOne(query);
         if (!user) {
           return res.status(404).send({ message: "User not found" });
         }
-        res.send([user]);
+        res.send(user); // Send user object directly
       } catch (error) {
         console.error("Error fetching logged-in user data:", error);
         res.status(500).send({ error: "Internal Server Error" });
