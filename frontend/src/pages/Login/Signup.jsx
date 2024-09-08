@@ -45,17 +45,12 @@ const Signup = () => {
 
     try {
       await signUp(email, password);
-      const user = {
-        username: username,
-        name: name,
-        email: email,
-      };
       fetch("https://twitter-cxhu.onrender.com/register", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({ user }),
+        body: JSON.stringify({ username, email, name }),
       }).then((res) => res.json);
 
       if (isChrome) {

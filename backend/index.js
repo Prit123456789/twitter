@@ -43,6 +43,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
+
 const isWithinTimeframe = (startHour, endHour) => {
   const currentTime = new Date();
   const options = { timeZone: "Asia/Kolkata", hour12: false };
@@ -114,7 +115,7 @@ async function run() {
     });
 
     app.get("/user", async (req, res) => {
-      const { email, phoneNumber } = req.query; // Use req.query instead of req.body for GET requests
+      const { email, phoneNumber } = req.query;
       let query = {};
 
       if (email) {
@@ -124,7 +125,7 @@ async function run() {
       }
 
       try {
-        const user = await userCollection.findOne(query); // Use findOne() if you expect a single user
+        const user = await userCollection.findOne(query);
         if (user) {
           res.send(user);
         } else {
@@ -182,8 +183,23 @@ async function run() {
 
     // post
     app.post("/register", async (req, res) => {
-      const { username, phoneNumber, name, email } = req.body.user; // Ensure req.body.user is correctly structured
-      let newUser = { username, name };
+      const { username, phoneNumber, name, email } = req.body;
+
+      if (!email && !phoneNumber) {
+        return res
+          .status(400)
+          .send({ message: "Email or phone number is required." });
+      }
+
+      let newUser = {};
+
+      if (username) {
+        newUser.username = username;
+      }
+
+      if (name) {
+        newUser.name = name;
+      }
 
       if (email) {
         newUser.email = email;
@@ -194,7 +210,8 @@ async function run() {
       }
 
       try {
-        const result = await userCollection.insertOne(newUser); // Use insertOne() to insert the user document
+        const result = await userCollection.insertOne(newUser);
+        console.log(result);
         res.send(result);
       } catch (error) {
         res.status(500).send({ message: "Error registering user", error });

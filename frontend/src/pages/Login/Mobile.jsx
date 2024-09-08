@@ -84,15 +84,13 @@ function Mobile() {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    const user = {
-      phoneNumber: phoneNumber,
-    };
+
     fetch("https://twitter-cxhu.onrender.com/register", {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ user }),
+      body: JSON.stringify({ phoneNumber }),
     }).then((res) => res.json);
     if (otp.length === 6 && confirmResult) {
       try {

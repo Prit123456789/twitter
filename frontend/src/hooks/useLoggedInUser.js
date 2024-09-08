@@ -31,7 +31,7 @@ const useLoggedInUser = () => {
     if (email || phoneNumber) {
       fetchLoggedInUser();
     }
-  }, [email, phoneNumber]);
+  }, [email, phoneNumber, loggedInUser]);
 
   return [loggedInUser, setLoggedInUser];
 };
