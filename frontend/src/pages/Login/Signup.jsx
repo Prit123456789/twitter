@@ -10,15 +10,15 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import "./Login.css";
 
 const Signup = () => {
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
+  const [username, setUsername] = useState(""); // Initialize with empty string
+  const [name, setName] = useState(""); // Initialize with empty string
+  const [email, setEmail] = useState(""); // Initialize with empty string
+  const [password, setPassword] = useState(""); // Initialize with empty string
+  const [otp, setOtp] = useState(""); // Initialize with empty string
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isChrome, setIsChrome] = useState(false);
-  const [isGoogleSignUp, setIsGoogleSignUp] = useState(false);
+  const [isGoogleSignUp, setIsGoogleSignUp] = useState(false); // Initialize with false
   const { t } = useTranslation("translations");
   const { signUp, googleSignIn } = useUserAuth();
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { email, name, username },
+          { email: email, name: name, username: username },
           {
             headers: {
               "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { email: user.user.email, name, username },
+          { email: user.user.email, name: name, username: username },
           {
             headers: {
               "Content-Type": "application/json",
@@ -228,6 +228,7 @@ const Signup = () => {
                 className="otp-field"
                 type="text"
                 placeholder={t("Enter OTP")}
+                value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
               <button type="button" className="otp" onClick={handleVerify}>

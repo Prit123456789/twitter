@@ -182,43 +182,61 @@ async function run() {
     });
 
     // post
+    // Main registration route: handles email, username, and name
     app.post("/register", async (req, res) => {
-      const { username, phoneNumber, name, email } = req.body;
+      const { username, name, email } = req.body;
 
-      if (!email && !phoneNumber) {
+      // Validate required fields
+      if (!email || !username || !name) {
         return res
           .status(400)
-          .send({ message: "Email or phone number is required." });
+          .send({ message: "Email, username, and name are required." });
       }
 
-      let newUser = {};
-
-      if (username) {
-        newUser.username = username;
-      }
-
-      if (name) {
-        newUser.name = name;
-      }
-
-      if (email) {
-        newUser.email = email;
-      }
-
-      if (phoneNumber) {
-        newUser.phoneNumber = phoneNumber;
-      }
+      // Create the newUser object with required fields
+      const newUser = { username, name, email };
 
       try {
-        const existingUser = await userCollection.findOne({
-          $or: [{ email }, { phoneNumber }],
-        });
+        // Check for existing user by email
+        const existingUser = await userCollection.findOne({ email });
+
         if (existingUser) {
           return res.status(400).send({ message: "User already exists." });
         }
+
+        // Insert the new user into the database
         const result = await userCollection.insertOne(newUser);
-        console.log(result);
-        res.send(result);
+        res.status(201).send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error registering user", error });
+      }
+    });
+
+    // Phone number registration route: handles phone number only
+    app.post("/register-phone", async (req, res) => {
+      const { phoneNumber } = req.body;
+
+      // Validate required field
+      if (!phoneNumber) {
+        return res
+          .status(400)
+          .send({ message: "Phone number is required for this registration." });
+      }
+
+      try {
+        // Check for existing user by phoneNumber
+        const existingUser = await userCollection.findOne({ phoneNumber });
+
+        if (existingUser) {
+          return res.status(400).send({ message: "User already exists." });
+        }
+
+        // Create the newUser object with only phoneNumber
+        const newUser = { phoneNumber };
+
+        // Insert the new user into the database
+        const result = await userCollection.insertOne(newUser);
+        res.status(201).send(result);
       } catch (error) {
         res.status(500).send({ message: "Error registering user", error });
       }

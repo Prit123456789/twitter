@@ -79,7 +79,7 @@ const Login = () => {
     try {
       const response = await axios.post(
         "https://twitter-cxhu.onrender.com/verify-email-otp",
-        { email: googleUserEmail || email, otp },
+        { email: email, otp },
         {
           headers: {
             "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const Login = () => {
         navigate("/");
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email: googleUserEmail || email } },
+          { systemInfo: { email: email } },
           {
             headers: {
               "Content-Type": "application/json",
@@ -119,7 +119,7 @@ const Login = () => {
     try {
       const user = await googleSignIn();
 
-      setEmail(user.email);
+      setEmail(user.user.email);
 
       if (isChrome) {
         const otpResponse = await axios.post(

@@ -85,13 +85,15 @@ function Mobile() {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
-    fetch("https://twitter-cxhu.onrender.com/register", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ phoneNumber }),
-    }).then((res) => res.json);
+    await axios.post(
+      "https://twitter-cxhu.onrender.com/register-phone",
+      { phoneNumber },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     if (otp.length === 6 && confirmResult) {
       try {
         const userCredential = await confirmResult.confirm(otp);
