@@ -210,6 +210,12 @@ async function run() {
       }
 
       try {
+        const existingUser = await userCollection.findOne({
+          $or: [{ email }, { phoneNumber }],
+        });
+        if (existingUser) {
+          return res.status(400).send({ message: "User already exists." });
+        }
         const result = await userCollection.insertOne(newUser);
         console.log(result);
         res.send(result);

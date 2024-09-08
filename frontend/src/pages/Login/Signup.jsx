@@ -45,13 +45,6 @@ const Signup = () => {
 
     try {
       await signUp(email, password);
-      fetch("https://twitter-cxhu.onrender.com/register", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ username, email, name }),
-      }).then((res) => res.json);
 
       if (isChrome) {
         const otpResponse = await axios.post(
@@ -68,6 +61,15 @@ const Signup = () => {
           setOtpSent(true);
         }
       } else {
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/register",
+          { email, name, username },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         navigate("/");
       }
     } catch (err) {
@@ -99,6 +101,15 @@ const Signup = () => {
           setOtpSent(true);
         }
       } else {
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/register",
+          { email: user.user.email, name, username },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         navigate("/");
 
         await axios.post(
@@ -132,6 +143,15 @@ const Signup = () => {
       );
 
       if (response.status === 200) {
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/register",
+          { email, name, username },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         navigate("/");
 
         await axios.post(
