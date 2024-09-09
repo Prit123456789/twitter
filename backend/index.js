@@ -5,6 +5,7 @@ const app = express();
 const UAParser = require("ua-parser-js");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
+const { mongoose } = require("mongoose");
 const sgMail = require("@sendgrid/mail");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
@@ -131,14 +132,12 @@ async function run() {
     });
     app.post("/register", async (req, res) => {
       const { username, phoneNumber, name, email } = req.body.user;
-      const result = await userCollection
-        .insertOne({
-          username,
-          phoneNumber,
-          name,
-          email,
-        })
-        .toArray();
+      const result = await userCollection.insertOne({
+        username,
+        phoneNumber,
+        name,
+        email,
+      });
       res.send(result);
     });
     //POSTS
