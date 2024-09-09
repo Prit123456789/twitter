@@ -32,7 +32,7 @@ const TimeRestrictedComponent = ({ children }) => {
   if (!isAllowed) {
     return (
       <div>
-        Access is restricted for mobile devices outside of 2 PM to 7 PM IST.
+        Access is restricted for mobile devices outside of 10 AM to 1 PM IST.
       </div>
     );
   }

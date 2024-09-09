@@ -8,28 +8,29 @@ const useLoggedInUser = () => {
   const [loggedInUser, setLoggedInUser] = useState({});
 
   useEffect(() => {
-    if (!phoneNumber) {
-      fetch(
-        `https://twitter-cxhu.onrender.com/loggedInUser?email=${encodeURIComponent(
-          email
-        )}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          setLoggedInUser(data);
-        });
-    } else {
-      fetch(
-        `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${encodeURIComponent(
-          phoneNumber
-        )}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          setLoggedInUser(data);
-        });
+    const fetchLoggedInUser = async () => {
+      try {
+        const identifier = email || phoneNumber.replace("+", "");
+
+        const response = await fetch(
+          `https://twitter-cxhu.onrender.com/loggedInUser/${identifier}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+
+        const data = await response.json();
+        setLoggedInUser(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    if (email || phoneNumber) {
+      fetchLoggedInUser();
     }
-  }, [email, phoneNumber, loggedInUser]);
+  }, [email, phoneNumber]);
 
   return [loggedInUser, setLoggedInUser];
 };
