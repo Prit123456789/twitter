@@ -9,16 +9,19 @@ const useLoggedInUser = () => {
 
   useEffect(() => {
     if (!phoneNumber) {
-      fetch(`https://twitter-cxhu.onrender.com/loggedInUser?email=${email}`)
+      fetch(
+        `https://twitter-cxhu.onrender.com/loggedInUser?email=${encodeURIComponent(
+          email
+        )}`
+      )
         .then((res) => res.json())
         .then((data) => {
           setLoggedInUser(data);
         });
     } else {
       fetch(
-        `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${phoneNumber.value(
-          "+",
-          ""
+        `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${encodeURIComponent(
+          phoneNumber
         )}`
       )
         .then((res) => res.json())
