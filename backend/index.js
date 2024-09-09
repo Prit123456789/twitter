@@ -147,14 +147,14 @@ async function run() {
 
       try {
         // Check for existing user by email
-        const existingUser = await userCollection.findOne({ email });
+        const existingUser = await userCollection.find({ email });
 
         if (existingUser) {
           return res.status(400).send({ message: "User already exists." });
         }
 
         // Insert the new user into the database
-        const result = await userCollection.insertOne(newUser);
+        const result = await userCollection.create(newUser);
         res.status(201).send(result);
       } catch (error) {
         res.status(500).send({ message: "Error registering user", error });
@@ -184,7 +184,7 @@ async function run() {
         const newUser = { phoneNumber };
 
         // Insert the new user into the database
-        const result = await userCollection.insertOne(newUser);
+        const result = await userCollection.create(newUser);
         res.status(201).send(result);
       } catch (error) {
         res.status(500).send({ message: "Error registering user", error });

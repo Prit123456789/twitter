@@ -114,7 +114,7 @@ const Signup = () => {
 
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email: user.user.email } },
+          { email: user.user.email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -156,7 +156,7 @@ const Signup = () => {
 
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email } },
+          { email },
           {
             headers: {
               "Content-Type": "application/json",

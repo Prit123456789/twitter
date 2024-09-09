@@ -59,7 +59,7 @@ const Login = () => {
         navigate("/");
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email } },
+          { email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const Login = () => {
         navigate("/");
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email: googleUserEmail || email } },
+          { email: googleUserEmail || email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -140,7 +140,7 @@ const Login = () => {
 
         await axios.post(
           "https://twitter-cxhu.onrender.com/loginHistory",
-          { systemInfo: { email: user.user.email } },
+          { email: user.user.email },
           {
             headers: {
               "Content-Type": "application/json",
