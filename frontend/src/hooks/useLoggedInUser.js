@@ -3,34 +3,36 @@ import { useUserAuth } from "../context/UserAuthContext";
 
 const useLoggedInUser = () => {
   const { user } = useUserAuth();
-  const email = user?.email;
-  const phoneNumber = user?.phoneNumber;
   const [loggedInUser, setLoggedInUser] = useState({});
 
   useEffect(() => {
-    const fetchLoggedInUser = async () => {
-      try {
-        const identifier = email || phoneNumber.replace("+", "");
-
-        const response = await fetch(
-          `https://twitter-cxhu.onrender.com/loggedInUser/${identifier}`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-
-        const data = await response.json();
-        setLoggedInUser(data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    if (email || phoneNumber) {
-      fetchLoggedInUser();
+    if (user?.email) {
+      fetch(
+        `https://twitter-cxhu.onrender.com/loggedInUser?email=${user?.email}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setLoggedInUser(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user posts:", error);
+        });
+    } else if (user?.phoneNumber) {
+      fetch(
+        `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${user?.phoneNumber.replace(
+          "+",
+          ""
+        )}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setLoggedInUser(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user posts:", error);
+        });
     }
-  }, [email, phoneNumber]);
+  }, [user?.email, user?.phoneNumber]);
 
   return [loggedInUser, setLoggedInUser];
 };

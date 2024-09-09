@@ -75,7 +75,7 @@ function TweetBox() {
       ? `email=${email}`
       : `phoneNumber=${phoneNumber.replace("+", "")}`;
     const response = await fetch(
-      `https://twitter-cxhu.onrender.com/loggedInUser/${identifier}`
+      `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
     );
     const data = await response.json();
     setName(data[0]?.name);

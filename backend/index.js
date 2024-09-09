@@ -77,43 +77,31 @@ async function run() {
 
     app.get("/user", async (req, res) => {
       const { email, phoneNumber } = req.query;
-      let query = {};
 
-      if (email) {
-        query.email = email;
-      } else if (phoneNumber) {
-        query.phoneNumber = phoneNumber;
-      }
+      const query = email ? { email } : { phoneNumber };
 
       try {
-        const user = await userCollection.findOne(query);
-        if (user) {
-          res.send(user);
-        } else {
-          res.status(404).send({ message: "User not found" });
-        }
+        const posts = await userCollection.find(query).toArray();
+
+        res.send(posts.reverse());
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        res.status(500).send({ message: "Error fetching user", error });
+        console.error("Error fetching user posts:", error);
+        res.status(500).send("Internal Server Error");
       }
     });
 
-    app.get("/loggedInUser/:identifier", async (req, res) => {
-      const { identifier } = req.params;
+    app.get("/loggedInUser", async (req, res) => {
+      const { email, phoneNumber } = req.query;
 
-      // Check if the identifier is an email or phone number
-      const isEmail = identifier.includes("@");
-      let query = isEmail ? { email: identifier } : { phoneNumber: identifier };
+      const query = email ? { email } : { phoneNumber };
 
       try {
-        const user = await userCollection.findOne(query);
-        if (!user) {
-          return res.status(404).send({ message: "User not found" });
-        }
-        res.send(user);
+        const posts = await userCollection.find(query).toArray();
+
+        res.send(posts.reverse());
       } catch (error) {
-        console.error("Error fetching logged-in user data:", error);
-        res.status(500).send({ error: "Internal Server Error" });
+        console.error("Error fetching user posts:", error);
+        res.status(500).send("Internal Server Error");
       }
     });
 
