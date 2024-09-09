@@ -154,7 +154,7 @@ async function run() {
         }
 
         // Insert the new user into the database
-        const result = await userCollection.create(newUser);
+        const result = await userCollection.create(newUser).toArray();
         res.status(201).send(result);
       } catch (error) {
         res.status(500).send({ message: "Error registering user", error });
