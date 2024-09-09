@@ -20,6 +20,7 @@ import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
 import ChatBot from "./pages/ChatBot/ChatBot";
 import "./Translation/Translation";
+import TimeRestrictedComponent from "./TimeRestricted"; // Import TimeRestrictedComponent
 
 function App() {
   return (
@@ -27,39 +28,41 @@ function App() {
       <BrowserRouter>
         <UserAuthContextProvider>
           <SpeedInsights />
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }>
-              <Route index element={<Feed />} />
-            </Route>
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }>
-              <Route path="feed" element={<Feed />} />
-              <Route path="explore" element={<Explore />} />
-              <Route path="notifications" element={<Notifications />} />
-              <Route path="messages" element={<Messages />} />
-              <Route path="bookmarks" element={<Bookmarks />} />
-              <Route path="languages" element={<Languages />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="more" element={<More />} />
-              <Route path="chatbot" element={<ChatBot />} />
-            </Route>
-            <Route path="/login" element={<Login />} />
-            <Route path="/reset" element={<Reset />} />
-            <Route path="/mobile" element={<Mobile />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/maps" element={<MyMapComponent />} />
-          </Routes>
+          <TimeRestrictedComponent>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }>
+                <Route index element={<Feed />} />
+              </Route>
+              <Route
+                path="/home"
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }>
+                <Route path="feed" element={<Feed />} />
+                <Route path="explore" element={<Explore />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="messages" element={<Messages />} />
+                <Route path="bookmarks" element={<Bookmarks />} />
+                <Route path="languages" element={<Languages />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="more" element={<More />} />
+                <Route path="chatbot" element={<ChatBot />} />
+              </Route>
+              <Route path="/login" element={<Login />} />
+              <Route path="/reset" element={<Reset />} />
+              <Route path="/mobile" element={<Mobile />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/maps" element={<MyMapComponent />} />
+            </Routes>
+          </TimeRestrictedComponent>
         </UserAuthContextProvider>
       </BrowserRouter>
     </div>

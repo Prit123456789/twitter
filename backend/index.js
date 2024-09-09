@@ -23,25 +23,13 @@ cloudinary.config({
 });
 const upload = multer();
 
-app.use(cors());
-
-app.options("*", cors());
-app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "http://localhost:3000",
-    "https://twitter-seven-puce.vercel.app"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, OPTIONS"
-  );
-  next();
-});
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://twitter-seven-puce.vercel.app"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -50,38 +38,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
-
-const isWithinTimeframe = (startHour, endHour) => {
-  const currentTime = new Date();
-  const options = { timeZone: "Asia/Kolkata", hour12: false };
-  const currentHourIST = new Date()
-    .toLocaleString("en-US", options)
-    .split(",")[1]
-    .trim()
-    .split(":")[0];
-  const hour = parseInt(currentHourIST, 10);
-
-  return hour >= startHour && hour < endHour;
-};
-
-// Middleware to enforce time restrictions for mobile devices
-function enforceMobileTimeRestrictions(req, res, next) {
-  const userAgent = req.headers["user-agent"];
-  const parser = new UAParser(userAgent);
-  const { device } = parser.getResult();
-
-  if (device.type === "mobile") {
-    const isAllowedTime = isWithinTimeframe(10, 13); // 10 AM to 1 PM IST
-    if (!isAllowedTime) {
-      return res.status(403).send({
-        error:
-          "Access is restricted for mobile devices outside of 10 AM to 1 PM IST",
-      });
-    }
-  }
-
-  next();
-}
 
 async function run() {
   try {
