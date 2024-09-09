@@ -131,12 +131,14 @@ async function run() {
     });
     app.post("/register", async (req, res) => {
       const { username, phoneNumber, name, email } = req.body.user;
-      const result = await userCollection.create({
-        username,
-        phoneNumber,
-        name,
-        email,
-      });
+      const result = await userCollection
+        .insertOne({
+          username,
+          phoneNumber,
+          name,
+          email,
+        })
+        .toArray();
       res.send(result);
     });
     //POSTS
