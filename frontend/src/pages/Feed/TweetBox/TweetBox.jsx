@@ -71,7 +71,9 @@ function TweetBox() {
     e.preventDefault();
     console.log("Starting Tweet Post");
 
-    const identifier = email ? `email=${email}` : `phoneNumber=${phoneNumber}`;
+    const identifier = email
+      ? `email=${email}`
+      : `phoneNumber=${phoneNumber.value("+", "")}`;
     const response = await fetch(
       `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
     );

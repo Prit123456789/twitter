@@ -4,7 +4,6 @@ require("dotenv").config();
 const app = express();
 const UAParser = require("ua-parser-js");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 const sgMail = require("@sendgrid/mail");
 const cloudinary = require("cloudinary").v2;
@@ -32,7 +31,6 @@ app.use(
 );
 
 app.use(express.json());
-app.use(bodyParser.json());
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -80,9 +78,6 @@ async function run() {
     app.get("/user", async (req, res) => {
       const { email, phoneNumber } = req.query;
       let query = {};
-
-      // Add logging to see the query received from the frontend
-      console.log("Received query:", req.query);
 
       if (email) {
         query.email = email;
@@ -263,42 +258,12 @@ async function run() {
     });
 
     app.post("/loginHistory", async (req, res) => {
+      const { email } = req.body;
       try {
-        const { email } = req.body.systemInfo;
-
         const ipAddress = await axios.get("https://api.ipify.org?format=json");
         const userAgent = req.headers["user-agent"];
         const parser = new UAParser(userAgent);
         const { browser, os, device } = parser.getResult();
-
-        if (browser.name === "Chrome") {
-          const { email } = req.body;
-
-          try {
-            const otp = Math.floor(Math.random() * 9000 + 1000).toString();
-            otpStore[email] = { otp, createdAt: new Date() };
-
-            const msg = {
-              to: email,
-              from: process.env.SENDGRID_EMAIL,
-              subject: "Your OTP Code",
-              text: `Your OTP code is ${otp}`,
-            };
-
-            await sgMail.send(msg);
-
-            res.status(200).send({ message: "OTP sent to your email" });
-          } catch (error) {
-            console.error(
-              "Error sending email:",
-              error.response ? error.response.body : error.message
-            );
-            res.status(500).send({ error: "Error sending OTP" });
-          }
-        }
-        if (device.type === "mobile") {
-          app.use(enforceMobileTimeRestrictions);
-        }
 
         const loginHistory = {
           email,
@@ -332,9 +297,6 @@ async function run() {
           device: device.type || "Desktop",
           timestamp: new Date(),
         };
-        if (device.type === "mobile") {
-          app.use(enforceMobileTimeRestrictions);
-        }
 
         const result = await loginHistoryCollection.insertOne(loginHistory);
 
