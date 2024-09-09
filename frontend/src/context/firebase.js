@@ -1,13 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 const firebaseConfig = {
-  apiKey: "AIzaSyD5GU77dnk6QbOOaUcMzqCqhoIVhvkynug",
-  authDomain: "website-like-twitter-76754.firebaseapp.com",
-  projectId: "website-like-twitter-76754",
-  storageBucket: "website-like-twitter-76754.appspot.com",
-  messagingSenderId: "200427848918",
-  appId: "1:200427848918:web:8da9b87413fdd599143577",
-  measurementId: "G-YCVZJ5KBJH",
+  apiKey: "AIzaSyCkiALQ9qNVskszacOKdopCHqWoy0X79Sg",
+  authDomain: "app-like-twitter-58321.firebaseapp.com",
+  projectId: "app-like-twitter-58321",
+  storageBucket: "app-like-twitter-58321.appspot.com",
+  messagingSenderId: "1064039332597",
+  appId: "1:1064039332597:web:9eac2763fe342936ade3bc",
+  measurementId: "G-K925FWXN5M",
 };
 
 const app = initializeApp(firebaseConfig);

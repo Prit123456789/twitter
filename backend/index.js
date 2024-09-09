@@ -113,10 +113,6 @@ async function run() {
           .send({ message: "Either email or phoneNumber must be provided" });
       }
 
-      // Log received parameters for debugging
-      console.log("Received email:", email);
-      console.log("Received phoneNumber:", phoneNumber);
-
       let query = {};
       if (email) {
         query.email = email;
