@@ -10,6 +10,7 @@ const useLoggedInUser = () => {
   useEffect(() => {
     const fetchLoggedInUser = async () => {
       try {
+        // Encode the email and phone number
         const response = email
           ? await fetch(
               `https://twitter-cxhu.onrender.com/loggedInUser?email=${email}`
@@ -21,6 +22,11 @@ const useLoggedInUser = () => {
               )}`
             );
 
+        if (!response.ok) {
+          console.error(`Error: ${response.status} - ${response.statusText}`);
+          return;
+        }
+
         const data = await response.json();
         setLoggedInUser(data);
       } catch (error) {
@@ -31,7 +37,7 @@ const useLoggedInUser = () => {
     if (email || phoneNumber) {
       fetchLoggedInUser();
     }
-  }, [email, phoneNumber]);
+  }, [email, phoneNumber, loggedInUser]);
 
   return [loggedInUser, setLoggedInUser];
 };

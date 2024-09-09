@@ -118,6 +118,9 @@ async function run() {
       const { email, phoneNumber } = req.query;
       let query = {};
 
+      // Add logging to see the query received from the frontend
+      console.log("Received query:", req.query);
+
       if (email) {
         query.email = email;
       } else if (phoneNumber) {
@@ -132,6 +135,7 @@ async function run() {
           res.status(404).send({ message: "User not found" });
         }
       } catch (error) {
+        console.error("Error fetching user data:", error);
         res.status(500).send({ message: "Error fetching user", error });
       }
     });
@@ -145,6 +149,10 @@ async function run() {
           .status(400)
           .send({ message: "Either email or phoneNumber must be provided" });
       }
+
+      // Log received parameters for debugging
+      console.log("Received email:", email);
+      console.log("Received phoneNumber:", phoneNumber);
 
       let query = {};
       if (email) {
