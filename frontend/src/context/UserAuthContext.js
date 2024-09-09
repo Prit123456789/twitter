@@ -18,8 +18,11 @@ export function UserAuthContextProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const email = currentUser.email || null;
+      const phoneNumber = currentUser.phoneNumber || null;
+
       if (currentUser) {
-        setUser(currentUser);
+        setUser({ email, phoneNumber, uid: currentUser.uid });
       } else {
         setUser(null);
       }

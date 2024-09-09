@@ -23,19 +23,26 @@ cloudinary.config({
 });
 const upload = multer();
 
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "https://twitter-seven-puce.vercel.app"],
-    "Cross-Origin-Embedder-Policy": "unsafe-none",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-  })
-);
+app.use(cors());
+
 app.options("*", cors());
 app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "http://localhost:3000",
+    "https://twitter-seven-puce.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, DELETE, OPTIONS"
+  );
   next();
 });
+
 app.use(express.json());
 app.use(bodyParser.json());
 
