@@ -130,23 +130,18 @@ async function run() {
       }
     });
 
-    // post
-    // Main registration route: handles email, username, and name
     app.post("/register", async (req, res) => {
       const { username, name, email } = req.body;
 
-      // Validate required fields
       if (!email || !username || !name) {
         return res
           .status(400)
           .send({ message: "Email, username, and name are required." });
       }
 
-      // Create the newUser object with required fields
       const newUser = { username, name, email };
 
       try {
-        // Check for existing user by email
         const existingUser = await userCollection.find({ email });
 
         if (existingUser) {
@@ -431,7 +426,7 @@ async function run() {
         if (!storedOtp || storedOtp.otp !== otp.trim())
           return res.status(400).send({ error: "Invalid OTP" });
 
-        const otpExpiry = 5 * 60 * 1000;
+        const otpExpiry = 2 * 60 * 1000;
         if (Date.now() - new Date(storedOtp.createdAt).getTime() > otpExpiry)
           return res.status(400).send({ error: "OTP expired" });
 

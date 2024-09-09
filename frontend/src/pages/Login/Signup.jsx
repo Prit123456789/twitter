@@ -16,6 +16,7 @@ const Signup = () => {
   const [password, setPassword] = useState(""); // Initialize with empty string
   const [otp, setOtp] = useState(""); // Initialize with empty string
   const [error, setError] = useState("");
+  const [googleUserEmail, setGoogleUserEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isChrome, setIsChrome] = useState(false);
   const [isGoogleSignUp, setIsGoogleSignUp] = useState(false); // Initialize with false
@@ -63,7 +64,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { email, name, username },
+          { name, username, email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -71,6 +72,15 @@ const Signup = () => {
           }
         );
         navigate("/");
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/loginHistory",
+          { email },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       }
     } catch (err) {
       setError(err.message);
@@ -80,11 +90,12 @@ const Signup = () => {
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
     setIsGoogleSignUp(true);
+    setGoogleUserEmail(true);
 
     try {
       const user = await googleSignIn();
 
-      setEmail(user.email);
+      setEmail(user.user.email);
 
       if (isChrome) {
         const otpResponse = await axios.post(
@@ -103,7 +114,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { email: user.user.email, name, username },
+          { username, name, email: user.user.email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -130,42 +141,44 @@ const Signup = () => {
 
   const handleVerify = async () => {
     setError("");
-
-    try {
-      const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-email-otp",
-        { email, otp },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        await axios.post(
-          "https://twitter-cxhu.onrender.com/register",
-          { email, name, username },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        navigate("/");
-
-        await axios.post(
-          "https://twitter-cxhu.onrender.com/loginHistory",
-          { email },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    if (otpSent) {
+      if (otp.length !== 4) {
+        alert("OTP must be exactly 4 characters.");
+        return;
       }
-    } catch (err) {
-      setError(err.message);
+      try {
+        const response = await axios.post(
+          "https://twitter-cxhu.onrender.com/verify-email-otp",
+          { email: email || googleUserEmail, otp: otp.trim() }
+        );
+
+        if (response.status === 200) {
+          await axios.post(
+            "https://twitter-cxhu.onrender.com/register",
+            { email, name, username },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          setOtp("");
+          setOtpSent(false);
+          navigate("/");
+
+          await axios.post(
+            "https://twitter-cxhu.onrender.com/loginHistory",
+            { email },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
+      } catch (err) {
+        setError(err.message);
+      }
     }
   };
 

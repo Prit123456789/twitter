@@ -75,32 +75,34 @@ const Login = () => {
 
   const handleVerify = async () => {
     setError("");
-
-    try {
-      const response = await axios.post(
-        "https://twitter-cxhu.onrender.com/verify-email-otp",
-        { email: googleUserEmail || email, otp },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        navigate("/");
-        await axios.post(
-          "https://twitter-cxhu.onrender.com/loginHistory",
-          { email: googleUserEmail || email },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    if (otpSent) {
+      if (otp.length !== 4) {
+        alert("OTP must be exactly 4 characters.");
+        return;
       }
-    } catch (err) {
-      setError(err.message);
+      try {
+        const response = await axios.post(
+          "https://twitter-cxhu.onrender.com/verify-email-otp",
+          { email: googleUserEmail || email, otp: otp.trim() }
+        );
+
+        if (response.status === 200) {
+          setOtp("");
+          setOtpSent(false);
+          navigate("/");
+          await axios.post(
+            "https://twitter-cxhu.onrender.com/loginHistory",
+            { email: googleUserEmail || email },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
+      } catch (err) {
+        setError(err.message);
+      }
     }
   };
 
