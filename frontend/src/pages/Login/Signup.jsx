@@ -46,6 +46,11 @@ const Signup = () => {
 
     try {
       await signUp(email, password);
+      const user = {
+        name: name,
+        username: username,
+        email: email,
+      };
 
       if (isChrome) {
         const otpResponse = await axios.post(
@@ -64,7 +69,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { name, username, email },
+          { user },
           {
             headers: {
               "Content-Type": "application/json",
@@ -90,12 +95,11 @@ const Signup = () => {
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
     setIsGoogleSignUp(true);
-    setGoogleUserEmail(true);
-
+    setEmail(true);
     try {
       const user = await googleSignIn();
 
-      setEmail(user.user.email);
+      setGoogleUserEmail(user.user.email);
 
       if (isChrome) {
         const otpResponse = await axios.post(
@@ -114,7 +118,7 @@ const Signup = () => {
       } else {
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { username, name, email: user.user.email },
+          { user: user.user.email },
           {
             headers: {
               "Content-Type": "application/json",
@@ -147,28 +151,43 @@ const Signup = () => {
         return;
       }
       try {
+        const user = {
+          name: name,
+          username: username,
+          email: email || googleUserEmail,
+        };
+        const requestData = {
+          email: googleUserEmail || email,
+          otp: otp.trim(),
+        };
+        console.log("Sending OTP verification request:", requestData);
+
         const response = await axios.post(
           "https://twitter-cxhu.onrender.com/verify-email-otp",
-          { email: email || googleUserEmail, otp: otp.trim() }
+          requestData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
 
         if (response.status === 200) {
+          setOtp("");
+          setOtpSent(false);
           await axios.post(
             "https://twitter-cxhu.onrender.com/register",
-            { email, name, username },
+            { user },
             {
               headers: {
                 "Content-Type": "application/json",
               },
             }
           );
-          setOtp("");
-          setOtpSent(false);
           navigate("/");
-
           await axios.post(
             "https://twitter-cxhu.onrender.com/loginHistory",
-            { email },
+            { email: googleUserEmail || email },
             {
               headers: {
                 "Content-Type": "application/json",
@@ -177,6 +196,7 @@ const Signup = () => {
           );
         }
       } catch (err) {
+        console.error("OTP verification error:", err.message);
         setError(err.message);
       }
     }

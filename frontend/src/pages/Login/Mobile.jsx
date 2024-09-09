@@ -86,8 +86,8 @@ function Mobile() {
     e.preventDefault();
 
     await axios.post(
-      "https://twitter-cxhu.onrender.com/register-phone",
-      { phoneNumber },
+      "https://twitter-cxhu.onrender.com/register",
+      { user: phoneNumber },
       {
         headers: {
           "Content-Type": "application/json",

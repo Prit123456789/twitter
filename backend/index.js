@@ -129,63 +129,11 @@ async function run() {
         res.status(500).send("Internal Server Error");
       }
     });
-
     app.post("/register", async (req, res) => {
-      const { username, name, email } = req.body;
-
-      if (!email || !username || !name) {
-        return res
-          .status(400)
-          .send({ message: "Email, username, and name are required." });
-      }
-
-      const newUser = { username, name, email };
-
-      try {
-        const existingUser = await userCollection.find({ email });
-
-        if (existingUser) {
-          return res.status(400).send({ message: "User already exists." });
-        }
-
-        // Insert the new user into the database
-        const result = await userCollection.create(newUser).toArray();
-        res.status(201).send(result);
-      } catch (error) {
-        res.status(500).send({ message: "Error registering user", error });
-      }
+      const { username, phoneNumber, name, email } = req.body.user;
+      const result = await users.create({ username, phoneNumber, name, email });
+      res.send(result);
     });
-
-    // Phone number registration route: handles phone number only
-    app.post("/register-phone", async (req, res) => {
-      const { phoneNumber } = req.body;
-
-      // Validate required field
-      if (!phoneNumber) {
-        return res
-          .status(400)
-          .send({ message: "Phone number is required for this registration." });
-      }
-
-      try {
-        // Check for existing user by phoneNumber
-        const existingUser = await userCollection.findOne({ phoneNumber });
-
-        if (existingUser) {
-          return res.status(400).send({ message: "User already exists." });
-        }
-
-        // Create the newUser object with only phoneNumber
-        const newUser = { phoneNumber };
-
-        // Insert the new user into the database
-        const result = await userCollection.create(newUser);
-        res.status(201).send(result);
-      } catch (error) {
-        res.status(500).send({ message: "Error registering user", error });
-      }
-    });
-
     //POSTS
 
     app.post("/post", upload.none(), async (req, res) => {

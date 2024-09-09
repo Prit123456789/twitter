@@ -81,9 +81,20 @@ const Login = () => {
         return;
       }
       try {
+        const requestData = {
+          email: googleUserEmail || email,
+          otp: otp.trim(),
+        };
+        console.log("Sending OTP verification request:", requestData);
+
         const response = await axios.post(
           "https://twitter-cxhu.onrender.com/verify-email-otp",
-          { email: googleUserEmail || email, otp: otp.trim() }
+          requestData,
+          {
+            headers: {
+              "Content-Type": "application/json", // Ensure the header is set
+            },
+          }
         );
 
         if (response.status === 200) {
@@ -101,6 +112,7 @@ const Login = () => {
           );
         }
       } catch (err) {
+        console.error("OTP verification error:", err.message);
         setError(err.message);
       }
     }
@@ -116,12 +128,11 @@ const Login = () => {
 
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
-    setGoogleUserEmail(true);
-
+    setEmail(true);
     try {
       const user = await googleSignIn();
 
-      setEmail(user.user.email);
+      setGoogleUserEmail(user.user.email);
 
       if (isChrome) {
         const otpResponse = await axios.post(
