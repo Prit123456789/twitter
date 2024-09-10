@@ -14,7 +14,6 @@ function Notifications() {
     const fetchLoginHistory = async () => {
       setLoading(true);
       try {
-        // Determine endpoint based on user's login method
         let endpoint = "";
         if (user?.email) {
           endpoint = `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`;

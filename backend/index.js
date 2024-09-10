@@ -324,7 +324,7 @@ async function run() {
         await fetch("https://gateway.seven.io/api/sms", {
           method: "POST",
           headers: {
-            "X-Api-Key": process.env.X_RAPID_API_KEY,
+            "X-Api-Key": process.env.SEVEN_API_KEY,
             Accept: "application/json",
             "Content-Type": "application/x-www-form-urlencoded",
           },

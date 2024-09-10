@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { useTranslation } from "react-i18next";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import auth from "../../context/firebase";
 import axios from "axios";
 
 function Mobile() {
@@ -15,25 +13,6 @@ function Mobile() {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation("translations");
-
-  useEffect(() => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: (response) => {
-            console.log("reCAPTCHA solved");
-          },
-          "expired-callback": () => {
-            console.log("reCAPTCHA expired. Please try again.");
-          },
-        },
-        auth
-      );
-    }
-  }, []);
 
   const validatePhoneNumber = () => {
     const regexp = /^\+[0-9]{10,15}$/;
@@ -51,11 +30,9 @@ function Mobile() {
     e.preventDefault();
     if (validatePhoneNumber()) {
       try {
-        const appVerifier = window.recaptchaVerifier;
-        const confirmationResult = await signInWithPhoneNumber(
-          auth,
-          phoneNumber,
-          appVerifier
+        const confirmationResult = await axios.post(
+          "https://twitter-cxhu.onrender.com/send-sms-otp",
+          { phoneNumber }
         );
 
         setConfirmResult(confirmationResult);
@@ -85,19 +62,29 @@ function Mobile() {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
-    await axios.post(
-      "https://twitter-cxhu.onrender.com/register",
-      { user: phoneNumber },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
     if (otp.length === 6 && confirmResult) {
       try {
-        const userCredential = await confirmResult.confirm(otp);
-        console.log(`Verified: ${userCredential.user.uid}`);
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/verify-sms-otp",
+          {
+            phoneNumber: phoneNumber,
+            otp: otp.trim(),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        await axios.post(
+          "https://twitter-cxhu.onrender.com/register",
+          { user: phoneNumber },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         navigate("/");
       } catch (error) {
@@ -105,7 +92,7 @@ function Mobile() {
         setError(error.message);
       }
     } else {
-      setError("Please enter a six-digit OTP code");
+      setError("Please enter a 4-digit OTP code");
     }
   };
 
@@ -135,23 +122,23 @@ function Mobile() {
             <button className="btn" type="submit">
               {t("Send")}
             </button>
+
+            {confirmResult && (
+              <div onSubmit={handleVerifyOtp}>
+                <input
+                  type="text"
+                  className="email"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder={t("Enter OTP")}
+                />
+
+                <button className="btn" type="submit">
+                  {t("Verify")}
+                </button>
+              </div>
+            )}
           </form>
-
-          {confirmResult && (
-            <form onSubmit={handleVerifyOtp}>
-              <input
-                type="text"
-                className="email"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder={t("Enter OTP")}
-              />
-
-              <button className="btn" type="submit">
-                {t("Verify")}
-              </button>
-            </form>
-          )}
         </div>
 
         <Link

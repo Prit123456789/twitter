@@ -19,7 +19,7 @@ const ChatBot = () => {
 
   const { t } = useTranslation("translations");
 
-  const onSent = async (prompt) => {
+  const onSubmit = async (prompt) => {
     const url = `https://twitter-api45.p.rapidapi.com/search.php?query=${encodeURIComponent(
       prompt
     )}&search_type=Top&count=1000`;
@@ -42,10 +42,10 @@ const ChatBot = () => {
     }
   };
 
-  const handleSendMessage = () => {
+  const handleQuery = () => {
     setIsLoading(true);
     if (input.trim()) {
-      onSent(input).finally(() => setIsLoading(false));
+      onSubmit(input).finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
     }
@@ -134,10 +134,10 @@ const ChatBot = () => {
             onChange={(e) => setInput(e.target.value)}
             value={input}
             type="text"
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && handleQuery()}
             placeholder={t("What do you want to see ??")}
           />
-          <button onClick={() => handleSendMessage()}>{t("Send")}</button>
+          <button onClick={() => handleQuery()}>{t("Send")}</button>
         </div>
       </div>
     </div>
