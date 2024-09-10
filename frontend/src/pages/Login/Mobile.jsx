@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from "@mui/icons-material/Twitter";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import "react-phone-number-input/style.css"; // Import the styles for PhoneInput
 
 function Mobile() {
-  const [phoneNumber, setPhoneNumber] = useState("+91");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -15,15 +17,12 @@ function Mobile() {
   const { t } = useTranslation("translations");
 
   const validatePhoneNumber = () => {
-    const regexp = /^\+[0-9]{10,15}$/;
-    return regexp.test(phoneNumber);
+    // Use isValidPhoneNumber from react-phone-number-input
+    return isValidPhoneNumber(phoneNumber);
   };
 
-  const handlePhoneNumberChange = async (e) => {
-    const value = e.target.value.startsWith("+91")
-      ? e.target.value
-      : `+91${e.target.value.replace(/^0+/, "")}`;
-    setPhoneNumber(value);
+  const handlePhoneNumberChange = (value) => {
+    setPhoneNumber(value || ""); // Handle the case where value might be null or undefined
   };
 
   const handleSendOtp = async (e) => {
@@ -62,7 +61,7 @@ function Mobile() {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
-    if (otp.length === 6 && confirmResult) {
+    if (otp.length === 4 && confirmResult) {
       try {
         await axios.post(
           "https://twitter-cxhu.onrender.com/verify-sms-otp",
@@ -112,11 +111,18 @@ function Mobile() {
           )}
 
           <form className="form-container" onSubmit={handleSendOtp}>
-            <input
+            <PhoneInput
               className="email"
+              international
+              defaultCountry="IN" // Set a default country if needed
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}
+              error={
+                phoneNumber && !validatePhoneNumber()
+                  ? t("Invalid Phone Number")
+                  : undefined
+              }
             />
 
             <button className="btn" type="submit">
@@ -124,7 +130,7 @@ function Mobile() {
             </button>
 
             {confirmResult && (
-              <div onSubmit={handleVerifyOtp}>
+              <form onSubmit={handleVerifyOtp}>
                 <input
                   type="text"
                   className="email"
@@ -136,7 +142,7 @@ function Mobile() {
                 <button className="btn" type="submit">
                   {t("Verify")}
                 </button>
-              </div>
+              </form>
             )}
           </form>
         </div>

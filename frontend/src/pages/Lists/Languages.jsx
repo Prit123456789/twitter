@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Languages.css";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
 function Langs() {
@@ -43,11 +44,14 @@ function Langs() {
           email,
         });
         alert("OTP sent to your email");
-      } else {
+      } else if (isValidPhoneNumber(phoneNumber)) {
         await axios.post("https://twitter-cxhu.onrender.com/send-sms-otp", {
           phoneNumber,
         });
         alert("OTP sent to your mobile number");
+      } else {
+        alert("Please enter a valid phone number.");
+        return;
       }
       setOtpSent(true);
     } catch (error) {
@@ -127,18 +131,19 @@ function Langs() {
       ) : (
         <div className="input">
           <div className="field">
-            <input
-              type="tel"
+            <PhoneInput
+              international
+              defaultCountry="IN" // Set a default country if preferred
               className="email"
               placeholder={t("Enter your phone number")}
               onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
               value={phoneNumber}
-              onChange={(e) => {
-                const input = e.target.value.startsWith("+91")
-                  ? e.target.value
-                  : `+91${e.target.value.replace(/^0+/, "")}`; // Remove non-digits
-                setPhoneNumber(input);
-              }}
+              onChange={setPhoneNumber}
+              error={
+                phoneNumber && !isValidPhoneNumber(phoneNumber)
+                  ? t("Invalid Phone Number")
+                  : undefined
+              }
             />
             <button onClick={handleSendOtp} className="otp-btn">
               {t("Send")}

@@ -136,26 +136,29 @@ async function run() {
       res.send(result);
     });
     //POSTS
-
     app.post("/post", upload.none(), async (req, res) => {
       console.log("Post Data Received:", req.body);
       try {
+        // Validate required fields (customize based on your actual data structure)
+        if (!req.body.post || !req.body.username) {
+          return res.status(400).send({ error: "Missing required fields" });
+        }
+
         const post = req.body;
         const result = await postCollection.insertOne(post);
         res.send(result);
       } catch (error) {
         console.error("Error posting:", error);
-        res.status(500).send({ error: "Failed to post data" });
+        res.status(500).json({ error: "Failed to post data" });
       }
     });
-
     app.post("/upload-audio", upload.single("audio"), async (req, res) => {
       try {
         if (!req.file) {
-          return res.status(400).send({ error: "No file uploaded" });
+          return res.status(400).json({ error: "No file uploaded" });
         }
 
-        const streamUpload = (file) => {
+        const streamUpload = (buffer) => {
           return new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
               { resource_type: "auto" },
@@ -167,15 +170,15 @@ async function run() {
                 }
               }
             );
-            streamifier.createReadStream(file.buffer).pipe(stream);
+            streamifier.createReadStream(buffer).pipe(stream);
           });
         };
 
         const result = await streamUpload(req.file.buffer);
-        res.send(result);
+        res.json(result);
       } catch (error) {
         console.error("Error uploading to Cloudinary:", error);
-        res.status(500).send({ error: "Failed to upload audio" });
+        res.status(500).json({ error: "Failed to upload audio" });
       }
     });
 
