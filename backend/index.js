@@ -298,7 +298,7 @@ async function run() {
         const msg = {
           to: email,
           from: process.env.SENDGRID_EMAIL,
-          subject: "Your OTP Code",
+          subject: "Your OTP Code for Srikanth's Twitter web application ",
           text: `Your OTP code is ${otp}`,
         };
 
@@ -330,7 +330,7 @@ async function run() {
           },
           body: new URLSearchParams({
             to: phoneNumber,
-            from: "Srikanth's twitter web application",
+            from: "Your OTP code for Srikanth's twitter web application",
             text: `Your OTP is: ${otp}`,
           }),
         });
