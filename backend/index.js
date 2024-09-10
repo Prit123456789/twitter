@@ -5,15 +5,10 @@ const app = express();
 const UAParser = require("ua-parser-js");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
-const { mongoose } = require("mongoose");
 const sgMail = require("@sendgrid/mail");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const streamifier = require("streamifier");
-const client1 = require("twilio")(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
 
 const port = process.env.PORT || 5000;
 cloudinary.config({
@@ -326,10 +321,18 @@ async function run() {
       try {
         const otp = Math.floor(Math.random() * 9000 + 1000).toString();
         otpStore[phoneNumber] = { otp, createdAt: new Date() };
-        await client1.messages.create({
-          body: `Your OTP code is ${otp}`,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: phoneNumber,
+        await fetch("https://gateway.seven.io/api/sms", {
+          method: "POST",
+          headers: {
+            "X-Api-Key": process.env.X_RAPID_API_KEY,
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            to: phoneNumber,
+            from: "Srikanth's twitter web application",
+            text: `Your OTP is: ${otp}`,
+          }),
         });
 
         res.status(200).send({ message: "OTP sent to your mobile number" });
