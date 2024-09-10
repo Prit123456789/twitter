@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./TweetBox.css";
 import { Avatar, Button } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useUserAuth } from "../../../context/UserAuthContext";
 import useLoggedInUser from "../../../hooks/useLoggedInUser";
 import RecordRTC from "recordrtc";
+import ReactAudioPlayer from "react-audio-player";
 
 function TweetBox() {
   const { t } = useTranslation("translations");
@@ -20,6 +21,7 @@ function TweetBox() {
   const { user } = useUserAuth();
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
+  const [audioUrl, setAudioUrl] = useState("");
   const [enteredEmail, setEnteredEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -115,15 +117,6 @@ function TweetBox() {
     }
   };
 
-  // Play the recorded audio
-  const handlePlayAudio = useCallback(() => {
-    if (audioBlob) {
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audioElement = new Audio(audioUrl);
-      audioElement.play();
-    }
-  }, [audioBlob]);
-
   const sendOtp = async (emailForOtp) => {
     if (emailForOtp) {
       try {
@@ -163,18 +156,26 @@ function TweetBox() {
     const emailForOtp = email || enteredEmail;
     sendOtp(emailForOtp);
   };
-
   const handleStopRecording = async () => {
-    if (recorderRef.current && recorderRef.current.stream) {
+    if (recorderRef.current) {
       try {
-        recorderRef.current.stopRecording(async () => {
-          const blob = await recorderRef.current.getBlob();
+        // Stop recording and get the audio blob
+        recorderRef.current.stopRecording(() => {
+          const blob = recorderRef.current.getBlob();
           setAudioBlob(blob);
           setIsRecording(false);
 
-          recorderRef.current.stream
-            .getTracks()
-            .forEach((track) => track.stop());
+          // Stop all tracks on the recorder's stream to release resources
+          const stream = recorderRef.current.stream;
+          if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+          }
+
+          // Create a URL for the audio blob and update state
+          const url = URL.createObjectURL(blob);
+          setAudioUrl(url);
+
+          // Reset the recorder reference
           recorderRef.current = null;
         });
       } catch (error) {
@@ -223,11 +224,7 @@ function TweetBox() {
               <MicIcon onClick={handleStartRecording} />
             )}
           </label>
-          {audioBlob && (
-            <Button onClick={handlePlayAudio} className="tweetBox__playButton">
-              {t("Play Audio")}
-            </Button>
-          )}
+          {audioBlob && <ReactAudioPlayer src={audioUrl} controls />}
 
           <Button
             type="submit"

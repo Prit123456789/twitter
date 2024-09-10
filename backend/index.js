@@ -136,49 +136,45 @@ async function run() {
       res.send(result);
     });
     //POSTS
-    app.post("/post", upload.none(), async (req, res) => {
+    app.post("/post", upload.single("audio"), async (req, res) => {
       console.log("Post Data Received:", req.body);
+      console.log("Audio File Received:", req.file); // Check if the file is received
+
       try {
-        // Validate required fields (customize based on your actual data structure)
+        // Validate required fields
         if (!req.body.post || !req.body.username) {
           return res.status(400).send({ error: "Missing required fields" });
         }
 
-        const post = req.body;
+        // Handle audio upload if present
+        let audioUrl = "";
+        if (req.file) {
+          const streamUpload = (buffer) => {
+            return new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream(
+                { resource_type: "auto" },
+                (error, result) => {
+                  if (result) {
+                    resolve(result);
+                  } else {
+                    reject(error);
+                  }
+                }
+              );
+              streamifier.createReadStream(buffer).pipe(stream);
+            });
+          };
+
+          const uploadResult = await streamUpload(req.file.buffer);
+          audioUrl = uploadResult.url; // Store the URL of the uploaded audio
+        }
+
+        const post = { ...req.body, audioUrl }; // Add the audio URL to the post object
         const result = await postCollection.insertOne(post);
         res.send(result);
       } catch (error) {
         console.error("Error posting:", error);
         res.status(500).json({ error: "Failed to post data" });
-      }
-    });
-    app.post("/upload-audio", upload.single("audio"), async (req, res) => {
-      try {
-        if (!req.file) {
-          return res.status(400).json({ error: "No file uploaded" });
-        }
-
-        const streamUpload = (buffer) => {
-          return new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-              { resource_type: "auto" },
-              (error, result) => {
-                if (result) {
-                  resolve(result);
-                } else {
-                  reject(error);
-                }
-              }
-            );
-            streamifier.createReadStream(buffer).pipe(stream);
-          });
-        };
-
-        const result = await streamUpload(req.file.buffer);
-        res.json(result);
-      } catch (error) {
-        console.error("Error uploading to Cloudinary:", error);
-        res.status(500).json({ error: "Failed to upload audio" });
       }
     });
 
