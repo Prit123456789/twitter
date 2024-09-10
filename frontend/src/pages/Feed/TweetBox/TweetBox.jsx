@@ -16,7 +16,7 @@ function TweetBox() {
   const [imageurl, setimageurl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [imageURL, setImageURL] = useState("");
-  const [name, setName] = useState("");
+
   const [otpSent, setOtpSent] = useState(false);
   const [loggedInUser] = useLoggedInUser();
   const { user } = useUserAuth();
@@ -29,7 +29,9 @@ function TweetBox() {
   const [otp, setOtp] = useState("");
   const [isAudioUploadAllowed, setIsAudioUploadAllowed] = useState(false);
   const recorderRef = useRef(null);
-
+  const name = loggedInUser[0]?.name
+    ? loggedInUser[0]?.name
+    : user?.displayName;
   const userProfilePic =
     loggedInUser[0]?.profileImage ||
     "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
@@ -74,18 +76,13 @@ function TweetBox() {
     const identifier = email
       ? `email=${email}`
       : `phoneNumber=${phoneNumber.replace("+", "")}`;
-    const response = await fetch(
-      `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
-    );
-    const data = await response.json();
-    setName(data[0]?.name);
+    await fetch(`https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`);
 
     console.log("Form Data:", {
       profilePhoto: userProfilePic,
       post,
       photo: imageURL,
       username,
-      name,
       email: email || enteredEmail,
       phoneNumber: phoneNumber || "",
     });
@@ -137,6 +134,7 @@ function TweetBox() {
         const postData = await postResponse.json();
         console.log("Post Response:", postData);
         setPost("");
+        setimageurl(false);
         setImageURL("");
         setAudioBlob(null);
       } catch (error) {
@@ -291,12 +289,12 @@ function TweetBox() {
 
         <div className="mediaIcons_tweetButton">
           <label htmlFor="file" className="imageIcon">
-            {isLoading ? (
+            {imageurl ? (
               <p>{t("Uploading Image")}</p>
             ) : (
               <p>
-                {imageurl ? (
-                  "Image Uploaded"
+                {imageurl && !isLoading ? (
+                  <p>{t("Image Uploaded")}</p>
                 ) : (
                   <AddPhotoAlternateOutlinedIcon />
                 )}

@@ -85,8 +85,6 @@ const Login = () => {
           email: googleUserEmail || email,
           otp: otp.trim(),
         };
-        console.log("Sending OTP verification request:", requestData);
-
         const response = await axios.post(
           "https://twitter-cxhu.onrender.com/verify-email-otp",
           requestData,

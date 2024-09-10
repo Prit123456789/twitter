@@ -95,7 +95,7 @@ const Signup = () => {
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
     setIsGoogleSignUp(true);
-    setEmail(true);
+
     try {
       const user = await googleSignIn();
 
@@ -160,7 +160,6 @@ const Signup = () => {
           email: googleUserEmail || email,
           otp: otp.trim(),
         };
-        console.log("Sending OTP verification request:", requestData);
 
         const response = await axios.post(
           "https://twitter-cxhu.onrender.com/verify-email-otp",

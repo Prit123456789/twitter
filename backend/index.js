@@ -143,7 +143,7 @@ async function run() {
     //POSTS
 
     app.post("/post", upload.none(), async (req, res) => {
-      console.log("Post Data Received:", req.body); // Add this line to log incoming post data
+      console.log("Post Data Received:", req.body);
       try {
         const post = req.body;
         const result = await postCollection.insertOne(post);
