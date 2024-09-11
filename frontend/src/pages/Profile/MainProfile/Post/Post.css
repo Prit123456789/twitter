@@ -51,4 +51,6 @@
   .post__avatar {
     padding: 20px;
   }
-  
+  .post__audio{
+    color: var(--twitter-color) !important;
+  }

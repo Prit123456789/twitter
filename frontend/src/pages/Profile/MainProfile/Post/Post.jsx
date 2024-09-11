@@ -6,10 +6,10 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PublishIcon from "@mui/icons-material/Publish";
-import ReactAudioPlayer from "react-audio-player";
-
+import ReactAudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 function Post({ p }) {
-  const { name, username, photo, post, profilePhoto, audioURL } = p;
+  const { name, username, photo, post, profilePhoto, audioUrl } = p;
 
   return (
     <div className="post">
@@ -32,13 +32,9 @@ function Post({ p }) {
           </div>
         </div>
         {photo && <img src={photo} alt="" width="500" />}
-        {audioURL && (
+        {audioUrl && (
           <div className="post__audio">
-            <ReactAudioPlayer
-              src={audioURL}
-              controls
-              // You can add other props here if needed
-            />
+            <ReactAudioPlayer src={audioUrl} className="audio" controls />
           </div>
         )}
         <div className="post__footer">

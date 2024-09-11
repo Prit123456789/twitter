@@ -36,24 +36,51 @@ function TweetBox() {
     loggedInUser[0]?.profileImage ||
     "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
   const username = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
-
   const email = user?.email;
   const phoneNumber = user?.phoneNumber;
 
   const handleUploadImage = async (e) => {
-    // ... (same image upload logic as before)
-  };
+    setIsLoading(true);
+    const image = e.target.files[0];
 
+    const formData = new FormData();
+    formData.set("image", image);
+    axios
+      .post(
+        "https://api.imgbb.com/1/upload?key=5ccca74448be7fb4c1a7baebca13e0d2",
+        formData
+      )
+      .then((res) => {
+        setimageurl(res.data.data.display_url);
+        setImageURL(res.data.data.display_url);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+  const isInAllowedTimeRange = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const ISTOffset = 330;
+    const IST = new Date(now.getTime() + (ISTOffset + offset) * 60000);
+    const hours = IST.getHours();
+    return hours >= 14 && hours <= 19;
+  };
   useEffect(() => {
     const startRecording = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        const recorder = new RecordRTC(stream, { type: "audio" });
-        recorderRef.current = recorder;
-        recorder.startRecording();
-        setIsRecording(true);
+        if (isInAllowedTimeRange()) {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          const recorder = new RecordRTC(stream, { type: "audio" });
+          recorderRef.current = recorder;
+          recorder.startRecording();
+          setIsRecording(true);
+        } else {
+          alert("Audio uploads are restricted beyond 2PM to 7PM IST");
+        }
       } catch (error) {
         console.error("Error starting recording:", error);
       }
@@ -70,69 +97,127 @@ function TweetBox() {
       return;
     }
     setIsLoading(true);
-    const identifier = email
-      ? `email=${email}`
-      : `phoneNumber=${phoneNumber.replace("+", "")}`;
-    await fetch(`https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`);
-
-    const formData = new FormData();
-    formData.append("profilePhoto", userProfilePic);
-    formData.append("post", post);
-    formData.append("photo", imageURL);
-    formData.append("username", username);
-    formData.append("name", name);
-
-    if (email || enteredEmail) {
-      formData.append("email", email || enteredEmail);
-    }
-
-    if (phoneNumber) {
-      formData.append("phoneNumber", phoneNumber);
-    }
 
     if (audioBlob) {
-      const audioFile = new File([audioBlob], "audio.mp3", {
-        type: "audio/mp3",
-      });
-      formData.append("audio", audioFile);
-    }
+      const audioSizeMB = audioBlob.size / (1024 * 1024);
+      if (audioSizeMB > 100) {
+        alert("Audio file size exceeds the 100 MB limit.");
+        setIsLoading(false);
+        return;
+      }
 
-    try {
-      console.log("Sending Post Request");
-      const postResponse = await fetch(
-        "https://twitter-cxhu.onrender.com/post",
-        {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.onloadedmetadata = () => {
+        const audioDuration = audio.duration;
+        if (audioDuration > 300) {
+          alert("Audio duration exceeds the 5 minutes limit.");
+          setIsLoading(false);
+          return;
+        }
+
+        const identifier = email
+          ? `email=${email}`
+          : `phoneNumber=${phoneNumber.replace("+", "")}`;
+        fetch(`https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`);
+
+        const formData = new FormData();
+        formData.append("profilePhoto", userProfilePic);
+        formData.append("post", post);
+        formData.append("photo", imageURL);
+        formData.append("username", username);
+        formData.append("name", name);
+
+        if (email || enteredEmail) {
+          formData.append("email", email || enteredEmail);
+        }
+
+        if (phoneNumber) {
+          formData.append("phoneNumber", phoneNumber);
+        }
+        const audioFile = new File([audioBlob], "audio.mp3", {
+          type: "audio/mp3",
+        });
+        formData.append("audio", audioFile);
+
+        fetch("https://twitter-cxhu.onrender.com/post", {
           method: "POST",
           body: formData,
-        }
-      );
-      const postData = await postResponse.json();
-      console.log("Post Response:", postData);
-      setPost("");
-      setimageurl("");
-      setImageURL("");
-      setAudioBlob(null);
-    } catch (error) {
-      console.error("Error posting tweet:", error);
+        })
+          .then((response) => response.json())
+          .then((postData) => {
+            console.log("Post Response:", postData);
+            setPost("");
+            setimageurl("");
+            setImageURL("");
+            setAudioBlob(null);
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error posting tweet:", error);
+            setIsLoading(false);
+          });
+      };
+    } else {
+      const identifier = email
+        ? `email=${email}`
+        : `phoneNumber=${phoneNumber.replace("+", "")}`;
+      fetch(`https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`);
+
+      const formData = new FormData();
+      formData.append("profilePhoto", userProfilePic);
+      formData.append("post", post);
+      formData.append("photo", imageURL);
+      formData.append("username", username);
+      formData.append("name", name);
+
+      if (email || enteredEmail) {
+        formData.append("email", email || enteredEmail);
+      }
+
+      if (phoneNumber) {
+        formData.append("phoneNumber", phoneNumber);
+      }
+
+      fetch("https://twitter-cxhu.onrender.com/post", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((postData) => {
+          console.log("Post Response:", postData);
+          setPost("");
+          setimageurl("");
+          setImageURL("");
+          setAudioBlob(null);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error posting tweet:", error);
+          setIsLoading(false);
+        });
     }
   };
 
   const sendOtp = async (emailForOtp) => {
-    if (emailForOtp) {
-      try {
-        await axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
-          email: emailForOtp,
-        });
-        alert("OTP sent to your email");
-        setOtpSent(true);
-      } catch (error) {
-        console.error("Error sending OTP:", error);
-        alert("Failed to send OTP. Please try again.");
+    if (isInAllowedTimeRange()) {
+      if (emailForOtp) {
+        try {
+          await axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
+            email: emailForOtp,
+          });
+          alert("OTP sent to your email");
+          setOtpSent(true);
+        } catch (error) {
+          console.error("Error sending OTP:", error);
+          alert("Failed to send OTP. Please try again.");
+        }
       }
+    } else {
+      alert("Audio uploads are restricted beyond 2PM to 7PM IST");
     }
   };
 
-  // Verify OTP
   const verifyOtp = async () => {
     const emailForOtp = email || enteredEmail;
     if (otpSent && otp) {
@@ -142,7 +227,7 @@ function TweetBox() {
           otp: otp,
         });
         alert("OTP verification successful");
-        setOtpVerified(true); // This triggers the recording start in useEffect
+        setOtpVerified(true);
         setOtpSent(false);
         setVerificationError(false);
       } catch (error) {
@@ -214,7 +299,7 @@ function TweetBox() {
             onChange={handleUploadImage}
           />
           <label className="micIcons">
-            {isRecording ? (
+            {isRecording && isInAllowedTimeRange() ? (
               <MicOffIcon onClick={handleStopRecording} />
             ) : (
               <MicIcon onClick={handleStartRecording} />

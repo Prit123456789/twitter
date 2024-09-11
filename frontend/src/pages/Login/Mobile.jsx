@@ -17,12 +17,11 @@ function Mobile() {
   const { t } = useTranslation("translations");
 
   const validatePhoneNumber = () => {
-    // Use isValidPhoneNumber from react-phone-number-input
     return isValidPhoneNumber(phoneNumber);
   };
 
   const handlePhoneNumberChange = (value) => {
-    setPhoneNumber(value || ""); // Handle the case where value might be null or undefined
+    setPhoneNumber(value || "");
   };
 
   const handleSendOtp = async (e) => {
@@ -86,6 +85,9 @@ function Mobile() {
         );
 
         navigate("/");
+        axios.post("https://twitter-cxhu.onrender.com/phoneHistory", {
+          phoneNumber,
+        });
       } catch (error) {
         console.error("Error verifying OTP:", error);
         setError(error.message);

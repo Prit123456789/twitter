@@ -141,12 +141,10 @@ async function run() {
       console.log("Audio File Received:", req.file);
 
       try {
-        // Check if either post content or audio file is present
         if (!req.body.post && !req.file) {
           return res.status(400).send({ error: "Missing required fields" });
         }
 
-        // Optional: Check if username is present
         if (!req.body.username) {
           return res.status(400).send({ error: "Missing username" });
         }
