@@ -31,14 +31,10 @@ function Post({ p }) {
             <p>{post}</p>
           </div>
         </div>
-        {photo && <img src={photo} alt="" width="500" />}
+        {photo && <img src={photo} alt="Post content" width="500" />}
         {audioURL && (
           <div className="post__audio">
-            <ReactAudioPlayer
-              src={audioURL}
-              controls
-              // You can add other props here if needed
-            />
+            <ReactAudioPlayer src={audioURL} controls />
           </div>
         )}
         <div className="post__footer">

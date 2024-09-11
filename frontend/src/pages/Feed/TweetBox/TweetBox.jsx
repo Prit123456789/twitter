@@ -67,9 +67,9 @@ function TweetBox() {
   const handleTweet = async (e) => {
     e.preventDefault();
     if (!imageurl && !audioBlob && !post) {
-      return; // No content to post
+      return;
     }
-
+    setIsLoading(true);
     const identifier = email
       ? `email=${email}`
       : `phoneNumber=${phoneNumber.replace("+", "")}`;
@@ -159,23 +159,19 @@ function TweetBox() {
   const handleStopRecording = async () => {
     if (recorderRef.current) {
       try {
-        // Stop recording and get the audio blob
         recorderRef.current.stopRecording(() => {
           const blob = recorderRef.current.getBlob();
           setAudioBlob(blob);
           setIsRecording(false);
 
-          // Stop all tracks on the recorder's stream to release resources
           const stream = recorderRef.current.stream;
           if (stream) {
             stream.getTracks().forEach((track) => track.stop());
           }
 
-          // Create a URL for the audio blob and update state
           const url = URL.createObjectURL(blob);
           setAudioUrl(url);
 
-          // Reset the recorder reference
           recorderRef.current = null;
         });
       } catch (error) {

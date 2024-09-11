@@ -16,7 +16,7 @@ cloudinary.config({
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
-const upload = multer();
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(
   cors({
@@ -138,21 +138,25 @@ async function run() {
     //POSTS
     app.post("/post", upload.single("audio"), async (req, res) => {
       console.log("Post Data Received:", req.body);
-      console.log("Audio File Received:", req.file); // Check if the file is received
+      console.log("Audio File Received:", req.file);
 
       try {
-        // Validate required fields
-        if (!req.body.post || !req.body.username) {
+        // Check if either post content or audio file is present
+        if (!req.body.post && !req.file) {
           return res.status(400).send({ error: "Missing required fields" });
         }
 
-        // Handle audio upload if present
+        // Optional: Check if username is present
+        if (!req.body.username) {
+          return res.status(400).send({ error: "Missing username" });
+        }
+
         let audioUrl = "";
         if (req.file) {
           const streamUpload = (buffer) => {
             return new Promise((resolve, reject) => {
               const stream = cloudinary.uploader.upload_stream(
-                { resource_type: "auto" },
+                { resource_type: "video" },
                 (error, result) => {
                   if (result) {
                     resolve(result);
@@ -166,10 +170,10 @@ async function run() {
           };
 
           const uploadResult = await streamUpload(req.file.buffer);
-          audioUrl = uploadResult.url; // Store the URL of the uploaded audio
+          audioUrl = uploadResult.url;
         }
 
-        const post = { ...req.body, audioUrl }; // Add the audio URL to the post object
+        const post = { ...req.body, audioUrl };
         const result = await postCollection.insertOne(post);
         res.send(result);
       } catch (error) {
