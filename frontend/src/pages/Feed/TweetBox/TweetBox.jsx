@@ -3,6 +3,7 @@ import "./TweetBox.css";
 import { Avatar, Button } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import MicIcon from "@mui/icons-material/Mic";
+import DoneIcon from "@mui/icons-material/Done";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
@@ -90,6 +91,23 @@ function TweetBox() {
       startRecording();
     }
   }, [otpVerified]);
+  const getAudioDurationUsingContext = async (audioBlob) => {
+    const arrayBuffer = await audioBlob.arrayBuffer();
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+
+    return new Promise((resolve, reject) => {
+      audioContext.decodeAudioData(
+        arrayBuffer,
+        (audioBuffer) => {
+          resolve(audioBuffer.duration);
+        },
+        (error) => {
+          reject("Error decoding audio data: " + error);
+        }
+      );
+    });
+  };
 
   const handleTweet = async (e) => {
     e.preventDefault();
@@ -106,20 +124,22 @@ function TweetBox() {
         return;
       }
 
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.onloadedmetadata = () => {
-        const audioDuration = audio.duration;
-        if (audioDuration > 300) {
+      try {
+        const duration = await getAudioDurationUsingContext(audioBlob);
+
+        if (duration > 300) {
           alert("Audio duration exceeds the 5 minutes limit.");
           setIsLoading(false);
           return;
         }
 
+        // Proceed with posting the tweet
         const identifier = email
           ? `email=${email}`
           : `phoneNumber=${phoneNumber.replace("+", "")}`;
-        fetch(`https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`);
+        await fetch(
+          `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
+        );
 
         const formData = new FormData();
         formData.append("profilePhoto", userProfilePic);
@@ -135,34 +155,36 @@ function TweetBox() {
         if (phoneNumber) {
           formData.append("phoneNumber", phoneNumber);
         }
+
         const audioFile = new File([audioBlob], "audio.mp3", {
           type: "audio/mp3",
         });
         formData.append("audio", audioFile);
 
-        fetch("https://twitter-cxhu.onrender.com/post", {
+        const response = await fetch("https://twitter-cxhu.onrender.com/post", {
           method: "POST",
           body: formData,
-        })
-          .then((response) => response.json())
-          .then((postData) => {
-            console.log("Post Response:", postData);
-            setPost("");
-            setimageurl("");
-            setImageURL("");
-            setAudioBlob(null);
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            console.error("Error posting tweet:", error);
-            setIsLoading(false);
-          });
-      };
+        });
+
+        const postData = await response.json();
+        console.log("Post Response:", postData);
+        setPost("");
+        setimageurl("");
+        setImageURL("");
+        setAudioBlob(null);
+        setIsLoading(false);
+      } catch (error) {
+        alert(error);
+        setIsLoading(false);
+      }
     } else {
+      // Handling non-audio posts
       const identifier = email
         ? `email=${email}`
         : `phoneNumber=${phoneNumber.replace("+", "")}`;
-      fetch(`https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`);
+      await fetch(
+        `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
+      );
 
       const formData = new FormData();
       formData.append("profilePhoto", userProfilePic);
@@ -280,12 +302,12 @@ function TweetBox() {
 
         <div className="mediaIcons_tweetButton">
           <label htmlFor="file" className="imageIcon">
-            {imageurl ? (
+            {imageurl && isLoading ? (
               <p>{t("Uploading Image")}</p>
             ) : (
               <p>
                 {imageurl && !isLoading ? (
-                  <p>{t("Image Uploaded")}</p>
+                  <DoneIcon />
                 ) : (
                   <AddPhotoAlternateOutlinedIcon />
                 )}
