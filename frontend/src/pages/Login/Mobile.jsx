@@ -4,21 +4,20 @@ import twitterimg from "../../image/twitter.jpeg";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import "react-phone-number-input/style.css"; // Import the styles for PhoneInput
+import { useUserAuth } from "../../context/UserAuthContext";
+import "react-phone-number-input/style.css";
 
 function Mobile() {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [confirmResult, setConfirmResult] = useState(null);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState(null);
   const navigate = useNavigate();
   const { t } = useTranslation("translations");
+  const { signInWithPhone } = useUserAuth();
 
-  const validatePhoneNumber = () => {
-    return isValidPhoneNumber(phoneNumber);
-  };
+  const validatePhoneNumber = () => isValidPhoneNumber(phoneNumber);
 
   const handlePhoneNumberChange = (value) => {
     setPhoneNumber(value || "");
@@ -28,28 +27,16 @@ function Mobile() {
     e.preventDefault();
     if (validatePhoneNumber()) {
       try {
-        const confirmationResult = await axios.post(
-          "https://twitter-cxhu.onrender.com/send-sms-otp",
-          { phoneNumber }
+        const result = await signInWithPhone(
+          phoneNumber,
+          "recaptcha-container"
         );
-
-        setConfirmResult(confirmationResult);
+        setConfirmationResult(result);
         setSuccess(true);
         setError("");
-
-        const response = await axios.post(
-          "https://twitter-cxhu.onrender.com/phoneHistory",
-          { phoneNumber },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log("Backend response:", response.data);
+        console.log("OTP sent successfully");
       } catch (error) {
-        console.error("Error during OTP sending or logging:", error);
+        console.error("Error during OTP sending:", error);
         setError(error.message);
       }
     } else {
@@ -59,41 +46,16 @@ function Mobile() {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-
-    if (otp.length === 4 && confirmResult) {
+    if (otp.length === 6 && confirmationResult) {
       try {
-        await axios.post(
-          "https://twitter-cxhu.onrender.com/verify-sms-otp",
-          {
-            phoneNumber: phoneNumber,
-            otp: otp.trim(),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        await axios.post(
-          "https://twitter-cxhu.onrender.com/register",
-          { user: phoneNumber },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
+        await confirmationResult.confirm(otp);
         navigate("/");
-        axios.post("https://twitter-cxhu.onrender.com/phoneHistory", {
-          phoneNumber,
-        });
       } catch (error) {
         console.error("Error verifying OTP:", error);
-        setError(error.message);
+        setError("Incorrect OTP, please try again.");
       }
     } else {
-      setError("Please enter a 4-digit OTP code");
+      setError("Please enter a 6-digit OTP code");
     }
   };
 
@@ -116,7 +78,7 @@ function Mobile() {
             <PhoneInput
               className="email"
               international
-              defaultCountry="IN" // Set a default country if needed
+              defaultCountry="IN"
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
               placeholder={t("Enter your phone number")}
@@ -126,27 +88,25 @@ function Mobile() {
                   : undefined
               }
             />
-
             <button className="btn" type="submit">
               {t("Send")}
             </button>
-
-            {confirmResult && (
-              <form onSubmit={handleVerifyOtp}>
-                <input
-                  type="text"
-                  className="email"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder={t("Enter OTP")}
-                />
-
-                <button className="btn" type="submit">
-                  {t("Verify")}
-                </button>
-              </form>
-            )}
           </form>
+
+          {confirmationResult && (
+            <form onSubmit={handleVerifyOtp}>
+              <input
+                type="text"
+                className="email"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder={t("Enter OTP")}
+              />
+              <button className="btn" type="submit">
+                {t("Verify")}
+              </button>
+            </form>
+          )}
         </div>
 
         <Link
