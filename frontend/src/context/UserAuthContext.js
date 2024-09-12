@@ -54,6 +54,7 @@ export function UserAuthContextProvider({ children }) {
 
   const signInWithPhone = (phoneNumber, recaptchaContainerId) => {
     const appVerifier = new RecaptchaVerifier(
+      auth,
       recaptchaContainerId,
       {
         size: "invisible",
