@@ -198,7 +198,6 @@ const Login = () => {
             </div>
           </form>
 
-          {/* OTP fields and button should be placed here for both login and Google sign-in */}
           {isChrome && otpSent && (
             <>
               <input

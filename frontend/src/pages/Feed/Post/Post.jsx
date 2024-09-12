@@ -34,7 +34,12 @@ function Post({ p }) {
         {photo && <img src={photo} alt="" width="500" />}
         {audioUrl && (
           <div className="post__audio">
-            <ReactAudioPlayer src={audioUrl} className="audio" controls />
+            <ReactAudioPlayer
+              src={audioUrl}
+              className="audio"
+              controls
+              showDownloadProgress="true"
+            />
           </div>
         )}
         <div className="post__footer">
