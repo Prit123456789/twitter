@@ -18,10 +18,7 @@ function Notifications() {
         if (user?.email) {
           endpoint = `https://twitter-cxhu.onrender.com/loginHistory/${user.email}`;
         } else if (user?.phoneNumber) {
-          endpoint = `https://twitter-cxhu.onrender.com/phoneHistory/${user.phoneNumber.replace(
-            "+",
-            ""
-          )}`;
+          endpoint = `https://twitter-cxhu.onrender.com/phoneHistory/${user.phoneNumber}`;
         } else {
           console.error(
             "User has neither email nor phoneNumber available for login history."

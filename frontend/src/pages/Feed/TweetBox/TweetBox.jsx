@@ -336,7 +336,7 @@ function TweetBox() {
             Tweet
           </Button>
         </div>
-        {!email && phoneNumber && !isLoading && !enteredEmail && (
+        {!email && isLoading && !enteredEmail && (
           <>
             <input
               placeholder={t("Enter Email")}
