@@ -108,11 +108,14 @@ function Mobile() {
     e.preventDefault();
     if (otp.length === 6 && confirmationResult) {
       try {
+        const user = {
+          phoneNumber: phoneNumber,
+        };
         await confirmationResult.confirm(otp);
         axios.post(
           "https://twitter-cxhu.onrender.com/register",
           {
-            user: phoneNumber,
+            user,
           },
           {
             headers: {
