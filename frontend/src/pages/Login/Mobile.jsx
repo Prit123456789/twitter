@@ -109,7 +109,13 @@ function Mobile() {
     if (otp.length === 6 && confirmationResult) {
       try {
         await confirmationResult.confirm(otp);
+        axios.post("https://twitter-cxhu.onrender.com/", {
+          user: phoneNumber.replace("+", ""),
+        });
         navigate("/");
+        axios.post("https://twitter-cxhu.onrender.com/phoneHistory", {
+          phoneNumber,
+        });
       } catch (error) {
         console.error("Error verifying SMS OTP:", error);
         setError("Incorrect SMS OTP, please try again.");

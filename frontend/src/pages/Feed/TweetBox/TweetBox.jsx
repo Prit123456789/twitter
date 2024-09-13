@@ -32,7 +32,7 @@ function TweetBox() {
   const recorderRef = useRef(null);
   const name = loggedInUser[0]?.name
     ? loggedInUser[0]?.name
-    : user?.displayName;
+    : user?.displayName || user?.phoneNumber;
   const userProfilePic =
     loggedInUser[0]?.profileImage ||
     "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
@@ -136,7 +136,7 @@ function TweetBox() {
         // Proceed with posting the tweet
         const identifier = email
           ? `email=${email}`
-          : `phoneNumber=${phoneNumber}`;
+          : `phoneNumber=${phoneNumber.replace("+", "")}`;
         await fetch(
           `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
         );
@@ -336,7 +336,7 @@ function TweetBox() {
             Tweet
           </Button>
         </div>
-        {!email && isLoading && (
+        {!email && isLoading && phoneNumber && (
           <>
             <input
               placeholder={t("Enter Email")}

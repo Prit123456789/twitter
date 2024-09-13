@@ -31,7 +31,10 @@ function MainProfile({ user }) {
         });
     } else if (user?.phoneNumber) {
       fetch(
-        `https://twitter-cxhu.onrender.com/userPost?phoneNumber=${user?.phoneNumber}`
+        `https://twitter-cxhu.onrender.com/userPost?phoneNumber=${user?.phoneNumber.replace(
+          "+",
+          ""
+        )}`
       )
         .then((res) => res.json())
         .then((data) => {
@@ -41,7 +44,7 @@ function MainProfile({ user }) {
           console.error("Error fetching user posts:", error);
         });
     }
-  }, [user?.email, user?.phoneNumber]);
+  }, [user?.email, user.phoneNumber]);
 
   const handleUploadCoverImage = (e) => {
     setIsLoading(true);
@@ -57,7 +60,9 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
-        const identifier = user?.email ? user?.email : user?.phoneNumber;
+        const identifier = user?.email
+          ? user?.email
+          : user?.phoneNumber.replace("+", "");
         const userCoverImage = {
           coverImage: url,
         };
@@ -100,7 +105,9 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
-        const identifier = user?.email ? user?.email : user?.phoneNumber;
+        const identifier = user?.email
+          ? user?.email
+          : user?.phoneNumber.replace("+", "");
         const userProfileImage = {
           profileImage: url,
         };
