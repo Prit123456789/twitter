@@ -243,7 +243,7 @@ async function run() {
         : { phoneNumber: identifier };
 
       try {
-        const existingUser = await userCollection.find(filter);
+        const existingUser = await userCollection.find(filter).toArray();
 
         if (!existingUser) {
           return res
