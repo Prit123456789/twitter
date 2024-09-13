@@ -82,10 +82,8 @@ export default function EditProfile({ user, loggedInUser }) {
   const [open, setOpen] = React.useState(false);
   const [dob, setDob] = React.useState("");
   const { t } = useTranslation("translations");
-
-  const identifier = user?.email
-    ? user?.email
-    : user?.phoneNumber.replace("+", "");
+  const phone = user?.phoneNumber ? user?.phoneNumber.replace("+", "") : null;
+  const identifier = user?.email ? user?.email : phone;
   const HandleSave = () => {
     const editedInfo = {
       ...(name && { name }),
