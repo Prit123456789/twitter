@@ -109,7 +109,7 @@ function Mobile() {
     if (otp.length === 6 && confirmationResult) {
       try {
         await confirmationResult.confirm(otp);
-        axios.post("https://twitter-cxhu.onrender.com/", {
+        axios.post("https://twitter-cxhu.onrender.com/register", {
           user: phoneNumber.replace("+", ""),
         });
         navigate("/");
