@@ -136,7 +136,7 @@ function TweetBox() {
         // Proceed with posting the tweet
         const identifier = email
           ? `email=${email}`
-          : `phoneNumber=${phoneNumber.replace("+", "")}`;
+          : `phoneNumber=${phoneNumber}`;
         await fetch(
           `https://twitter-cxhu.onrender.com/loggedInUser?${identifier}`
         );
