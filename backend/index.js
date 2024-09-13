@@ -238,14 +238,12 @@ async function run() {
       const { identifier } = req.params;
       const profileUpdates = req.body;
 
-      // Determine the filter based on identifier
       const filter = identifier.includes("@")
         ? { email: identifier }
         : { phoneNumber: identifier };
 
       try {
-        // Check if the user exists
-        const existingUser = await userCollection.findOne(filter);
+        const existingUser = await userCollection.find(filter);
 
         if (!existingUser) {
           return res
@@ -253,7 +251,6 @@ async function run() {
             .send({ message: "User not found, no document updated" });
         }
 
-        // Filter out undefined or unwanted fields from profileUpdates
         const validUpdates = Object.fromEntries(
           Object.entries(profileUpdates).filter(
             ([key, value]) => value != null && value !== ""
