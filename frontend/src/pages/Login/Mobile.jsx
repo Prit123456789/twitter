@@ -14,6 +14,7 @@ function Mobile() {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [otpEmail, setOtpEmail] = useState("");
+  const [otpSent, setOtpSent] = useState();
   const [success, setSuccess] = useState(false);
   const [isChrome, setIsChrome] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState(null);
@@ -40,13 +41,13 @@ function Mobile() {
   };
 
   const handleSendEmailOtp = async (e) => {
-    e.preventDefault();
     try {
       await axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
         email,
       });
       setSuccess(true);
       setError("");
+      setOtpSent(true);
       console.log("Email OTP sent successfully");
     } catch (error) {
       console.error("Error during Email OTP sending:", error);
@@ -55,13 +56,18 @@ function Mobile() {
   };
 
   const handleVerifyEmailOtp = async (e) => {
-    e.preventDefault();
     try {
+      console.log(email, otpEmail);
       const isVerified = await axios.post(
         "https://twitter-cxhu.onrender.com/verify-email-otp",
         {
-          email,
-          otpEmail,
+          email: email,
+          otp: otpEmail.trim(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json", // Ensure the header is set
+          },
         }
       );
       if (isVerified) {
@@ -134,38 +140,41 @@ function Mobile() {
                 Since you're using google chrome browser you must authenticate
                 with email to proceed to login
               </p>
-              <form onSubmit={handleSendEmailOtp}>
-                <input
-                  type="email"
-                  className="email"
-                  placeholder={t("Enter your email")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <button className="btn" type="submit">
-                  {t("Send Email OTP")}
-                </button>
-              </form>
+
+              <input
+                type="email"
+                className="email"
+                placeholder={t("Enter your email")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <button
+                className="btn"
+                onClick={handleSendEmailOtp}
+                type="submit">
+                {t("Send")}
+              </button>
             </>
           )}
-
-          {isChrome && !emailVerified && otpEmail && (
-            <form onSubmit={handleVerifyEmailOtp}>
+          {otpSent && !emailVerified && (
+            <>
               <input
                 type="text"
                 className="otp-field"
-                placeholder={t("Enter OTP sent to email")}
+                placeholder={t("Enter OTP ")}
                 value={otpEmail}
                 onChange={(e) => setOtpEmail(e.target.value)}
                 required
               />
-              <button className="btn" type="submit">
-                {t("Verify Email OTP")}
+              <button
+                className="btn"
+                onClick={handleVerifyEmailOtp}
+                type="submit">
+                {t("Verify")}
               </button>
-            </form>
+            </>
           )}
-
           {(!isChrome || emailVerified) && (
             <form className="form-container" onSubmit={handleSendPhoneOtp}>
               <PhoneInput
@@ -183,7 +192,7 @@ function Mobile() {
                 required
               />
               <button className="btn" type="submit">
-                {t("Send SMS OTP")}
+                {t("Send OTP")}
               </button>
             </form>
           )}
@@ -199,7 +208,7 @@ function Mobile() {
                 required
               />
               <button className="btn" type="submit">
-                {t("Verify SMS OTP")}
+                {t("Verify")}
               </button>
             </form>
           )}
