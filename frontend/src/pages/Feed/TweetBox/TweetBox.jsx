@@ -347,7 +347,9 @@ function TweetBox() {
               onChange={(e) => setEnteredEmail(e.target.value)}
               required
             />
-            <button onClick={sendOtp} className="otp-btn">
+            <button
+              onClick={() => sendOtp(email || enteredEmail)}
+              className="otp-btn">
               {t("Send")}
             </button>
           </>
