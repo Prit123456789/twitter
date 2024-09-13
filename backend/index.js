@@ -126,12 +126,12 @@ async function run() {
       }
     });
     app.post("/register", async (req, res) => {
-      const { username, phoneNumber, name, email } = req.body.user || {};
+      const { username, phoneNumber, name, email } = req.body.user;
       const result = await userCollection.insertOne({
-        username: username || "",
+        username,
         phoneNumber,
-        name: name || "",
-        email: email || "",
+        name,
+        email,
       });
       res.send(result);
     });
