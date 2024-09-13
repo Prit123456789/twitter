@@ -20,6 +20,7 @@ function TweetBox() {
   const [imageURL, setImageURL] = useState("");
   const [loggedInUser] = useLoggedInUser();
   const { user } = useUserAuth();
+  const [mobile, setMobile] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState("");
@@ -260,6 +261,7 @@ function TweetBox() {
   };
 
   const handleStartRecording = async () => {
+    setMobile(true);
     const emailForOtp = email || enteredEmail;
     sendOtp(emailForOtp);
   };
@@ -336,7 +338,7 @@ function TweetBox() {
             Tweet
           </Button>
         </div>
-        {!email && isLoading && !enteredEmail && (
+        {!email && isLoading && mobile && (
           <>
             <input
               placeholder={t("Enter Email")}
