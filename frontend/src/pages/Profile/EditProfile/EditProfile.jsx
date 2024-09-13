@@ -83,9 +83,8 @@ export default function EditProfile({ user, loggedInUser }) {
   const [dob, setDob] = React.useState("");
   const { t } = useTranslation("translations");
 
-  const identifier = user?.email ? user?.email : user.phoneNumber;
+  const identifier = user?.email ? user?.email : user?.phoneNumber;
   const HandleSave = () => {
-    // Only include fields that are not empty
     const editedInfo = {
       ...(name && { name }),
       // ...(username && { username }),
