@@ -62,7 +62,7 @@ function MainProfile({ user }) {
         const url = res.data.data.display_url;
         const identifier = user?.email
           ? user?.email
-          : user?.phoneNumber.replace("+", "");
+          : user.phoneNumber.replace("+", "");
         const userCoverImage = {
           coverImage: url,
         };

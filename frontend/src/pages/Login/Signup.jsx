@@ -116,12 +116,9 @@ const Signup = () => {
           setOtpSent(true);
         }
       } else {
-        const user = {
-          email: googleUserEmail,
-        };
         await axios.post(
           "https://twitter-cxhu.onrender.com/register",
-          { user },
+          { user: user.user.email },
           {
             headers: {
               "Content-Type": "application/json",
