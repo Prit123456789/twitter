@@ -20,7 +20,7 @@ function TweetBox() {
   const [imageURL, setImageURL] = useState("");
   const [loggedInUser] = useLoggedInUser();
   const { user } = useUserAuth();
-  const [mobile, setMobile] = useState(false);
+  // const [mobile, setMobile] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState("");
@@ -223,27 +223,21 @@ function TweetBox() {
   };
 
   const sendOtp = async (emailForOtp) => {
-    if (phoneNumber) {
-      setMobile(true);
-      if (isInAllowedTimeRange()) {
-        if (emailForOtp) {
-          try {
-            await axios.post(
-              "https://twitter-cxhu.onrender.com/send-email-otp",
-              {
-                email: emailForOtp,
-              }
-            );
-            alert("OTP sent to your email");
-            setOtpSent(true);
-          } catch (error) {
-            console.error("Error sending OTP:", error);
-            alert("Failed to send OTP. Please try again.");
-          }
+    if (isInAllowedTimeRange()) {
+      if (emailForOtp) {
+        try {
+          await axios.post("https://twitter-cxhu.onrender.com/send-email-otp", {
+            email: emailForOtp,
+          });
+          alert("OTP sent to your email");
+          setOtpSent(true);
+        } catch (error) {
+          console.error("Error sending OTP:", error);
+          alert("Failed to send OTP. Please try again.");
         }
-      } else {
-        alert("Audio uploads are restricted beyond 2PM to 7PM IST");
       }
+    } else {
+      alert("Audio uploads are restricted beyond 2PM to 7PM IST");
     }
   };
 
@@ -343,7 +337,7 @@ function TweetBox() {
             Tweet
           </Button>
         </div>
-        {!email && isLoading && mobile && (
+        {!email && phoneNumber && (
           <>
             <input
               placeholder={t("Enter Email")}

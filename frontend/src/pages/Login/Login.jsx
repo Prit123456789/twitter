@@ -90,7 +90,7 @@ const Login = () => {
           requestData,
           {
             headers: {
-              "Content-Type": "application/json", // Ensure the header is set
+              "Content-Type": "application/json",
             },
           }
         );
