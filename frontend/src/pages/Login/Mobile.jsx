@@ -66,7 +66,7 @@ function Mobile() {
         },
         {
           headers: {
-            "Content-Type": "application/json", // Ensure the header is set
+            "Content-Type": "application/json",
           },
         }
       );
@@ -109,7 +109,7 @@ function Mobile() {
     if (otp.length === 6 && confirmationResult) {
       try {
         const user = {
-          phoneNumber: phoneNumber,
+          phoneNumber: phoneNumber.replace("+", ""),
         };
         await confirmationResult.confirm(otp);
         axios.post(
