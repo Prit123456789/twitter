@@ -214,47 +214,48 @@ const Signup = () => {
           <h3 className="heading1">{t("Join Twitter today")}</h3>
 
           {error && <p className="errorMessage">{error}</p>}
-          <form onSubmit={handleSubmit}>
-            <input
-              className="display-name"
-              type="text"
-              placeholder="@username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
+          {!otpSent && (
+            <form onSubmit={handleSubmit}>
+              <input
+                className="display-name"
+                type="text"
+                placeholder="@username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
 
-            <input
-              className="display-name"
-              type="text"
-              placeholder={t("Enter Full Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+              <input
+                className="display-name"
+                type="text"
+                placeholder={t("Enter Full Name")}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
 
-            <input
-              className="email"
-              type="email"
-              placeholder={t("Email address")}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+              <input
+                className="email"
+                type="email"
+                placeholder={t("Email address")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
 
-            <input
-              className="password"
-              type="password"
-              placeholder={t("Password")}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+              <input
+                className="password"
+                type="password"
+                placeholder={t("Password")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-            <div className="btn-login">
-              <button type="submit" className="btn">
-                {t("Sign Up")}
-              </button>
-            </div>
-          </form>
-
-          {otpSent && (
+              <div className="btn-login">
+                <button type="submit" className="btn">
+                  {t("Sign Up")}
+                </button>
+              </div>
+            </form>
+          )}
+          {otpSent && isChrome && (
             <>
               <input
                 className="otp-field"

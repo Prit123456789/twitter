@@ -177,27 +177,28 @@ const Login = () => {
           <h2 className="heading">{t("Happening now")}</h2>
 
           {error && <p className="errorMessage">{error}</p>}
-          <form onSubmit={handleSubmit}>
-            <input
-              type="email"
-              className="email"
-              placeholder={t("Email address")}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              className="password"
-              type="password"
-              placeholder={t("Password")}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          {!otpSent && (
+            <form onSubmit={handleSubmit}>
+              <input
+                type="email"
+                className="email"
+                placeholder={t("Email address")}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                className="password"
+                type="password"
+                placeholder={t("Password")}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-            <div className="btn-login">
-              <button type="submit" className="btn">
-                {t("Log In")}
-              </button>
-            </div>
-          </form>
-
+              <div className="btn-login">
+                <button type="submit" className="btn">
+                  {t("Log In")}
+                </button>
+              </div>
+            </form>
+          )}
           {isChrome && otpSent && (
             <>
               <input
