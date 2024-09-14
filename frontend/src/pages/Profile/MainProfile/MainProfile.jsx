@@ -18,6 +18,9 @@ function MainProfile({ user }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loggedInUser] = useLoggedInUser();
   const username = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
+  const phoneNumber = user?.phoneNumber
+    ? user.phoneNumber.replace("+", "")
+    : null;
   const [posts, setPosts] = useState([]);
   useEffect(() => {
     if (user?.email) {
@@ -29,9 +32,9 @@ function MainProfile({ user }) {
         .catch((error) => {
           console.error("Error fetching user posts:", error);
         });
-    } else if (user?.phoneNumber) {
+    } else if (phoneNumber) {
       fetch(
-        `https://twitter-cxhu.onrender.com/userPost?phoneNumber=${user?.phoneNumber}`
+        `https://twitter-cxhu.onrender.com/userPost?phoneNumber=${phoneNumber}`
       )
         .then((res) => res.json())
         .then((data) => {
@@ -41,7 +44,7 @@ function MainProfile({ user }) {
           console.error("Error fetching user posts:", error);
         });
     }
-  }, [user?.email, user?.phoneNumber]);
+  }, [user?.email, phoneNumber]);
 
   const handleUploadCoverImage = (e) => {
     setIsLoading(true);
@@ -57,7 +60,7 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
-        const identifier = user?.email ? user?.email : user?.phoneNumber;
+        const identifier = user?.email ? user?.email : phoneNumber;
         const userCoverImage = {
           coverImage: url,
         };
@@ -100,7 +103,7 @@ function MainProfile({ user }) {
       )
       .then((res) => {
         const url = res.data.data.display_url;
-        const identifier = user?.email ? user?.email : user?.phoneNumber;
+        const identifier = user?.email ? user?.email : phoneNumber;
         const userProfileImage = {
           profileImage: url,
         };

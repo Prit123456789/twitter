@@ -121,7 +121,7 @@ const Login = () => {
   };
 
   const handlePhone = () => {
-    navigate("/mobile");
+    navigate("/mobilelogin");
   };
 
   const handleGoogleSignIn = async (e) => {
