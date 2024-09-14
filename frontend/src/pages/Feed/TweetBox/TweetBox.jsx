@@ -39,7 +39,7 @@ function TweetBox() {
     "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png";
   const username = user.email ? user?.email?.split("@")[0] : user.phoneNumber;
   const email = user?.email;
-  const phoneNumber = user?.phoneNumber.replace("+", "");
+  const phoneNumber = user?.phoneNumber;
 
   const handleUploadImage = async (e) => {
     setIsLoading(true);
