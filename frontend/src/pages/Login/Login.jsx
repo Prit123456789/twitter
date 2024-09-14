@@ -231,7 +231,7 @@ const Login = () => {
                 marginLeft="80px"
                 onClick={handlePhone}>
                 <PhoneIcon style={{ color: "green" }} />
-                {t("Sign in with Phone")}
+                {t("Login with Phone")}
               </button>
             </div>
           </div>
