@@ -19,10 +19,7 @@ const useLoggedInUser = () => {
         });
     } else if (user?.phoneNumber) {
       fetch(
-        `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${user?.phoneNumber.replace(
-          "+",
-          ""
-        )}`
+        `https://twitter-cxhu.onrender.com/loggedInUser?phoneNumber=${user?.phoneNumber}`
       )
         .then((res) => res.json())
         .then((data) => {

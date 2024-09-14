@@ -44,7 +44,7 @@ i18n
           "Generate Password": "पासवर्ड जनरेट करें",
           Copy: "कॉपी",
           "Already have an account?": "पहले से एक खाता है?",
-          "Join twitter today": "आज ही ट्विटर जॉइन करें",
+          "Join Twitter today": "आज ही ट्विटर जॉइन करें",
           "Happening now": "अब हो रहा है",
           "Email address": "ईमेल पता",
           "Sign in with Google": "Google के साथ साइन इन करें",
@@ -94,6 +94,8 @@ i18n
           "IP Address": " आईपी पता",
           Device: "उपकरण",
           On: "पर",
+          "Since you are using google chrome browser you must authenticate with email to proceed to login":
+            "चूंकि आप Google Chrome ब्राउज़र का उपयोग कर रहे हैं, आपको लॉगिन करने के लिए ईमेल के साथ प्रमाणीकरण करना होगा।",
         },
       },
       fr: {
@@ -175,6 +177,8 @@ i18n
           "IP Address": "Adresse IP",
           Device: " Appareil",
           On: "sur",
+          "Since you are using google chrome browser you must authenticate with email to proceed to login":
+            "Puisque vous utilisez le navigateur Google Chrome, vous devez vous authentifier avec un email pour continuer à vous connecter",
         },
       },
       sp: {
@@ -256,6 +260,8 @@ i18n
           "IP Address": "Dirección IP",
           " Device": "Dispositivo",
           On: "en",
+          "Since you are using google chrome browser you must authenticate with email to proceed to login":
+            "Dado que estás usando el navegador Google Chrome, debes autenticarte con tu correo electrónico para proceder a iniciar sesión",
         },
       },
       po: {
@@ -335,6 +341,8 @@ i18n
           "IP Address": " Endereço IP",
           Device: "Dispositivo",
           On: "em",
+          "Since you are using google chrome browser you must authenticate with email to proceed to login":
+            "Como você está usando o navegador Google Chrome, deve se autenticar com o e-mail para continuar o login",
         },
       },
       ch: {
@@ -412,6 +420,8 @@ i18n
           "IP Address": "IP 地址",
           Device: " 设备",
           On: "上",
+          "Since you are using google chrome browser you must authenticate with email to proceed to login":
+            "由于您正在使用 Google Chrome 浏览器，您必须通过电子邮件进行身份验证才能继续登录",
         },
       },
       te: {
@@ -492,6 +502,8 @@ i18n
           "IP Address": "IP చిరునామా",
           Device: "పరికరం",
           On: "పై",
+          "Since you are using google chrome browser you must authenticate with email to proceed to login":
+            "మీరు Google Chrome బ్రౌజర్‌ని ఉపయోగిస్తున్నందున లాగిన్ చేయడానికి ఈమెయిల్‌తో నిర్ధారణ చేయాలి",
         },
       },
       ta: {
@@ -573,6 +585,8 @@ i18n
           "IP Address": "ஐபி முகவரி",
           Device: " சாதனம்",
           On: "மீது",
+          "Since you are using Google Chrome browser you must authenticate with email to proceed to login":
+            "நீங்கள் Google Chrome உலாவியைப் பயன்படுத்துவதால், லாகினுக்கு முன்னால் உங்கள் மின்னஞ்சல் மூலம் அங்கீகரிக்க வேண்டும்",
         },
       },
     },

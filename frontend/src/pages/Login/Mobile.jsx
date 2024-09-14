@@ -154,8 +154,9 @@ function Mobile() {
           {isChrome && !emailVerified && (
             <>
               <p>
-                Since you're using google chrome browser you must authenticate
-                with email to proceed to login
+                {t(
+                  "Since you are using google chrome browser you must authenticate with email to proceed to login"
+                )}
               </p>
 
               <input
@@ -193,41 +194,43 @@ function Mobile() {
             </>
           )}
           {(!isChrome || emailVerified) && (
-            <form className="form-container" onSubmit={handleSendPhoneOtp}>
-              <PhoneInput
-                className="email"
-                international
-                defaultCountry="IN"
-                value={phoneNumber}
-                onChange={handlePhoneNumberChange}
-                placeholder={t("Enter your phone number")}
-                error={
-                  phoneNumber && !validatePhoneNumber()
-                    ? t("Invalid Phone Number")
-                    : undefined
-                }
-                required
-              />
-              <button className="btn" type="submit">
-                {t("Send OTP")}
-              </button>
-            </form>
-          )}
+            <>
+              <form className="form-container" onSubmit={handleSendPhoneOtp}>
+                <PhoneInput
+                  className="email"
+                  international
+                  defaultCountry="IN"
+                  value={phoneNumber}
+                  onChange={handlePhoneNumberChange}
+                  placeholder={t("Enter your phone number")}
+                  error={
+                    phoneNumber && !validatePhoneNumber()
+                      ? t("Invalid Phone Number")
+                      : undefined
+                  }
+                  required
+                />
+                <button className="btn" type="submit">
+                  {t("Send OTP")}
+                </button>
+              </form>
 
-          {confirmationResult && (
-            <form onSubmit={handleVerifyPhoneOtp}>
-              <input
-                type="text"
-                className="email"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder={t("Enter SMS OTP")}
-                required
-              />
-              <button className="btn" type="submit">
-                {t("Verify")}
-              </button>
-            </form>
+              {confirmationResult && (
+                <>
+                  <input
+                    type="text"
+                    className="email"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder={t("Enter SMS OTP")}
+                    required
+                  />
+                  <button className="btn" onClick={handleVerifyPhoneOtp}>
+                    {t("Verify")}
+                  </button>
+                </>
+              )}
+            </>
           )}
         </div>
 
