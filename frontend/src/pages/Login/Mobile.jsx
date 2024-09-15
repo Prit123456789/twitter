@@ -109,7 +109,7 @@ function Mobile() {
     if (otp.length === 6 && confirmationResult) {
       try {
         const user = {
-          phoneNumber: phoneNumber.replace("+", ""),
+          phoneNumber: phoneNumber,
         };
         await confirmationResult.confirm(otp);
         axios.post(

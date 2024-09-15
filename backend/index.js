@@ -130,7 +130,7 @@ async function run() {
 
       const result = await userCollection.insertOne({
         username,
-        phoneNumber,
+        phoneNumber: phoneNumber.replace("+", ""),
         name,
         email,
       });
