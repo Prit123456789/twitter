@@ -1,9 +1,7 @@
-// TimeRestrictedComponent.js
 import React, { useEffect, useState } from "react";
 import UAParser from "ua-parser-js";
 
 const isWithinTimeframe = (startHour, endHour) => {
-  const currentTime = new Date();
   const options = { timeZone: "Asia/Kolkata", hour12: false };
   const currentHourIST = new Date()
     .toLocaleString("en-US", options)
@@ -31,7 +29,7 @@ const TimeRestrictedComponent = ({ children }) => {
 
   if (!isAllowed) {
     return (
-      <div>
+      <div className="Mess">
         Access is restricted for mobile devices outside of 10 AM to 1 PM IST.
       </div>
     );

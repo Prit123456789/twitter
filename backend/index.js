@@ -129,16 +129,16 @@ async function run() {
       const { username, phoneNumber, name, email } = req.body.user;
 
       try {
-        const existingUser = await userCollection.findOne({
-          $or: [{ email }, { phoneNumber }],
-        });
+        const existingUser = await userCollection
+          .find({
+            $or: [{ email }, { phoneNumber }],
+          })
+          .toArray();
 
         if (existingUser) {
-          return res
-            .status(400)
-            .json({
-              message: "User with this email or phone number already exists",
-            });
+          return res.status(400).json({
+            message: "User with this email or phone number already exists",
+          });
         }
 
         const result = await userCollection.insertOne({
