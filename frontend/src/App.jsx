@@ -21,7 +21,7 @@ import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
 import ChatBot from "./pages/ChatBot/ChatBot";
 import "./Translation/Translation";
-import TimeRestrictedComponent from "./TimeRestricted"; // Import TimeRestrictedComponent
+import TimeRestrictedComponent from "./TimeRestricted";
 
 function App() {
   return (

@@ -337,7 +337,7 @@ function TweetBox() {
             Tweet
           </Button>
         </div>
-        {!email && phoneNumber && mobile && !isInAllowedTimeRange() && (
+        {!email && phoneNumber && mobile && isInAllowedTimeRange() && (
           <>
             <input
               placeholder={t("Enter Email")}
