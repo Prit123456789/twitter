@@ -128,32 +128,14 @@ async function run() {
     app.post("/register", async (req, res) => {
       const { username, phoneNumber, name, email } = req.body.user;
 
-      try {
-        const existingUser = await userCollection
-          .find({
-            $or: [{ email }, { phoneNumber }],
-          })
-          .toArray();
+      const result = await userCollection.insertOne({
+        username,
+        phoneNumber,
+        name,
+        email,
+      });
 
-        if (existingUser) {
-          return res.status(400).json({
-            message: "User with this email or phone number already exists",
-          });
-        }
-
-        const result = await userCollection.insertOne({
-          username,
-          phoneNumber,
-          name,
-          email,
-        });
-
-        res
-          .status(201)
-          .json({ message: "User registered successfully", result });
-      } catch (error) {
-        res.status(500).json({ message: "Error registering user", error });
-      }
+      res.status(201).json({ message: "User registered successfully", result });
     });
 
     //POSTS
