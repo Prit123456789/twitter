@@ -15,6 +15,7 @@ cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
+  secure: "true",
 });
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -117,6 +118,7 @@ async function run() {
       try {
         const audioResource = await cloudinary.api.resource(publicId, {
           resource_type: "video",
+          secure: "true",
         });
         res.send({ secure_url: audioResource.secure_url });
       } catch (error) {

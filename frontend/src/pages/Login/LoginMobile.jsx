@@ -108,6 +108,7 @@ function Mobile() {
     e.preventDefault();
     if (otp.length === 6 && confirmationResult) {
       try {
+        await confirmationResult.confirm(otp);
         navigate("/");
         axios.post("https://twitter-cxhu.onrender.com/phoneHistory", {
           phoneNumber,
