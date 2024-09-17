@@ -111,6 +111,19 @@ async function run() {
         res.status(500).send("Internal Server Error");
       }
     });
+    app.get("/secure-audio-url/:publicId", async (req, res) => {
+      const { publicId } = req.params;
+
+      try {
+        const audioResource = await cloudinary.api.resource(publicId, {
+          resource_type: "video",
+        });
+        res.send({ secure_url: audioResource.secure_url });
+      } catch (error) {
+        console.error("Error fetching secure audio URL:", error.message);
+        res.status(500).send({ error: "Failed to fetch secure audio URL" });
+      }
+    });
 
     app.get("/post", async (req, res) => {
       try {
@@ -168,7 +181,7 @@ async function run() {
           const streamUpload = (buffer) => {
             return new Promise((resolve, reject) => {
               const stream = cloudinary.uploader.upload_stream(
-                { resource_type: "video" },
+                { resource_type: "video", secure: "true" },
                 (error, result) => {
                   if (result) {
                     resolve(result);
