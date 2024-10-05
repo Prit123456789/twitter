@@ -15,7 +15,6 @@ import Languages from "./pages/Lists/Languages";
 import Profile from "./pages/Profile/Profile";
 import Reset from "./pages/Login/Reset";
 import Mobile from "./pages/Login/Mobile";
-import LoginMobile from "./pages/Login/LoginMobile";
 import More from "./pages/More/More";
 import Notifications from "./pages/Notifications/Notifications";
 import MyMapComponent from "./pages/Profile/MyMapComponent";
@@ -60,7 +59,6 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/reset" element={<Reset />} />
               <Route path="/mobile" element={<Mobile />} />
-              <Route path="/mobilelogin" element={<LoginMobile />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/maps" element={<MyMapComponent />} />
             </Routes>
